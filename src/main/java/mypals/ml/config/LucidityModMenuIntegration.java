@@ -13,7 +13,7 @@ import net.minecraft.text.Text;
 import java.util.ArrayList;
 
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
-import static mypals.ml.features.selectiveRendering.WandActionsManager.resolveSelectiveWandMode;
+import static mypals.ml.features.selectiveRendering.WandActionsManager.resolveWandMode;
 
 public class LucidityModMenuIntegration implements ModMenuApi {
     @Override
@@ -142,9 +142,9 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                         .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand_apply")))
                                         .binding(0, () -> instance.instance().wandApplyMode, v -> instance.instance().wandApplyMode = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, WandActionsManager.WandApplyToMode.values().length)
+                                                .range(0, WandActionsManager.WandApplyToMode.values().length-1)
                                                 .step(1)
-                                                .formatValue(val -> Text.translatable(resolveSelectiveWandMode(val))))
+                                                .formatValue(val -> Text.translatable(resolveWandMode(val))))
                                         .build()
                                 ).option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.lucidity.render_mode.rendering_mode_block"))
@@ -171,7 +171,7 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                         .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_particle")))
                                         .binding(0, () -> instance.instance().renderModeParticle, v -> instance.instance().renderModeParticle = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, RenderMode.values().length-1)
+                                                .range(0, RenderMode.values().length)
                                                 .step(1)
                                                 .formatValue(val -> Text.translatable(resolveSelectiveParticleRenderingMode(val))))
                                         .build()
@@ -208,6 +208,31 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                                         .step(1)
                                                         .formatValue(val -> Text.of(val.toString())))
                                                 .build()
+                                        )
+                                        .build()
+                                )
+
+                                .build()
+                ).category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.keyPresses"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.keyPresses"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.keyPresses"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.keyPresses"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.keyPresses"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderKeyPresses, bool -> instance.instance().renderKeyPresses = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
                                         )
                                         .build()
                                 )

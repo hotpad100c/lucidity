@@ -3,6 +3,7 @@ package mypals.ml.mixin.compat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildBuffers;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.FluidRenderer;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.blockRenderMode;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
 
 @Mixin(ChunkBuilderMeshingTask.class)

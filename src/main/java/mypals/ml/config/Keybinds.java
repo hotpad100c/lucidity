@@ -17,7 +17,7 @@ public class Keybinds {
         addArea = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.selective_renderings.addSelection",
                 InputUtil.Type.KEYSYM,
-                GLFW_MOUSE_BUTTON_5,
+                GLFW_KEY_EQUAL,
                 "category.selective_renderings"
         ));
         switchRenderMode = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -29,7 +29,7 @@ public class Keybinds {
         deleteArea = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.selective_renderings.removeSelection",
                 InputUtil.Type.KEYSYM,
-                GLFW_MOUSE_BUTTON_4,
+                GLFW_KEY_MINUS,
                 "category.selective_renderings"
         ));
 

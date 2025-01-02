@@ -11,7 +11,7 @@
   "config.lucidity.description.selectiveRenderings":"只渲染玩家希望渲染的方块，实体和粒子。",
 
   "config.lucidity.option.wand": "选择手杖",
-  "config.lucidity.description.wand": "输入物品名指定手杖\n例:minecraft:blaze_rod \n手持手杖左键点击可以选择区域，右键点击可以选择单种方块。\n手持手杖ctrl+左键点击可以添加选区，shift+左键点击可以删除未完成的选区。",
+  "config.lucidity.description.wand": "",
   "config.lucidity.option.wand_apply":"手杖选则应用",
   "config.lucidity.description.wand_apply":"指定使用手杖进行的选则将应用于方块，实体，粒子中的哪种选择性渲染",
 
@@ -24,10 +24,14 @@
   "config.lucidity.category.selectedEntity":"选中的实体",
   "config.lucidity.category.selectedParticle":"选中的粒子",
   "config.lucidity.description.selectiveAreaRender": "<选择性渲染>选中的区域",
+  "category.selective_renderings": "选择性渲染热键",
+  "key.selective_renderings.addSelection": "添加选区",
+  "key.selective_renderings.renderingMode": "切换模式",
+  "key.selective_renderings.removeSelection": "切除选区",
 
   "config.lucidity.point1_add": "点1已记录: ",
   "config.lucidity.point2_add": "点2已记录: ",
-  "config.lucidity.should_add_area": "点1，2均已记录，可以按下鼠标中键以添加选区。",
+  "config.lucidity.should_add_area": "点1，2均已记录，可以按下 添加选区按键 以添加选区。",
   "config.lucidity.add_type": "已选择方块:",
   "config.lucidity.removed_type": "已放弃选择方块:",
   "config.lucidity.cant_add_area": "请完成点1，2的选择再添加选区。",
@@ -59,6 +63,9 @@
   "config.lucidity.wand.apply_to_blocks": "手杖选择应用于方块",
   "config.lucidity.wand.apply_to_entities": "手杖选择应用于实体",
   "config.lucidity.wand.apply_to_particles": "手杖选择应用于粒子",
+
+  "config.lucidity.keyPresses": "显示按键",
+  "config.lucidity.description.keyPresses": "在屏幕右下角渲染按下的按键",
 
   "config.lucidity.wand.how_to_use": "\n左键点击:选择区域角点\n右键点击:选择单种方块。\nctrl+左键点击:添加选区，shift+左键点击:可以删除未完成的选区\nctrl+跳跃:切换方块渲染模式"
 }

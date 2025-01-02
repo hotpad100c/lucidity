@@ -23,15 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static mypals.ml.Lucidity.*;
 import static mypals.ml.config.Keybinds.*;
-import static mypals.ml.config.LucidityConfig.renderModeBlock;
-import static mypals.ml.config.LucidityConfig.selectInSpectator;
+import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.selectiveRendering.IntersectionResolver.cutBox;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedBlockTypes;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 
 public class WandActionsManager {
     public static BlockPos pos1;
     public static BlockPos pos2;
-    public static int SELECT_COOLDOWN = 2;
+    public static int SELECT_COOLDOWN = 5;
     public static int selectCoolDown = SELECT_COOLDOWN;
 
     public static boolean deleteMode = false;
@@ -49,10 +50,10 @@ public class WandActionsManager {
         }
     }
     public static WandApplyToMode wandApplyToMode = WandApplyToMode.APPLY_TO_BLOCKS;
-    public static String resolveSelectiveWandMode(int index) {
+    public static String resolveWandMode(int index) {
         WandApplyToMode[] modes = WandApplyToMode.values();
 
-        if (index >= 0 && index < modes.length-1) {
+        if (index >= 0 && index < modes.length) {
             wandApplyToMode = modes[index];
             return modes[index].getTranslationKey();
         }
@@ -147,13 +148,49 @@ public class WandActionsManager {
     }
     public static void switchRenderMod(boolean increase){
         LucidityConfig.CONFIG_HANDLER.instance();
-        if (increase) {
-            renderModeBlock = renderModeBlock == RenderMode.values().length - 1 ? 0 : renderModeBlock + 1;
-        } else {
-            renderModeBlock = renderModeBlock == 0 ? RenderMode.values().length - 1 : renderModeBlock - 1;
+        switch (wandApplyToMode){
+            case WandApplyToMode.APPLY_TO_BLOCKS -> {
+                if (increase) {
+                    renderModeBlock = renderModeBlock == RenderMode.values().length - 1 ? 0 : renderModeBlock + 1;
+                } else {
+                    renderModeBlock = renderModeBlock == 0 ? RenderMode.values().length - 1 : renderModeBlock - 1;
+                }
+                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
+                        Text.translatable(resolveSelectiveBlockRenderingMode(renderModeBlock)).getString()), true);
+            }
+            case WandApplyToMode.APPLY_TO_ENTITIES -> {
+                if (increase) {
+                    renderModeEntity = renderModeEntity == RenderMode.values().length - 1 ? 0 : renderModeEntity + 1;
+                } else {
+                    renderModeEntity = renderModeEntity == 0 ? RenderMode.values().length - 1 : renderModeEntity - 1;
+                }
+                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
+                        Text.translatable(resolveSelectiveEntityRenderingMode(renderModeEntity)).getString()), true);
+            }
+            case WandApplyToMode.APPLY_TO_PARTICLES -> {
+                if (increase) {
+                    renderModeParticle = renderModeParticle == RenderMode.values().length - 1 ? 0 : renderModeParticle + 1;
+                } else {
+                    renderModeParticle = renderModeParticle == 0 ? RenderMode.values().length - 1 : renderModeParticle - 1;
+                }
+                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
+                        Text.translatable(resolveSelectiveParticleRenderingMode(renderModeParticle)).getString()), true);
+            }
         }
-        MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
-                Text.translatable(resolveSelectiveBlockRenderingMode(renderModeBlock)).getString()), true);
+        LucidityConfig.CONFIG_HANDLER.save();
+        if(wandApplyToMode == WandApplyToMode.APPLY_TO_BLOCKS){
+            onConfigUpdated();
+        }
+    }
+    public static void switchWandMod(boolean increase){
+        LucidityConfig.CONFIG_HANDLER.instance();
+        if (increase) {
+            wandApplyMode = wandApplyMode == WandApplyToMode.values().length - 1 ? 0 : wandApplyMode + 1;
+        } else {
+            wandApplyMode = wandApplyMode == 0 ? WandApplyToMode.values().length - 1 : wandApplyMode - 1;
+        }
+
+        MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable(resolveWandMode(wandApplyMode)).getString()), true);
         LucidityConfig.CONFIG_HANDLER.save();
         onConfigUpdated();
     }
@@ -239,8 +276,13 @@ public class WandActionsManager {
                 }
             }
             else if (client.options.pickItemKey.isPressed()) {
-                selectBlockTypeAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
-                selectCoolDown = SELECT_COOLDOWN;
+                if (switchRenderMode.isPressed()){
+                    switchWandMod(true);
+                    selectCoolDown = SELECT_COOLDOWN;
+                }else {
+                    selectBlockTypeAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
+                    selectCoolDown = SELECT_COOLDOWN;
+                }
             }
             else if (addArea.isPressed()){
                 addAreaAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);

@@ -52,4 +52,7 @@ public class LucidityConfig {
     @SerialEntry
     public static int hightLightRange = 30;
 
+    @SerialEntry
+    public static boolean renderKeyPresses = false;
+
 }

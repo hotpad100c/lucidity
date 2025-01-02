@@ -1,5 +1,6 @@
 package mypals.ml.features.renderKeyPresses;
 
+import mypals.ml.config.LucidityConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.resource.language.I18n;
@@ -7,6 +8,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
+import static mypals.ml.config.LucidityConfig.renderKeyPresses;
 import static mypals.ml.features.renderKeyPresses.KeyPressTracker.*;
 
 public class KeyPressesManager {
@@ -48,7 +50,8 @@ public class KeyPressesManager {
         };
     }
     public static void renderPressed(DrawContext context) {
-        if (!getKeyDisplay().isEmpty()) {
+        LucidityConfig.CONFIG_HANDLER.instance();
+        if (!getKeyDisplay().isEmpty() && renderKeyPresses) {
             int x = MinecraftClient.getInstance().getWindow().getScaledWidth() - 110;
             int y = MinecraftClient.getInstance().getWindow().getScaledHeight() - 20;
             context.drawText(MinecraftClient.getInstance().textRenderer, getKeyDisplay(), x, y, 0xFFFFFF, true);
