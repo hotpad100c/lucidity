@@ -1,0 +1,64 @@
+{
+  "config.lucidity.title":"澄明视界",
+
+  "config.lucidity.category.oreHighlight": "矿物高亮",
+  "config.lucidity.option.oreHighlight": "启用矿物高亮",
+  "config.lucidity.description.oreHighlight": "高亮暴露于地表的矿物。",
+  "config.lucidity.option.oreHighlightRange": "探测范围",
+
+  "config.lucidity.category.selectiveRenderings":"选择性渲染",
+  "config.lucidity.group.selectiveRenderings": "选择性渲染",
+  "config.lucidity.description.selectiveRenderings":"只渲染玩家希望渲染的方块，实体和粒子。",
+
+  "config.lucidity.option.wand": "选择手杖",
+  "config.lucidity.description.wand": "输入物品名指定手杖\n例:minecraft:blaze_rod \n手持手杖左键点击可以选择区域，右键点击可以选择单种方块。\n手持手杖ctrl+左键点击可以添加选区，shift+左键点击可以删除未完成的选区。",
+  "config.lucidity.option.wand_apply":"手杖选则应用",
+  "config.lucidity.description.wand_apply":"指定使用手杖进行的选则将应用于方块，实体，粒子中的哪种选择性渲染",
+
+  "config.lucidity.option.selectiveBlockRenderings":"选择性渲染方块",
+  "config.lucidity.option.selectiveEntityRenderings":"选择性渲染实体",
+  "config.lucidity.option.selectiveParticleRenderings":"选择性渲染粒子",
+
+  "config.lucidity.option.selectedAreaRender": "选中的区域",
+  "config.lucidity.category.selectedBlock":"选中的方块",
+  "config.lucidity.category.selectedEntity":"选中的实体",
+  "config.lucidity.category.selectedParticle":"选中的粒子",
+  "config.lucidity.description.selectiveAreaRender": "<选择性渲染>选中的区域",
+
+  "config.lucidity.point1_add": "点1已记录: ",
+  "config.lucidity.point2_add": "点2已记录: ",
+  "config.lucidity.should_add_area": "点1，2均已记录，可以按下鼠标中键以添加选区。",
+  "config.lucidity.add_type": "已选择方块:",
+  "config.lucidity.removed_type": "已放弃选择方块:",
+  "config.lucidity.cant_add_area": "请完成点1，2的选择再添加选区。",
+  "config.lucidity.switched_rendering_method": "渲染模式已切换到:",
+  "config.lucidity.area_added": "已添加新的选区。",
+  "config.lucidity.clear": "已放弃当前选区。",
+
+  "config.lucidity.render_mode.rendering_mode_block": "方块渲染模式",
+  "config.lucidity.render_mode.rendering_mode_entity": "实体渲染模式",
+  "config.lucidity.render_mode.rendering_mode_particle": "粒子渲染模式",
+
+
+  "config.lucidity.render_mode.off": "关闭",
+  "config.lucidity.render_mode.render_inside_include": "选区内渲染特定内容",
+  "config.lucidity.render_mode.render_outside_include": "选区外渲染特定内容",
+  "config.lucidity.render_mode.render_inside_exclude": "选区内不渲染特定内容",
+  "config.lucidity.render_mode.render_outside_exclude": "选区外不渲染特定内容",
+  "config.lucidity.render_mode.render_inside_none": "选区内不渲染任何内容",
+  "config.lucidity.render_mode.render_only_specific": "仅渲染特定内容",
+  "config.lucidity.render_mode.render_inside_only": "仅在选区内渲染内容",
+  "config.lucidity.render_mode.render_exclude_specific": "不渲染特定内容",
+  "config.lucidity.render_mode.render_inside_all": "选区内渲染所有内容",
+  "config.lucidity.render_mode.render_outside_all": "选区外渲染所有内容",
+  "config.lucidity.render_mode.render_inside_exclude_specific": "选区内渲染并排除特定内容",
+  "config.lucidity.render_mode.render_outside_exclude_specific": "选区外渲染并排除特定内容",
+  "config.lucidity.render_mode.render_both_include": "选区内外渲染特定内容",
+  "config.lucidity.render_mode.render_both_exclude": "选区内外不渲染特定内容",
+
+  "config.lucidity.wand.apply_to_blocks": "手杖选择应用于方块",
+  "config.lucidity.wand.apply_to_entities": "手杖选择应用于实体",
+  "config.lucidity.wand.apply_to_particles": "手杖选择应用于粒子",
+
+  "config.lucidity.wand.how_to_use": "\n左键点击:选择区域角点\n右键点击:选择单种方块。\nctrl+左键点击:添加选区，shift+左键点击:可以删除未完成的选区\nctrl+跳跃:切换方块渲染模式"
+}

@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "lucidity",
+	"version": "${version}",
+	"name": "lucidity",
+	"description": "help you in minecraft!",
+	"authors": [
+		"Ryan100c"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/lucidity/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"mypals.ml.Lucidity"
+		],"modmenu": [
+			"mypals.ml.config.LucidityModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"lucidity.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.2",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"accessWidener": "lucidity.accesswidener",
+	"suggests": {
+		"another-mod": "*"
+	}
+}

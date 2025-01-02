@@ -1,0 +1,6 @@
+accessWidener v2 named
+accessible method net/minecraft/client/render/WorldRenderer updateChunks (Lnet/minecraft/client/render/Camera;)V
+accessible class net/minecraft/client/render/chunk/RenderedChunk
+accessible field net/minecraft/client/world/ClientChunkManager chunks Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
+accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
+accessible class net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator

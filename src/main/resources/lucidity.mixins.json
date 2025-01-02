@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "mypals.ml.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ItemMixin",
+    "compat.ChunkBuilderMeshingTaskMixin",
+    "compat.MixinBlockOcclusionCacheMixin",
+    "vanilla.BlockMixin",
+    "vanilla.FluidRenderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "KeyboardMixin",
+    "LightmapTextureManagerMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "WorldRenderMixin",
+    "vanilla.EntityRenderDispatcherMixin",
+    "vanilla.ParticleManagerMixin",
+    "vanilla.SectionBuilderMixin"
+  ]
+}
