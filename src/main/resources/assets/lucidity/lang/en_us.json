@@ -31,8 +31,8 @@
   "config.lucidity.point1_add": "Point 1 recorded: ",
   "config.lucidity.point2_add": "Point 2 recorded: ",
   "config.lucidity.should_add_area": "Both points are recorded. press addSelection key to add a region.",
-  "config.lucidity.add_type": "Selected block type: ",
-  "config.lucidity.removed_type": "Deselected block type: ",
+  "config.lucidity.add_type": "Selected type: ",
+  "config.lucidity.removed_type": "Deselected type: ",
   "config.lucidity.cant_add_area": "Please complete the selection of Points 1 and 2 before adding a region.",
   "config.lucidity.switched_rendering_method": "Rendering mode switched to: ",
   "config.lucidity.area_added": "New region added.",
@@ -66,11 +66,19 @@
   "config.lucidity.wand.apply_to_entities": "Wand selection applies to entities",
   "config.lucidity.wand.apply_to_particles": "Wand selection applies to particles",
 
-  "config.lucidity.wand.how_to_use_lc": "Left-click: Select corners of the area.",
-  "config.lucidity.wand.how_to_use_rc": "Right-click: Select a single block type.",
-  "config.lucidity.wand.how_to_use_ctrl_lc": "Ctrl + Left-click: Add to selection.",
-  "config.lucidity.wand.how_to_use_shift_lc": "Shift + Left-click: Remove unfinished selection",
-  "config.lucidity.wand.how_to_use_ctrl_space": "Ctrl + Jump: Switch block rendering mode",
+  "config.lucidity.wand.selectP1": "Left-click: Select point1 of the area.",
+  "config.lucidity.wand.selectP2": "Right-click: Select point2 of the area.",
+  "config.lucidity.wand.cancel": "Shift+Left-click: Cancel.",
+
+  "config.lucidity.wand.delete": "Right-click: Delete.",
+  "config.lucidity.wand.cut": "Left-click: Cut.",
+
+  "config.lucidity.wand.addSpecific": "Right-click: Add specific block/entity.",
+  "config.lucidity.wand.addArea": "Left-click: Add selected area.",
+
+  "config.lucidity.wand.switchWandMode": "middle-click: Switch wand mode.",
+  "config.lucidity.wand.switchRenderingNext": "Left-click: Switch rendering mode(next).",
+  "config.lucidity.wand.switchRenderingLast": "Right-click: Switch rendering mode(last).",
 
   "config.lucidity.keyPresses": "Render Key Presses",
   "config.lucidity.description.keyPresses": "Render Key-Presses at bottom right corner of the screen."

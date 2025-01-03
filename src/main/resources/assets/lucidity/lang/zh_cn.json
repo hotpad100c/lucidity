@@ -64,6 +64,20 @@
   "config.lucidity.wand.apply_to_entities": "手杖选择应用于实体",
   "config.lucidity.wand.apply_to_particles": "手杖选择应用于粒子",
 
+  "config.lucidity.wand.selectP1": "左键：选择区域的点1。",
+  "config.lucidity.wand.selectP2": "右键：选择区域的点2。",
+  "config.lucidity.wand.cancel": "Shift+左键：取消。",
+
+  "config.lucidity.wand.delete": "右键：删除。",
+  "config.lucidity.wand.cut": "左键：剪切。",
+
+  "config.lucidity.wand.addSpecific": "右键：添加特定方块/实体。",
+  "config.lucidity.wand.addArea": "左键：添加选定区域。",
+
+  "config.lucidity.wand.switchWandMode": "中键：切换魔杖模式。",
+  "config.lucidity.wand.switchRenderingNext": "左键：切换渲染模式（下一个）。",
+  "config.lucidity.wand.switchRenderingLast": "右键：切换渲染模式（上一个）。",
+
   "config.lucidity.keyPresses": "显示按键",
   "config.lucidity.description.keyPresses": "在屏幕右下角渲染按下的按键",
 

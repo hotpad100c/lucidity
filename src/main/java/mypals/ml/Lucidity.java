@@ -3,6 +3,7 @@ package mypals.ml;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
+import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
@@ -23,12 +24,17 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
@@ -83,7 +89,7 @@ public class Lucidity implements ModInitializer {
 		Keybinds.initialize();
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
 			KeyPressesManager.renderPressed(context);
-			//WandTooltipRenderer.renderWandTooltip(context);
+			WandTooltipRenderer.renderWandTooltip(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
@@ -155,4 +161,55 @@ public class Lucidity implements ModInitializer {
 		);
 		return world.raycast(context);
 	}
+	public static EntityHitResult getPlayerLookedEntity(PlayerEntity player, World world) {
+		Entity camera = MinecraftClient.getInstance().getCameraEntity();
+
+		Vec3d start = camera.getCameraPosVec(1.0F);
+
+		Vec3d end = start.add(camera.getRotationVec(1.0F).multiply(player.isCreative()?5:4));
+
+		Box box = player.getBoundingBox().stretch(end.subtract(start)).expand(1.0);
+		EntityHitResult result = getEntityCollision(
+				world,
+				player,
+				start,
+				end,
+				box,
+				entity -> entity != player, // 忽略玩家自身
+				0.5F
+		);
+
+		return result;
+	}
+	public static EntityHitResult getEntityCollision(
+			World world,
+			Entity entity,
+			Vec3d min,
+			Vec3d max,
+			Box box,
+			Predicate<Entity> predicate,
+			float margin
+	) {
+		double closestDistance = Double.MAX_VALUE;
+		Entity closestEntity = null;
+
+		for (Entity target : world.getOtherEntities(entity, box, predicate)) {
+			// 扩展包围盒
+			Box expandedBox = target.getBoundingBox().expand(margin);
+
+			// 检测射线与包围盒的交点
+			Optional<Vec3d> hitPos = expandedBox.raycast(min, max);
+			if (hitPos.isPresent()) {
+				double distance = min.squaredDistanceTo(hitPos.get());
+				if (distance < closestDistance) {
+					closestEntity = target;
+					closestDistance = distance;
+				}
+			}
+		}
+
+		// 返回最近的命中实体结果
+		return closestEntity == null ? null : new EntityHitResult(closestEntity);
+	}
+
 }

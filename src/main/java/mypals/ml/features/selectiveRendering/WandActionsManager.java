@@ -3,6 +3,7 @@ package mypals.ml.features.selectiveRendering;
 import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -10,6 +11,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -27,6 +29,7 @@ import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.selectiveRendering.IntersectionResolver.cutBox;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedBlockTypes;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedEntityTypes;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 
 public class WandActionsManager {
@@ -67,7 +70,7 @@ public class WandActionsManager {
             player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
             if(pos1 != null){
                 player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
-                player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
+                //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             }
         } else{
             pos2 = pos;
@@ -76,7 +79,7 @@ public class WandActionsManager {
             player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
             if(pos2 != null){
                 player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
-                player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
+                //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             }
         }
     }
@@ -87,7 +90,7 @@ public class WandActionsManager {
                     + pos2.getX() + "," + pos2.getY() + "," + pos2.getZ());
             LucidityConfig.CONFIG_HANDLER.save();
             onConfigUpdated();
-            player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
+            //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             pos1 = null;
             pos2 = null;
             player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
@@ -139,6 +142,23 @@ public class WandActionsManager {
             player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
         } else {
             LucidityConfig.selectedBlockTypes.remove(id);
+            player.sendMessage(Text.literal(Text.translatable("config.lucidity.removed_type").getString() + id), true);
+            player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value());
+        }
+        player.swingHand(hand);
+        LucidityConfig.CONFIG_HANDLER.save();
+        onConfigUpdated();
+    }
+    public static void selectEntityTypeAction(Entity target, Hand hand, PlayerEntity player, World world) {
+        LucidityConfig.CONFIG_HANDLER.instance();
+        if(target == null ){return;}
+        String id = Registries.ENTITY_TYPE.getId(target.getType()).toString();
+        if (!selectedEntityTypes.contains(Registries.ENTITY_TYPE.getRawId(target.getType()))) {
+            LucidityConfig.selectedEntityTypes.add(id);
+            player.sendMessage(Text.literal(Text.translatable("config.lucidity.add_type").getString() + id), true);
+            player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
+        } else {
+            LucidityConfig.selectedEntityTypes.remove(id);
             player.sendMessage(Text.literal(Text.translatable("config.lucidity.removed_type").getString() + id), true);
             player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value());
         }
@@ -257,7 +277,7 @@ public class WandActionsManager {
                     getAreasToDelete(blockRayCast.getBlockPos(),true);
                     client.player.swingHand(client.player.getActiveHand());
                 }
-                else if (pos1 != null && pos2 != null) {
+                else if (pos1 != null && pos2 != null && client.options.attackKey.isPressed()) {
                     cutAreaAction(client.player);
                     selectCoolDown = SELECT_COOLDOWN;
                     client.player.swingHand(client.player.getActiveHand());
@@ -269,6 +289,9 @@ public class WandActionsManager {
                 } else if (switchRenderMode.isPressed()){
                     switchRenderMod(false);
                     selectCoolDown = SELECT_COOLDOWN;
+                }else if (addArea.isPressed()){
+                    addAreaAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
+                    selectCoolDown = SELECT_COOLDOWN;
                 }else {
                     BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(client.player, client.world);
                     selectingAction(blockBreakingRayCast.getBlockPos(), client.player.getActiveHand(), client.player, true);
@@ -279,20 +302,23 @@ public class WandActionsManager {
                 if (switchRenderMode.isPressed()){
                     switchWandMod(true);
                     selectCoolDown = SELECT_COOLDOWN;
-                }else {
-                    selectBlockTypeAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
-                    selectCoolDown = SELECT_COOLDOWN;
                 }
-            }
-            else if (addArea.isPressed()){
-                addAreaAction(client.player.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
-                selectCoolDown = SELECT_COOLDOWN;
             }
             else if (client.options.useKey.isPressed()) {
                 if (switchRenderMode.isPressed()){
                     switchRenderMod(true);
                     selectCoolDown = SELECT_COOLDOWN;
-                }else {
+                }else if (addArea.isPressed()){
+                    if(wandApplyToMode == WandApplyToMode.APPLY_TO_BLOCKS){
+                        BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(client.player, client.world);
+                        selectBlockTypeAction(blockBreakingRayCast.getBlockPos(), client.player.getActiveHand(), client.player, client.world);
+                    }
+                    if(wandApplyToMode == WandApplyToMode.APPLY_TO_ENTITIES){
+                        EntityHitResult entityHitResult = getPlayerLookedEntity(client.player, client.world);
+                        selectEntityTypeAction(entityHitResult.getEntity(), client.player.getActiveHand(), client.player, client.world);
+                    }
+                    selectCoolDown = SELECT_COOLDOWN;
+                } else {
                     BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(client.player, client.world);
                     selectingAction(blockBreakingRayCast.getBlockPos(), client.player.getActiveHand(), client.player, false);
                     selectCoolDown = SELECT_COOLDOWN;

@@ -12,7 +12,7 @@
 		"sources": ""
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/lucidity/icon.png",
+	"icon": "assets/lucidity/modIcon.png",
 	"environment": "client",
 	"entrypoints": {
 		"main": [

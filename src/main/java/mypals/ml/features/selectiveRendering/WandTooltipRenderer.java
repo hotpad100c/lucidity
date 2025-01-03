@@ -1,5 +1,5 @@
 package mypals.ml.features.selectiveRendering;
-
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -10,56 +10,116 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
+import java.awt.image.renderable.RenderContext;
+import java.util.ArrayList;
+import java.util.List;
+
+import static mypals.ml.Lucidity.MOD_ID;
+import static mypals.ml.config.Keybinds.*;
+import static mypals.ml.config.LucidityConfig.selectInSpectator;
+import static mypals.ml.features.renderKeyPresses.KeyPressesManager.getTranslatedKeyName;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
+import static mypals.ml.features.selectiveRendering.WandActionsManager.*;
 
 public class WandTooltipRenderer {
-    public static void renderWandTooltip(DrawContext context) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
-        if(client.player.getInventory() == null) return;
+    private static final List<ToolTipItem> hudItems = new ArrayList<>();
+    private static class ToolTipItem {
+        String text;
+        int color;
 
-        // 获取当前选中的物品
-        ItemStack stack = client.player.getInventory().getMainHandStack();
-        if (!stack.isOf(wand)) return;
-
-        // 定义提示内容
-        String[] tooltips = {
-                net.minecraft.text.Text.translatable("config.lucidity.wand.how_to_use_lc").getString(),
-                net.minecraft.text.Text.translatable("config.lucidity.wand.how_to_use_ctrl_lc").getString(),
-                net.minecraft.text.Text.translatable("config.lucidity.wand.how_to_use_shift_lc").getString(),
-                net.minecraft.text.Text.translatable("config.lucidity.wand.how_to_use_rc").getString(),
-                net.minecraft.text.Text.translatable("config.lucidity.wand.how_to_use_ctrl_space").getString()
-        };
-
-
-        // 获取屏幕尺寸和物品栏位置
-        int screenWidth = client.getWindow().getScaledWidth();
-        int screenHeight = client.getWindow().getScaledHeight();
-
-        // 渲染背景框和文字
-        //renderTooltip(context, client, tooltips, tooltipX, tooltipY);
+        @Nullable
+        Identifier icon;
+        public ToolTipItem(String text, Color color, Identifier icon) {
+            this.text = text;
+            this.color = (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
+            this.icon = icon;
+        }
+    }
+    public static void addTooltip(String text, Color color, Identifier icon) {
+        hudItems.add(new ToolTipItem(text, color, icon));
     }
 
-    private static void renderTooltip(DrawContext context, MinecraftClient client, String[] lines, int x, int y) {
-        // 计算 tooltip 的宽度和高度
-        int width = 0;
-        for (String line : lines) {
-            int lineWidth = client.textRenderer.getWidth(line);
-            if (lineWidth > width) {
-                width = lineWidth;
+    // 动态移除HUD条目（按索引）
+    public void removeTooltip(int index) {
+        if (index >= 0 && index < hudItems.size()) {
+            hudItems.remove(index);
+        }
+    }
+    public static void generateTooltip(){
+        hudItems.clear();
+        if(switchRenderMode.isPressed()){
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchWandMode").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseMiddle.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingNext").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingLast").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+        }else if(addArea.isPressed()){
+            if(wandApplyToMode != WandApplyToMode.APPLY_TO_PARTICLES) {
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addSpecific").getString(), new Color(255, 255, 255, 200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+            }if(pos1 != null && pos2 != null){
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addArea").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+            }
+        }if(deleteArea.isPressed()){
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.delete").getString(), new Color(255,180,180,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+            if(pos1 != null && pos2 != null){
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.cut").getString(), new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+            }
+        }else{
+            WandTooltipRenderer.addTooltip(Text.translatable(switchRenderMode.getTranslationKey()).getString() +"("+switchRenderMode.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
+            if(pos1 == null){
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP1").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+            }if(pos2 == null){
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP2").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+            }if(pos1 != null && pos2 != null){
+                WandTooltipRenderer.addTooltip(Text.translatable(addArea.getTranslationKey()).getString() +"("+addArea.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable(deleteArea.getTranslationKey()).getString()+"("+deleteArea.getBoundKeyLocalizedText().getString()+")", new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
+
             }
         }
-        int height = lines.length * 10; // 每行高度约为10像素
 
-        //TooltipBackgroundRenderer.render(context,x - 3, y - 3, x + width + 3, y + height + 3, 5);
-        context.fill(x - 5, y - 3, x + width + 5, y + height + 3, 0x80000000);
-        // 渲染背景框
+    }
+    public static void renderWandTooltip(DrawContext context) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity player = client.player;
+        boolean shouldSelect = player.getMainHandStack().getItem() == wand || (selectInSpectator && player.isSpectator());
+        if (!shouldSelect) {
+            return;
+        }
 
-        // 渲染文字
-        for (int i = 0; i < lines.length; i++) {
-            context.drawText(client.textRenderer, lines[i], x, y + i * 10, 0xFFFFFF,true); // 白色文字
+        generateTooltip();
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        int centerX = screenWidth / 2;
+        int centerY = screenHeight / 2;
+
+        int x = centerX - 50;
+        int y = centerY + 5;
+        int lineHeight = 15;
+
+        int maxTextWidth = 0;
+        for (ToolTipItem item : hudItems) {
+            int textWidth = client.textRenderer.getWidth(item.text);
+            maxTextWidth = Math.max(maxTextWidth, textWidth);
+        }
+
+        x = centerX - maxTextWidth / 2;
+
+        for (ToolTipItem item : hudItems) {
+            if (item.icon != null) {
+                context.drawTexture(item.icon, x, y, 0, 0, 16, 16, 16, 16);
+            }
+
+            int textX = x + (item.icon != null ? 20 : 0);
+            context.drawText(client.textRenderer, item.text, textX, (int) (y + 4), item.color, true);
+
+            y += lineHeight;
         }
     }
+
 }
