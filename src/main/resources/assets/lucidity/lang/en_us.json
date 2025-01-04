@@ -76,7 +76,7 @@
   "config.lucidity.wand.addSpecific": "Right-click: Add specific block/entity.",
   "config.lucidity.wand.addArea": "Left-click: Add selected area.",
 
-  "config.lucidity.wand.switchWandMode": "middle-click: Switch wand mode.",
+  "config.lucidity.wand.switchWandMode": "Middle-click: Switch wand mode.",
   "config.lucidity.wand.switchRenderingNext": "Left-click: Switch rendering mode(next).",
   "config.lucidity.wand.switchRenderingLast": "Right-click: Switch rendering mode(last).",
 

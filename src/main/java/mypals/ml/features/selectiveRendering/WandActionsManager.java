@@ -40,16 +40,21 @@ public class WandActionsManager {
 
     public static boolean deleteMode = false;
     public enum WandApplyToMode {
-        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks"),
-        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities"),
-        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles");
+        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks","textures/gui/renderingMode/wand_mode_blocks.png"),
+        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities","textures/gui/renderingMode/wand_mode_entities.png"),
+        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles","textures/gui/renderingMode/wand_mode_particles.png");
         private final String translationKey;
+        private final String icon;
 
-        WandApplyToMode(String translationKey) {
+        WandApplyToMode(String translationKey, String icon) {
             this.translationKey = translationKey;
+            this.icon = icon;
         }
         public String getTranslationKey() {
             return translationKey;
+        }
+        public String getIcon() {
+            return icon;
         }
     }
     public static WandApplyToMode wandApplyToMode = WandApplyToMode.APPLY_TO_BLOCKS;
@@ -65,21 +70,17 @@ public class WandActionsManager {
     public static void selectingAction(BlockPos pos, Hand hand, PlayerEntity player, Boolean isFirstPoint) {
         if (isFirstPoint) {
             pos1 = pos;
-            player.sendMessage(Text.literal(Text.translatable("config.lucidity.point1_add").getString() + pos.toString()), true);
             player.swingHand(hand);
             player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
             if(pos1 != null){
                 player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
-                //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             }
         } else{
             pos2 = pos;
-            player.sendMessage(Text.literal(Text.translatable("config.lucidity.point2_add").getString() + pos.toString()), true);
             player.swingHand(hand);
             player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
             if(pos2 != null){
                 player.playSound(SoundEvents.BLOCK_CHAIN_PLACE);
-                //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             }
         }
     }
@@ -90,7 +91,6 @@ public class WandActionsManager {
                     + pos2.getX() + "," + pos2.getY() + "," + pos2.getZ());
             LucidityConfig.CONFIG_HANDLER.save();
             onConfigUpdated();
-            //player.sendMessage(Text.literal(Text.translatable("config.lucidity.should_add_area").getString()), true);
             pos1 = null;
             pos2 = null;
             player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);
@@ -175,8 +175,7 @@ public class WandActionsManager {
                 } else {
                     renderModeBlock = renderModeBlock == 0 ? RenderMode.values().length - 1 : renderModeBlock - 1;
                 }
-                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
-                        Text.translatable(resolveSelectiveBlockRenderingMode(renderModeBlock)).getString()), true);
+                resolveSelectiveBlockRenderingMode(renderModeBlock);
             }
             case WandApplyToMode.APPLY_TO_ENTITIES -> {
                 if (increase) {
@@ -184,8 +183,7 @@ public class WandActionsManager {
                 } else {
                     renderModeEntity = renderModeEntity == 0 ? RenderMode.values().length - 1 : renderModeEntity - 1;
                 }
-                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
-                        Text.translatable(resolveSelectiveEntityRenderingMode(renderModeEntity)).getString()), true);
+                resolveSelectiveEntityRenderingMode(renderModeEntity);
             }
             case WandApplyToMode.APPLY_TO_PARTICLES -> {
                 if (increase) {
@@ -193,8 +191,7 @@ public class WandActionsManager {
                 } else {
                     renderModeParticle = renderModeParticle == 0 ? RenderMode.values().length - 1 : renderModeParticle - 1;
                 }
-                MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable("config.lucidity.switched_rendering_method").getString() +" "+
-                        Text.translatable(resolveSelectiveParticleRenderingMode(renderModeParticle)).getString()), true);
+                resolveSelectiveParticleRenderingMode(renderModeParticle);
             }
         }
         LucidityConfig.CONFIG_HANDLER.save();
@@ -210,9 +207,10 @@ public class WandActionsManager {
             wandApplyMode = wandApplyMode == 0 ? WandApplyToMode.values().length - 1 : wandApplyMode - 1;
         }
 
-        MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable(resolveWandMode(wandApplyMode)).getString()), true);
+        //MinecraftClient.getInstance().player.sendMessage(Text.literal(Text.translatable(resolveWandMode(wandApplyMode)).getString()), true);
         LucidityConfig.CONFIG_HANDLER.save();
         onConfigUpdated();
+        resolveWandMode(wandApplyMode);
     }
     public static void clearArea(BlockPos pos, Hand hand, PlayerEntity player, World world){
         ItemStack heldItem = player.getStackInHand(hand);
