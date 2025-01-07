@@ -195,6 +195,8 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                                         .name(Text.translatable("config.lucidity.option.oreHighlight"))
                                                         .description(OptionDescription.createBuilder()
                                                                 .text(Text.translatable("config.lucidity.description.oreHighlight"))
+                                                                .text(Text.of(""))
+                                                                .text(Text.translatable("warn.lucidity.photosensitive-seizure-warning"))
                                                                 .build()
                                                         )
                                                         .binding(false, () -> instance.instance().enableWorldEaterHelper, bool -> instance.instance().enableWorldEaterHelper = bool)

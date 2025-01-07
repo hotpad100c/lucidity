@@ -56,26 +56,26 @@ public class WandTooltipRenderer {
     public static void generateTooltip(){
         hudItems.clear();
         if(switchRenderMode.isPressed()){
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchWandMode").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseMiddle.png"));
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingNext").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingLast").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchWandMode").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_middle.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingNext").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingLast").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
         }else if(addArea.isPressed()){
             if(wandApplyToMode != WandApplyToMode.APPLY_TO_PARTICLES) {
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addSpecific").getString(), new Color(255, 255, 255, 200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addSpecific").getString(), new Color(255, 255, 255, 200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
             }if(pos1 != null && pos2 != null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addArea").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addArea").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
             }
         }if(deleteArea.isPressed()){
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.delete").getString(), new Color(255,180,180,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.delete").getString(), new Color(255,180,180,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
             if(pos1 != null && pos2 != null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.cut").getString(), new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.cut").getString(), new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
             }
         }else{
             WandTooltipRenderer.addTooltip(Text.translatable(switchRenderMode.getTranslationKey()).getString() +"("+switchRenderMode.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
             if(pos1 == null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP1").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseLeft.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP1").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
             }if(pos2 == null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP2").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouseRight.png"));
+                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP2").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
             }if(pos1 != null && pos2 != null){
                 WandTooltipRenderer.addTooltip(Text.translatable(addArea.getTranslationKey()).getString() +"("+addArea.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
                 WandTooltipRenderer.addTooltip(Text.translatable(deleteArea.getTranslationKey()).getString()+"("+deleteArea.getBoundKeyLocalizedText().getString()+")", new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
