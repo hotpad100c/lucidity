@@ -5,6 +5,7 @@
   "mixins": [
     "ItemMixin",
     "compat.ChunkBuilderMeshingTaskMixin",
+    "compat.DefaultFluidRendererMixin",
     "compat.MixinBlockOcclusionCacheMixin",
     "vanilla.BlockMixin",
     "vanilla.FluidRenderMixin"

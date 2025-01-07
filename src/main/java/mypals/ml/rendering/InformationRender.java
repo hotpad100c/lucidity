@@ -8,8 +8,10 @@ import mypals.ml.rendering.shapes.CubeShape;
 import mypals.ml.rendering.shapes.Line;
 import mypals.ml.rendering.shapes.ShineMarker;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -19,8 +21,10 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.Lucidity.getPlayerLookedBlock;
 import static mypals.ml.config.LucidityConfig.selectInSpectator;
+import static mypals.ml.features.AdvancedContentRender.ImageRenderer.renderPicture;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.deleteMode;
@@ -58,6 +62,7 @@ public class InformationRender {
     }
     public static void render(MatrixStack matrixStack, RenderTickCounter counter){
         if(MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().gameRenderer.getCamera().isReady()) {
+            renderPicture(matrixStack, Identifier.of(MOD_ID,"textures/DebugPNG.png"),new Vec3d(0,0,0),1,240, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
             for (BoxShape box : boxes) {
                 ShapeRender.drawCube(matrixStack, box.pos.toCenterPos(), box.length, box.weigth, box.height, counter.getTickDelta(true), box.color, box.alpha);
             }
