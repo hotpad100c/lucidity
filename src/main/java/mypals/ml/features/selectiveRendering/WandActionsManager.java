@@ -136,7 +136,7 @@ public class WandActionsManager {
         LucidityConfig.CONFIG_HANDLER.instance();
         String id = Registries.BLOCK.getId(world.getBlockState(pos).getBlock()).toString();
         if(world.getBlockState(pos).getBlock() == Blocks.AIR ){return;}
-        if (!selectedBlockTypes.contains(Registries.BLOCK.getRawId(world.getBlockState(pos).getBlock()))) {
+        if (selectedBlockTypes.get(Registries.BLOCK.getRawId(world.getBlockState(pos).getBlock())) == null) {
             LucidityConfig.selectedBlockTypes.add(id);
             player.sendMessage(Text.literal(Text.translatable("config.lucidity.add_type").getString() + id), true);
             player.playSound(SoundEvents.BLOCK_RESPAWN_ANCHOR_CHARGE);

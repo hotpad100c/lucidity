@@ -2,6 +2,8 @@ package mypals.ml;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
+import mypals.ml.features.damageIndicator.DamageHandler;
+import mypals.ml.features.damageIndicator.IndicatorRenderer;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
 import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
@@ -62,7 +64,7 @@ public class Lucidity implements ModInitializer {
 		resolveSettings();
     }
 	private static void resolveSettings(){
-		resolveSelectedBlockTypesFromString(LucidityConfig.selectedBlockTypes);
+		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
 		resolveSelectedEntityTypesFromString(LucidityConfig.selectedEntityTypes);
 		resolveSelectedParticleTypesFromString(LucidityConfig.selectedParticleTypes);
 
@@ -90,6 +92,7 @@ public class Lucidity implements ModInitializer {
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
 			KeyPressesManager.renderPressed(context);
 			WandTooltipRenderer.renderWandTooltip(context);
+			IndicatorRenderer.renderIndicators(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
@@ -139,6 +142,10 @@ public class Lucidity implements ModInitializer {
 		if(enableWorldEaterHelper) {
 			scanForMineralsOptimized(hightLightRange);
 		}
+		/*if(enableDamageIndicator){
+			DamageHandler.PlayerHealthMonitor();
+		}*/
+		DamageHandler.PlayerHealthMonitor();
 	}
 	public static void UpdateTimers(){
 		warningTime = warningTime <= 0? 0 : warningTime-1;

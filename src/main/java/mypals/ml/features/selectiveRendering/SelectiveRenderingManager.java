@@ -3,26 +3,29 @@ package mypals.ml.features.selectiveRendering;
 import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FarmlandBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 
 public class SelectiveRenderingManager {
-    public static List<Integer> selectedBlockTypes = new CopyOnWriteArrayList<>();
+    public static Map<Integer, Map<Property,Object>> selectedBlockTypes = new HashMap<>();
     public static List<Integer> selectedEntityTypes = new CopyOnWriteArrayList<>();
     public static List<Integer> selectedParticleTypes = new CopyOnWriteArrayList<>();
     public static List<AreaBox> selectedAreas = new CopyOnWriteArrayList<>();
@@ -63,7 +66,7 @@ public class SelectiveRenderingManager {
 
 
 
-    public static void resolveSelectedBlockTypesFromString(List<String> blockStrings){
+    /*public static void resolveSelectedBlockTypesFromString(List<String> blockStrings){
         selectedBlockTypes.clear();
 
         LucidityConfig.CONFIG_HANDLER.instance();
@@ -81,7 +84,67 @@ public class SelectiveRenderingManager {
                 selectedBlockTypes.add(Registries.BLOCK.getRawId(targetBlock));
             }
         });
+    }*/
+    public static void resolveSelectedBlockStatesFromString(List<String> blockStrings) {
+        selectedBlockTypes.clear();
+
+        LucidityConfig.CONFIG_HANDLER.instance();
+        blockStrings.forEach(blockString -> {
+            try {
+                // 检查是否包含属性（例如 "minecraft:stone[age=3]"）
+                String[] parts = blockString.split("\\[", 2);
+                String blockIdString = parts[0];
+
+                // 如果没有 ":"，则默认补充 "minecraft:"
+                if (!blockIdString.contains(":")) {
+                    blockIdString = "minecraft:" + blockIdString;
+                }
+
+                Identifier blockId = Identifier.of(blockIdString);
+                Block block = Registries.BLOCK.get(blockId);
+
+                if (block == null) {
+                    // 如果找不到方块，跳过此条目
+                    return;
+                }
+
+                Map<Property,Object> states = new HashMap<>();
+                boolean hasState = false;
+                // 如果存在属性，处理属性部分
+                if (parts.length > 1) {
+                    String propertiesString = parts[1].replace("]", ""); // 移除尾部的 "]"
+                    String[] properties = propertiesString.split(",");
+
+                    for (String property : properties) {
+                        String[] keyValue = property.split("=");
+                        if (keyValue.length != 2) continue;
+
+                        String key = keyValue[0];
+                        String value = keyValue[1];
+
+                        Property<?> blockProperty = block.getStateManager().getProperty(key);
+                        if (blockProperty != null) {
+                            states.put(blockProperty,value);
+                            hasState = true;
+                        }
+                    }
+                }
+
+                if(hasState) {
+                    // 将解析后的方块状态添加到列表
+                    selectedBlockTypes.put(Registries.BLOCK.getRawId(block), states);
+                }else{
+                    selectedBlockTypes.put(Registries.BLOCK.getRawId(block), null);
+                }
+
+            } catch (Exception e) {
+                // 处理解析错误
+                System.err.println("Failed to parse block state: " + blockString);
+            }
+        });
     }
+
+
     public static void resolveSelectedEntityTypesFromString(List<String> entityStrings){
         selectedEntityTypes.clear();
 
@@ -207,9 +270,10 @@ public class SelectiveRenderingManager {
     public static boolean shouldRenderBlock(BlockState block, BlockPos pos) {
         return shouldRender(
                 blockRenderMode,
-                block.getBlock(),
+                block,
                 new Vec3d(pos.getX(), pos.getY(), pos.getZ()),
                 blockType -> Registries.BLOCK.getRawId(block.getBlock()),
+                null,
                 selectedBlockTypes
         );
     }
@@ -220,7 +284,8 @@ public class SelectiveRenderingManager {
                 entity,
                 pos,
                 entityType -> Registries.ENTITY_TYPE.getRawId(entity),
-                selectedEntityTypes
+                selectedEntityTypes,
+                null
         );
     }
 
@@ -230,17 +295,31 @@ public class SelectiveRenderingManager {
                 particle,
                 pos,
                 particleType -> Registries.PARTICLE_TYPE.getRawId(particle),
-                selectedParticleTypes
+                selectedParticleTypes,
+                null
         );
     }
     private static <T> boolean shouldRender(
-            RenderMode renderMode, T type, Vec3d pos, Function<T, Integer> getIdFunction
-            ,List<Integer> selectedTypes) {
+            RenderMode renderMode,
+            T type,
+            Vec3d pos,
+            Function<T, Integer> getIdFunction,
+            @Nullable
+            List<Integer> selectedTypes,
+            @Nullable
+            Map<Integer, Map<Property,Object>> selectedBlockStates
+    ) {
         if (renderMode == RenderMode.OFF) {
             return true;
         }
+        boolean isSelected;
+        if(selectedBlockStates == null){
+            if(selectedTypes == null) return true;
+            isSelected = isSelectedType(getIdFunction.apply(type), selectedTypes);
+        }else{
+            isSelected = isSelectedTypeAndState((BlockState) type, selectedBlockStates);
+        }
 
-        boolean isSelected = isSelectedType(getIdFunction.apply(type), selectedTypes);
         boolean isInArea = isSelectedArea(pos);
 
         switch (renderMode) {
@@ -256,14 +335,8 @@ public class SelectiveRenderingManager {
             case RENDER_OUTSIDE_EXCLUDE:
                 return !(isSelected && !isInArea);
 
-            /*case RENDER_INSIDE_NONE:
-                return !isInArea;*/
-
             case RENDER_ONLY_SPECIFIC:
                 return isSelected;
-
-            /*case RENDER_INSIDE_ONLY:
-                return isInArea;*/
 
             case RENDER_EXCLUDE_SPECIFIC:
                 return !isSelected;
@@ -286,6 +359,46 @@ public class SelectiveRenderingManager {
     }
     public static boolean isSelectedType(int id, List<Integer> selectedTypes) {
         return selectedTypes.contains(id);
+    }
+    public static boolean isSelectedTypeAndState(BlockState state, Map<Integer, Map<Property, Object>> selectedTypes) {
+        for (Map.Entry<Integer, Map<Property, Object>> entry : selectedTypes.entrySet()) {
+            Integer blockId = entry.getKey();
+            Map<Property, Object> properties = entry.getValue();
+
+            // 如果属性为空或方块ID不匹配，返回false
+            if (!blockId.equals(Registries.BLOCK.getRawId(state.getBlock()))) {
+                continue;
+            }
+            if(properties == null || properties.isEmpty()){
+                if(Registries.BLOCK.getRawId(state.getBlock()) == blockId){
+                    return true;
+                }
+            }
+
+            // 检查BlockState是否包含所有属性
+            boolean hasAllProperties = true;
+            for (Map.Entry<Property, Object> property : properties.entrySet()) {
+                Optional<Object> stateProperty = state.getOrEmpty(property.getKey());
+
+                // 如果BlockState中不存在该属性
+                if (!stateProperty.isPresent()) {
+                    hasAllProperties = false;
+                    break;
+                }
+
+                // 如果属性的值不匹配
+                if (!stateProperty.get().toString().equals(property.getValue())) {
+                    hasAllProperties = false;
+                    break;
+                }
+            }
+
+            // 如果所有属性都匹配
+            if (hasAllProperties) {
+                return true;
+            }
+        }
+        return false;
     }
     public static boolean isSelectedArea(Vec3d blockPos){
         for(AreaBox selectedArea : selectedAreas){

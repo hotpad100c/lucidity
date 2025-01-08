@@ -7,6 +7,7 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import mypals.ml.Lucidity;
 import net.fabricmc.loader.api.FabricLoader;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,5 +55,14 @@ public class LucidityConfig {
 
     @SerialEntry
     public static boolean renderKeyPresses = false;
+
+    @SerialEntry
+    public static boolean enableDamageIndicator = false;
+    @SerialEntry
+    public static int damageIndicatorLifeTime = 50;
+    @SerialEntry
+    public static int indicatorOffset = 0;
+    @SerialEntry
+    public static Color indicatorColor = Color.red;
 
 }

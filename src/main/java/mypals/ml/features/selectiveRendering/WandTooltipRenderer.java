@@ -62,29 +62,29 @@ public class WandTooltipRenderer {
 
         if (switchRenderMode.isPressed()) {
             addKeyTooltip.accept(switchRenderMode, new Color(200, 255, 200, 200),"textures/gui/hotkey.png");
-            addTooltip.accept("config.lucidity.wand.switchWandMode", new Color(255, 255, 255, 200), "textures/gui/mouseMiddle.png");
-            addTooltip.accept("config.lucidity.wand.switchRenderingNext", new Color(255, 255, 255, 200), "textures/gui/mouseRight.png");
-            addTooltip.accept("config.lucidity.wand.switchRenderingLast", new Color(255, 255, 255, 200), "textures/gui/mouseLeft.png");
+            addTooltip.accept("config.lucidity.wand.switchWandMode", new Color(255, 255, 255, 200), "textures/gui/mouse_middle.png");
+            addTooltip.accept("config.lucidity.wand.switchRenderingNext", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
+            addTooltip.accept("config.lucidity.wand.switchRenderingLast", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
         } else if (addArea.isPressed()) {
             addKeyTooltip.accept(addArea, new Color(200, 255, 200, 200),"textures/gui/hotkey.png");
             if (wandApplyToMode != WandApplyToMode.APPLY_TO_PARTICLES) {
-                addTooltip.accept("config.lucidity.wand.addSpecific", new Color(255, 255, 255, 200), "textures/gui/mouseRight.png");
+                addTooltip.accept("config.lucidity.wand.addSpecific", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
             }
             if (pos1 != null && pos2 != null) {
-                addTooltip.accept("config.lucidity.wand.addArea", new Color(255, 255, 255, 200), "textures/gui/mouseLeft.png");
+                addTooltip.accept("config.lucidity.wand.addArea", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
             }
         } else if (deleteArea.isPressed()) {
             addKeyTooltip.accept(deleteArea,new Color(200, 255, 200, 200), "textures/gui/hotkey.png");
-            addTooltip.accept("config.lucidity.wand.delete", new Color(255, 180, 180, 200), "textures/gui/mouseRight.png");
+            addTooltip.accept("config.lucidity.wand.delete", new Color(255, 180, 180, 200), "textures/gui/mouse_right.png");
             if (pos1 != null && pos2 != null) {
-                addTooltip.accept("config.lucidity.wand.cut", new Color(255, 200, 200, 200), "textures/gui/mouseLeft.png");
+                addTooltip.accept("config.lucidity.wand.cut", new Color(255, 200, 200, 200), "textures/gui/mouse_left.png");
             }
         } else {
             if (pos1 == null) {
-                addTooltip.accept("config.lucidity.wand.selectP1", new Color(255, 255, 255, 200), "textures/gui/mouseLeft.png");
+                addTooltip.accept("config.lucidity.wand.selectP1", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
             }
             if (pos2 == null) {
-                addTooltip.accept("config.lucidity.wand.selectP2", new Color(255, 255, 255, 200), "textures/gui/mouseRight.png");
+                addTooltip.accept("config.lucidity.wand.selectP2", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
             }
             if (pos1 != null && pos2 != null) {
                 if (!addArea.isPressed()) {
@@ -103,7 +103,7 @@ public class WandTooltipRenderer {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
         boolean shouldSelect = player.getMainHandStack().getItem() == wand || (selectInSpectator && player.isSpectator());
-        if (!shouldSelect) {
+        if (!shouldSelect || client.options.hudHidden) {
             return;
         }
 
