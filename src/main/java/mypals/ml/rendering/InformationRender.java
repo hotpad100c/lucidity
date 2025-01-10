@@ -62,7 +62,7 @@ public class InformationRender {
     }
     public static void render(MatrixStack matrixStack, RenderTickCounter counter){
         if(MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().gameRenderer.getCamera().isReady()) {
-            renderPicture(matrixStack, Identifier.of(MOD_ID,"textures/DebugPNG.png"),new Vec3d(0,0,0),1,240, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
+            //renderPicture(matrixStack, Identifier.of(MOD_ID,"textures/DebugPNG.png"),new Vec3d(0,0,0),1,240, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
             for (BoxShape box : boxes) {
                 ShapeRender.drawCube(matrixStack, box.pos.toCenterPos(), box.length, box.weigth, box.height, counter.getTickDelta(true), box.color, box.alpha);
             }

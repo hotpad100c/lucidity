@@ -83,5 +83,13 @@
   "config.lucidity.wand.switchRenderingLast": "Right-click: Switch rendering mode(last).",
 
   "config.lucidity.keyPresses": "Render Key Presses",
-  "config.lucidity.description.keyPresses": "Render Key-Presses at bottom right corner of the screen."
+  "config.lucidity.description.keyPresses": "Render Key-Presses at bottom right corner of the screen.",
+
+  "config.lucidity.damageIndicator": "Damage Indicator",
+  "config.lucidity.description.damageIndicator": "Simply indicates the location of the damage source.",
+  "config.lucidity.damageIndicator.enable": "Enable the damage indicator.",
+  "config.lucidity.damageIndicator.color": "Color of the damage indicator.",
+  "config.lucidity.damageIndicator.offset": "Damage indicator offset.",
+  "config.lucidity.description.damageIndicator.offset": "The amount by which the damage indicator is offset from the center of the screen.",
+  "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen."
 }

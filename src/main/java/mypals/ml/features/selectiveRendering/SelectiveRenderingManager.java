@@ -4,9 +4,13 @@ import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FarmlandBlock;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Property;
@@ -65,36 +69,15 @@ public class SelectiveRenderingManager {
 
 
 
-
-    /*public static void resolveSelectedBlockTypesFromString(List<String> blockStrings){
-        selectedBlockTypes.clear();
-
-        LucidityConfig.CONFIG_HANDLER.instance();
-        blockStrings.forEach(blockString -> {
-
-            if (!blockString.contains(":")) {
-                blockString = "minecraft:" + blockString;
-            }
-            Identifier blockId = Identifier.of(blockString);
-            Block targetBlock = Registries.BLOCK.get(blockId);
-            if (targetBlock == null) {
-                blockStrings.remove(blockId);
-            }
-            else{
-                selectedBlockTypes.add(Registries.BLOCK.getRawId(targetBlock));
-            }
-        });
-    }*/
     public static void resolveSelectedBlockStatesFromString(List<String> blockStrings) {
         selectedBlockTypes.clear();
 
         LucidityConfig.CONFIG_HANDLER.instance();
         blockStrings.forEach(blockString -> {
             try {
-                // 检查是否包含属性（例如 "minecraft:stone[age=3]"）
+                blockString = blockString.replace(" ","");
                 String[] parts = blockString.split("\\[", 2);
                 String blockIdString = parts[0];
-
                 // 如果没有 ":"，则默认补充 "minecraft:"
                 if (!blockIdString.contains(":")) {
                     blockIdString = "minecraft:" + blockIdString;
@@ -104,15 +87,15 @@ public class SelectiveRenderingManager {
                 Block block = Registries.BLOCK.get(blockId);
 
                 if (block == null) {
-                    // 如果找不到方块，跳过此条目
                     return;
                 }
 
                 Map<Property,Object> states = new HashMap<>();
                 boolean hasState = false;
+                NbtCompound w = new NbtCompound();
                 // 如果存在属性，处理属性部分
                 if (parts.length > 1) {
-                    String propertiesString = parts[1].replace("]", ""); // 移除尾部的 "]"
+                    String propertiesString = parts[1].replace("]", "");
                     String[] properties = propertiesString.split(",");
 
                     for (String property : properties) {

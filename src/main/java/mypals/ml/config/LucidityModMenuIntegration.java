@@ -4,12 +4,14 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
+import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import mypals.ml.Lucidity;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import net.minecraft.text.Text;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
@@ -236,6 +238,63 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
+                                        .build()
+                                )
+
+                                .build()
+                ).category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.damageIndicator"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.damageIndicator"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.damageIndicator"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.damageIndicator.enable"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.damageIndicator"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().enableDamageIndicator, bool -> instance.instance().enableDamageIndicator = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        ).option(
+                                                Option.<Integer>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.damageIndicator.offset"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.damageIndicator.offset"))
+                                                                .build()
+                                                        )
+                                                        .binding(0, () -> instance.instance().indicatorOffset, integer -> instance.instance().indicatorOffset = integer)
+                                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                                .range(0, 50)
+                                                                .step(1)
+                                                                .formatValue(val -> Text.of(val.toString())))
+                                                        .build()
+                                        ).option(
+                                                Option.<Integer>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.damageIndicator.time"))
+
+                                                        .binding(0, () -> instance.instance().damageIndicatorLifeTime, integer -> instance.instance().damageIndicatorLifeTime = integer)
+                                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                                .range(50, 100)
+                                                                .step(1)
+                                                                .formatValue(val -> Text.of(val.toString())))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.damageIndicator.color"))
+
+                                                        .binding(Color.red, () -> instance.instance().indicatorColor, color -> instance.instance().indicatorColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        )
+
                                         .build()
                                 )
 

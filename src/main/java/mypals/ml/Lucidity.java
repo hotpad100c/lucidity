@@ -70,7 +70,7 @@ public class Lucidity implements ModInitializer {
 
 		resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
 		resolveSelectedWandFromString(LucidityConfig.wand);
-		if(!!blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
+		if(blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
 			MinecraftClient.getInstance().player.
 					removeStatusEffect(StatusEffects.NIGHT_VISION);
 	}
@@ -142,10 +142,9 @@ public class Lucidity implements ModInitializer {
 		if(enableWorldEaterHelper) {
 			scanForMineralsOptimized(hightLightRange);
 		}
-		/*if(enableDamageIndicator){
+		if(enableDamageIndicator){
 			DamageHandler.PlayerHealthMonitor();
-		}*/
-		DamageHandler.PlayerHealthMonitor();
+		}
 	}
 	public static void UpdateTimers(){
 		warningTime = warningTime <= 0? 0 : warningTime-1;

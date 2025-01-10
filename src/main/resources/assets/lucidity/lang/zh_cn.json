@@ -83,5 +83,11 @@
   "config.lucidity.keyPresses": "显示按键",
   "config.lucidity.description.keyPresses": "在屏幕右下角渲染按下的按键",
 
-  "config.lucidity.wand.how_to_use": "\n左键点击:选择区域角点\n右键点击:选择单种方块。\nctrl+左键点击:添加选区，shift+左键点击:可以删除未完成的选区\nctrl+跳跃:切换方块渲染模式"
+  "config.lucidity.damageIndicator": "伤害指示器",
+  "config.lucidity.description.damageIndicator": "简单地指示伤害的来源位置。",
+  "config.lucidity.damageIndicator.enable": "启用伤害指示器。",
+  "config.lucidity.damageIndicator.color": "伤害指示器颜色。",
+  "config.lucidity.damageIndicator.offset": "伤害指示器偏移量。",
+  "config.lucidity.description.damageIndicator.offset": "伤害指示器偏离屏幕中心的量。",
+  "config.lucidity.damageIndicator.time": "伤害指示器在屏幕上留存的时间。"
 }
