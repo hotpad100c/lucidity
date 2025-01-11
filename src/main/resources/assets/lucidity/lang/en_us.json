@@ -91,5 +91,98 @@
   "config.lucidity.damageIndicator.color": "Color of the damage indicator.",
   "config.lucidity.damageIndicator.offset": "Damage indicator offset.",
   "config.lucidity.description.damageIndicator.offset": "The amount by which the damage indicator is offset from the center of the screen.",
-  "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen."
+  "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen.",
+
+  "config.lucidity.title.explosion_visualizer": "ExplosionVisualizer",
+  "config.lucidity.category.explosion_visualizer": "ExplosionVisualizer",
+  "config.lucidity.group.renders": "Renders",
+  "config.lucidity.description.main_features": "Main features",
+
+  "config.lucidity.option.main_render": "Main render",
+  "config.lucidity.option.description.main_render": "This is the main render. Make sure to turn this on first!",
+
+  "config.lucidity.option.block_destruction": "Block destruction",
+  "config.lucidity.option.description.block_destruction": "Render the blocks to be destroyed by explosion.",
+
+  "config.lucidity.option.block_detection_ray": "Block detection ray",
+  "config.lucidity.option.description.block_detection_ray": "Render the detection rays for detecting the blocks to be destroyed by explosion.",
+
+  "config.lucidity.option.sample_points": "Sample-points",
+  "config.lucidity.option.description.sample_points": "Render in range entity's sample-points for ray-cast in explosion.",
+
+  "config.lucidity.option.explosion_damage": "Explosion damage",
+  "config.lucidity.option.description.explosion_damage": "Render explosion damage for in-range entities.",
+
+  "config.lucidity.title.settings": "Settings",
+  "config.lucidity.category.settings": "Settings",
+
+  "config.lucidity.group.block_detection_ray_settings": "Block detection ray settings",
+  "config.lucidity.description.block_detection_ray_settings": "In Minecraft, 1532 rays are emitted from the center of the explosion towards the outermost layer of a 16x16x16 voxel grid surrounding the explosion center. \n(See\" https://minecraft.fandom.com/wiki/Explosion\" for details.)\n\nDisplaying them all together can look very cluttered. This command allows you to slice these rays for easier viewing.",
+
+  "config.lucidity.option.x_min": "X-min",
+  "config.lucidity.option.description.x_min": "(0~16)",
+
+  "config.lucidity.option.x_max": "X-max",
+  "config.lucidity.option.description.x_max": "(0~16)",
+
+  "config.lucidity.option.y_min": "Y-min",
+  "config.lucidity.option.description.y_min": "(0~16)",
+
+  "config.lucidity.option.y_max": "Y-max",
+  "config.lucidity.option.description.y_max": "(0~16)",
+
+  "config.lucidity.option.z_min": "Z-min",
+  "config.lucidity.option.description.z_min": "(0~16)",
+
+  "config.lucidity.option.z_max": "Z-max",
+  "config.lucidity.option.description.z_max": "(0~16)",
+
+  "config.lucidity.option.invert": "Invert",
+  "config.lucidity.option.description.invert": "Invert the render range.",
+
+  "config.lucidity.option.layer_min": "Layer-min",
+  "config.lucidity.option.description.layer_min": "Minimal rendering layer",
+
+  "config.lucidity.option.layer_max": "Layer-max",
+  "config.lucidity.option.description.layer_max": "Maximum rendering layer",
+
+  "config.lucidity.option.block_detection_ray_icon": "Block detection ray render icon",
+  "config.lucidity.option.description.block_detection_ray_icon": "Text of the icon for the detection rays",
+
+  "config.lucidity.option.block_detection_ray_icon_size": "Block detection ray render icon size",
+  "config.lucidity.option.description.block_detection_ray_icon_size": "Size of the icon for the detection rays",
+
+  "config.lucidity.option.render_with_alpha": "Render with alpha",
+  "config.lucidity.option.description.render_with_alpha": "Render explosion power by ray's alpha.",
+
+  "config.lucidity.option.block_destruction_render_settings": "Block-destruction render settings",
+
+  "config.lucidity.option.block_destruction_render_color": "Block destruction render color",
+  "config.lucidity.option.description.block_destruction_render_color": "Color of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.lucidity.option.block_destruction_render_icon": "Block destruction render icon",
+  "config.lucidity.option.description.block_destruction_render_icon": "Text of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.lucidity.option.block_destruction_render_icon_size": "Block destruction render icon size",
+  "config.lucidity.option.description.block_destruction_render_icon_size": "Size of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.lucidity.option.entity_sample_point_render_settings": "Entity sample-point render settings",
+
+  "config.lucidity.option.entity_sample_point_safe_color": "Entity sample-point (safe) render color",
+
+  "config.lucidity.option.entity_sample_point_safe_icon": "Entity sample-point (safe) render icon",
+
+  "config.lucidity.option.entity_sample_point_danger_color": "Entity sample-point (danger) render color",
+
+  "config.lucidity.option.entity_sample_point_danger_icon": "Entity sample-point (danger) render icon",
+
+  "config.lucidity.option.entity_sample_point_blocked_color": "Entity sample-point (blocked position) render color",
+
+  "config.lucidity.option.entity_sample_point_blocked_icon": "Entity sample-point (blocked position) render icon",
+
+  "config.lucidity.option.entity_sample_point_icon_size": "Entity sample-point (safe) icon size",
+  "config.lucidity.option.description.entity_sample_point_icon_size": "Size of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.lucidity.option.see_Throw": "Visible throw walls",
+  "config.lucidity.option.description.see_Throw": "Icon visible throw walls"
 }

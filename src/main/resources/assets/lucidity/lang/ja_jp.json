@@ -1,0 +1,109 @@
+{
+  "command.explosion-visualizer.main_render": "爆発可視化: メインレンダリング -> %s",
+  "command.explosion-visualizer.entity_damage_render": "爆発可視化: エンティティダメージレンダリング -> %s",
+  "command.explosion-visualizer.entity_ray_cast": "爆発可視化: エンティティダメージレイキャスト/サンプルポイントレンダリング -> %s",
+  "command.explosion-visualizer.block_destruction_render": "爆発可視化: ブロック破壊レンダリング -> %s",
+  "command.explosion-visualizer.block_detection_ray_render": "爆発可視化: ブロック検出レイレンダリング -> %s",
+  "command.explosion-visualizer.block_damage_ray_range_updated": "爆発可視化: ブロック検出レイレンダリング範囲が更新されました。",
+  "command.explosion-visualizer.block_damage_ray_layer_updated": "爆発可視化: ブロック検出レイレンダリングレイヤーが更新されました。",
+  "command.explosion-visualizer.block_detection_ray_settings_reset": "爆発可視化: ブロック検出レイレンダリング設定がリセットされました！",
+  "command.explosion-visualizer.block_detection_ray_layer_reset": "爆発可視化: ブロック検出レイレンダリングレイヤーがリセットされました！",
+  "command.explosion-visualizer.block_detection_ray_range_reset": "爆発可視化: ブロック検出レイレンダリング範囲がリセットされました！",
+  "command.explosion-visualizer.fake_explosion_add": "爆発可視化: 偽爆発が追加されました: %s 位置 %s、威力 %s",
+  "command.explosion-visualizer.fake_explosion_duplicate": "爆発可視化: 偽爆発 %s 位置 %s の追加に失敗しました: 名前が重複しています！",
+  "command.explosion-visualizer.fake_explosion_remove": "爆発可視化: 偽爆発が削除されました: %s",
+  "command.explosion-visualizer.fake_explosion_clear": "爆発可視化: すべての偽爆発がクリアされました",
+
+  "config.title.explosion_visualizer": "爆発可視化",
+  "config.category.explosion_visualizer": "爆発可視化",
+  "config.group.renders": "レンダリング設定",
+  "config.description.main_features": "主な機能",
+
+  "config.option.main_render": "メインレンダリング",
+  "config.option.description.main_render": "これはメインレンダリングです。まずはこれをオンにしてください！",
+
+  "config.option.block_destruction": "ブロック破壊",
+  "config.option.description.block_destruction": "爆発で破壊されるブロックをレンダリングします。",
+
+  "config.option.block_detection_ray": "ブロック検出レイ",
+  "config.option.description.block_detection_ray": "爆発によるブロック破壊を検出するレイをレンダリングします。",
+
+  "config.option.sample_points": "サンプルポイント",
+  "config.option.description.sample_points": "爆発のレイキャスティング用の範囲内にあるエンティティサンプルポイントをレンダリングします。",
+
+  "config.option.explosion_damage": "爆発ダメージ",
+  "config.option.description.explosion_damage": "範囲内のエンティティの爆発ダメージをレンダリングします。",
+
+  "config.title.settings": "設定",
+  "config.category.settings": "設定",
+
+  "config.group.block_detection_ray_settings": "ブロック検出レイ設定",
+  "config.description.block_detection_ray_settings": "Minecraftでは、1532本のレイが爆発中心から外向きに発射され、16x16x16のボクセルグリッドの外層をカバーします。\n(詳細は\" https://minecraft.fandom.com/wiki/Explosion \")\n\nすべてのレイを表示すると非常に混乱することがあります。このコマンドではこれらのレイをレイヤーごとに表示できます。",
+
+  "config.option.x_min": "X-最小値",
+  "config.option.description.x_min": "(0~16)",
+
+  "config.option.x_max": "X-最大値",
+  "config.option.description.x_max": "(0~16)",
+
+  "config.option.y_min": "Y-最小値",
+  "config.option.description.y_min": "(0~16)",
+
+  "config.option.y_max": "Y-最大値",
+  "config.option.description.y_max": "(0~16)",
+
+  "config.option.z_min": "Z-最小値",
+  "config.option.description.z_min": "(0~16)",
+
+  "config.option.z_max": "Z-最大値",
+  "config.option.description.z_max": "(0~16)",
+
+  "config.option.invert": "反転",
+  "config.option.description.invert": "レンダリング範囲を反転します。",
+
+  "config.option.layer_min": "最小レイヤー",
+  "config.option.description.layer_min": "最小レンダリングレイヤー",
+
+  "config.option.layer_max": "最大レイヤー",
+  "config.option.description.layer_max": "最大レンダリングレイヤー",
+
+  "config.option.block_detection_ray_icon": "ブロック検出レイレンダリングアイコン",
+  "config.option.description.block_detection_ray_icon": "ブロック検出レイのアイコンテキスト",
+
+  "config.option.block_detection_ray_icon_size": "ブロック検出レイレンダリングアイコンサイズ",
+  "config.option.description.block_detection_ray_icon_size": "ブロック検出レイのアイコンサイズ",
+
+  "config.option.render_with_alpha": "アルファ付きレンダリング",
+  "config.option.description.render_with_alpha": "レイの透明度に基づいて爆発の威力をレンダリングします。",
+
+  "config.option.block_destruction_render_settings": "ブロック破壊レンダリング設定",
+
+  "config.option.block_destruction_render_color": "ブロック破壊レンダリング色",
+  "config.option.description.block_destruction_render_color": "爆発で破壊されるブロックアイコンの色",
+
+  "config.option.block_destruction_render_icon": "ブロック破壊レンダリングアイコン",
+  "config.option.description.block_destruction_render_icon": "爆発で破壊されるブロックのアイコンテキスト",
+
+  "config.option.block_destruction_render_icon_size": "ブロック破壊レンダリングアイコンサイズ",
+  "config.option.description.block_destruction_render_icon_size": "爆発で破壊されるブロックのアイコンサイズ",
+
+  "config.option.entity_sample_point_render_settings": "エンティティサンプルポイントレンダリング設定",
+
+  "config.option.entity_sample_point_safe_color": "エンティティサンプルポイント(安全)レンダリング色",
+
+  "config.option.entity_sample_point_safe_icon": "エンティティサンプルポイント(安全)レンダリングアイコン",
+
+  "config.option.entity_sample_point_danger_color": "エンティティサンプルポイント(危険)レンダリング色",
+
+  "config.option.entity_sample_point_danger_icon": "エンティティサンプルポイント(危険)レンダリングアイコン",
+
+  "config.option.entity_sample_point_blocked_color": "エンティティサンプルポイント(ブロック位置)レンダリング色",
+
+  "config.option.entity_sample_point_blocked_icon": "エンティティサンプルポイント(ブロック位置)レンダリングアイコン",
+
+  "config.option.entity_sample_point_icon_size": "エンティティサンプルポイント(安全)アイコンサイズ",
+  "config.option.description.entity_sample_point_icon_size": "爆発で破壊されるブロックのアイコンサイズ",
+
+  "config.option.see_Throw": "シースルー",
+  "config.option.description.see_Throw": "すべてのものの上にレンダリング、壁の後ろでも見える"
+}
