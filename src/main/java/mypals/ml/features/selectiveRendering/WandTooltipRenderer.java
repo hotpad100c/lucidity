@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -14,19 +15,22 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.apache.commons.lang3.function.TriConsumer;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.renderable.RenderContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.Keybinds.*;
+import static mypals.ml.config.LucidityConfig.renderModeBlock;
 import static mypals.ml.config.LucidityConfig.selectInSpectator;
 import static mypals.ml.features.renderKeyPresses.KeyPressesManager.getTranslatedKeyName;
-import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
-import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.*;
 
 public class WandTooltipRenderer {
@@ -47,48 +51,59 @@ public class WandTooltipRenderer {
         hudItems.add(new ToolTipItem(text, color, icon));
     }
 
-    // 动态移除HUD条目（按索引）
-    public void removeTooltip(int index) {
-        if (index >= 0 && index < hudItems.size()) {
-            hudItems.remove(index);
-        }
-    }
-    public static void generateTooltip(){
+    public static void generateTooltip() {
         hudItems.clear();
-        if(switchRenderMode.isPressed()){
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchWandMode").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_middle.png"));
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingNext").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.switchRenderingLast").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
-        }else if(addArea.isPressed()){
-            if(wandApplyToMode != WandApplyToMode.APPLY_TO_PARTICLES) {
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addSpecific").getString(), new Color(255, 255, 255, 200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
-            }if(pos1 != null && pos2 != null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.addArea").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
-            }
-        }if(deleteArea.isPressed()){
-            WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.delete").getString(), new Color(255,180,180,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
-            if(pos1 != null && pos2 != null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.cut").getString(), new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
-            }
-        }else{
-            WandTooltipRenderer.addTooltip(Text.translatable(switchRenderMode.getTranslationKey()).getString() +"("+switchRenderMode.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
-            if(pos1 == null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP1").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_left.png"));
-            }if(pos2 == null){
-                WandTooltipRenderer.addTooltip(Text.translatable("config.lucidity.wand.selectP2").getString(), new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/mouse_right.png"));
-            }if(pos1 != null && pos2 != null){
-                WandTooltipRenderer.addTooltip(Text.translatable(addArea.getTranslationKey()).getString() +"("+addArea.getBoundKeyLocalizedText().getString()+")", new Color(255,255,255,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
-                WandTooltipRenderer.addTooltip(Text.translatable(deleteArea.getTranslationKey()).getString()+"("+deleteArea.getBoundKeyLocalizedText().getString()+")", new Color(255,200,200,200), Identifier.of(MOD_ID, "textures/gui/hotkey.png"));
 
+        TriConsumer<String,Color,String> addTooltip = (key, color, icon) ->
+                WandTooltipRenderer.addTooltip(Text.translatable(key).getString(), color, Identifier.of(MOD_ID, icon));
+
+        TriConsumer<KeyBinding,Color ,String> addKeyTooltip = (key,color, icon) ->
+                addTooltip.accept(Text.translatable(key.getTranslationKey()).getString() + "(" + key.getBoundKeyLocalizedText().getString() + ")", color, icon);
+
+        if (switchRenderMode.isPressed()) {
+            addKeyTooltip.accept(switchRenderMode, new Color(200, 255, 200, 200),"textures/gui/hotkey.png");
+            addTooltip.accept("config.lucidity.wand.switchWandMode", new Color(255, 255, 255, 200), "textures/gui/mouse_middle.png");
+            addTooltip.accept("config.lucidity.wand.switchRenderingNext", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
+            addTooltip.accept("config.lucidity.wand.switchRenderingLast", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
+        } else if (addArea.isPressed()) {
+            addKeyTooltip.accept(addArea, new Color(200, 255, 200, 200),"textures/gui/hotkey.png");
+            if (wandApplyToMode != WandApplyToMode.APPLY_TO_PARTICLES) {
+                addTooltip.accept("config.lucidity.wand.addSpecific", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
+            }
+            if (pos1 != null && pos2 != null) {
+                addTooltip.accept("config.lucidity.wand.addArea", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
+            }
+        } else if (deleteArea.isPressed()) {
+            addKeyTooltip.accept(deleteArea,new Color(200, 255, 200, 200), "textures/gui/hotkey.png");
+            addTooltip.accept("config.lucidity.wand.delete", new Color(255, 180, 180, 200), "textures/gui/mouse_right.png");
+            if (pos1 != null && pos2 != null) {
+                addTooltip.accept("config.lucidity.wand.cut", new Color(255, 200, 200, 200), "textures/gui/mouse_left.png");
+            }
+        } else {
+            if (pos1 == null) {
+                addTooltip.accept("config.lucidity.wand.selectP1", new Color(255, 255, 255, 200), "textures/gui/mouse_left.png");
+            }
+            if (pos2 == null) {
+                addTooltip.accept("config.lucidity.wand.selectP2", new Color(255, 255, 255, 200), "textures/gui/mouse_right.png");
+            }
+            if (pos1 != null && pos2 != null) {
+                if (!addArea.isPressed()) {
+                    addKeyTooltip.accept(addArea, new Color(255, 255, 255, 200),"textures/gui/hotkey.png");
+                }
+                if (!deleteArea.isPressed()) {
+                    addKeyTooltip.accept(deleteArea, new Color(255, 255, 255, 200),"textures/gui/hotkey.png");
+                }
+            }
+            if (!switchRenderMode.isPressed()) {
+                addKeyTooltip.accept(switchRenderMode, new Color(255, 255, 255, 200),"textures/gui/hotkey.png");
             }
         }
-
     }
     public static void renderWandTooltip(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
         boolean shouldSelect = player.getMainHandStack().getItem() == wand || (selectInSpectator && player.isSpectator());
-        if (!shouldSelect) {
+        if (!shouldSelect || client.options.hudHidden) {
             return;
         }
 
@@ -100,7 +115,7 @@ public class WandTooltipRenderer {
 
         int x = centerX - 50;
         int y = centerY + 5;
-        int lineHeight = 15;
+        int lineHeight = 10;
 
         int maxTextWidth = 0;
         for (ToolTipItem item : hudItems) {
@@ -109,17 +124,65 @@ public class WandTooltipRenderer {
         }
 
         x = centerX - maxTextWidth / 2;
-
         for (ToolTipItem item : hudItems) {
             if (item.icon != null) {
+                RenderSystem.enableBlend();
                 context.drawTexture(item.icon, x, y, 0, 0, 16, 16, 16, 16);
+                RenderSystem.disableBlend();
             }
 
             int textX = x + (item.icon != null ? 20 : 0);
             context.drawText(client.textRenderer, item.text, textX, (int) (y + 4), item.color, true);
 
             y += lineHeight;
+            renderWandModeIcon(context);
         }
-    }
 
+
+
+    }
+    public static void renderWandModeIcon(DrawContext context) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity player = client.player;
+        boolean shouldSelect = player.getMainHandStack().getItem() == wand || (selectInSpectator && player.isSpectator());
+        if (!shouldSelect) {
+            return;
+        }
+
+        int screenWidth = client.getWindow().getScaledWidth();
+        int screenHeight = client.getWindow().getScaledHeight();
+        int centerX = screenWidth / 2;
+        int centerY = screenHeight;
+
+        int iconWidth = 32;
+        int distance = 2;
+
+        int x = 0;
+        int y = centerY - 60/* + iconYOffset*/;
+        RenderSystem.enableBlend();
+        context.drawTexture(Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        RenderSystem.disableBlend();
+        context.drawText(client.textRenderer, Text.translatable(wandApplyToMode.getTranslationKey()), x+iconWidth+2, y+(iconWidth/2), 0xFFFFFFE0, true);
+
+        String translationKey = "-";
+        Identifier secondIcon = switch (wandApplyToMode) {
+            case WandApplyToMode.APPLY_TO_BLOCKS -> {
+                translationKey = blockRenderMode.getTranslationKey();
+                yield Identifier.of(MOD_ID, blockRenderMode.getIcon());
+            }
+            case WandApplyToMode.APPLY_TO_ENTITIES -> {
+                translationKey = entityRenderMode.getTranslationKey();
+                yield Identifier.of(MOD_ID, entityRenderMode.getIcon());
+            }
+            case WandApplyToMode.APPLY_TO_PARTICLES -> {
+                translationKey = particleRenderMode.getTranslationKey();
+                yield Identifier.of(MOD_ID, particleRenderMode.getIcon());
+            }
+        };
+        RenderSystem.enableBlend();
+        context.drawTexture(secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        RenderSystem.disableBlend();
+        context.drawText(client.textRenderer, Text.translatable(translationKey), x+iconWidth, y + iconWidth, 0xFFFFFFE0, true);
+
+    }
 }

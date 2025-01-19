@@ -1,0 +1,106 @@
+{
+  "command.explosion-visualizer.main_render": "爆炸可視化: 主渲染 -> %s",
+  "command.explosion-visualizer.entity_damage_render": "爆炸可視化: 實體傷害渲染 -> %s",
+  "command.explosion-visualizer.entity_ray_cast": "爆炸可視化: 實體傷害射線/取樣點渲染 -> %s",
+  "command.explosion-visualizer.block_destruction_render": "爆炸可視化: 方塊破壞渲染 -> %s",
+  "command.explosion-visualizer.block_detection_ray_render": "爆炸可視化: 方塊檢測射線渲染 -> %s",
+  "command.explosion-visualizer.block_damage_ray_range_updated": "爆炸可視化: 方塊檢測射線渲染範圍已更新。",
+  "command.explosion-visualizer.block_damage_ray_layer_updated": "爆炸可視化: 方塊檢測射線渲染層已更新。",
+  "command.explosion-visualizer.block_detection_ray_settings_reset": "爆炸可視化: 方塊檢測射線渲染設定已重置！",
+  "command.explosion-visualizer.block_detection_ray_layer_reset": "爆炸可視化: 方塊檢測射線渲染層已重置！",
+  "command.explosion-visualizer.block_detection_ray_range_reset": "爆炸可視化: 方塊檢測射線渲染範圍已重置！",
+  "command.explosion-visualizer.fake_explosion_add": "爆炸可視化: 已添加假爆炸: %s 於 %s，威力為 %s",
+  "command.explosion-visualizer.fake_explosion_duplicate": "爆炸可視化: 無法添加假爆炸 %s 於 %s: 名稱重複！",
+  "command.explosion-visualizer.fake_explosion_remove": "爆炸可視化: 已移除假爆炸: %s",
+  "command.explosion-visualizer.fake_explosion_clear": "爆炸可視化: 已清除所有假爆炸",
+
+  "config.title.explosion_visualizer": "爆炸可視化",
+  "config.category.explosion_visualizer": "爆炸可視化",
+  "config.group.renders": "渲染設定",
+  "config.description.main_features": "主要功能",
+
+  "config.option.main_render": "主渲染",
+  "config.option.description.main_render": "這是主渲染，請先確保啟用它！",
+
+  "config.option.block_destruction": "方塊破壞",
+  "config.option.description.block_destruction": "渲染爆炸將破壞的方塊。",
+
+  "config.option.block_detection_ray": "方塊檢測射線",
+  "config.option.description.block_detection_ray": "渲染用於檢測爆炸破壞方塊的檢測射線。",
+
+  "config.option.sample_points": "取樣點",
+  "config.option.description.sample_points": "渲染範圍內的實體取樣點，用於爆炸中的射線投射。",
+
+  "config.option.explosion_damage": "爆炸傷害",
+  "config.option.description.explosion_damage": "渲染範圍內實體的爆炸傷害。",
+
+  "config.title.settings": "設定",
+  "config.category.settings": "設定",
+
+  "config.group.block_detection_ray_settings": "方塊檢測射線設定",
+  "config.description.block_detection_ray_settings": "在Minecraft中，1532條射線從爆炸中心向外發射，覆蓋16x16x16的體素網格的最外層。\n(詳情見\" https://minecraft.fandom.com/wiki/Explosion \")\n\n同時顯示所有射線可能會顯得非常混亂。此命令允許您分層查看這些射線。",
+
+  "config.option.x_min": "X-最小值",
+  "config.option.description.x_min": "(0~16)",
+
+  "config.option.x_max": "X-最大值",
+  "config.option.description.x_max": "(0~16)",
+
+  "config.option.y_min": "Y-最小值",
+  "config.option.description.y_min": "(0~16)",
+
+  "config.option.y_max": "Y-最大值",
+  "config.option.description.y_max": "(0~16)",
+
+  "config.option.z_min": "Z-最小值",
+  "config.option.description.z_min": "(0~16)",
+
+  "config.option.z_max": "Z-最大值",
+  "config.option.description.z_max": "(0~16)",
+
+  "config.option.invert": "反轉",
+  "config.option.description.invert": "反轉渲染範圍。",
+
+  "config.option.layer_min": "最小層",
+  "config.option.description.layer_min": "最小渲染層",
+
+  "config.option.layer_max": "最大層",
+  "config.option.description.layer_max": "最大渲染層",
+
+  "config.option.block_detection_ray_icon": "方塊檢測射線渲染圖標",
+  "config.option.description.block_detection_ray_icon": "方塊檢測射線的圖標文本",
+
+  "config.option.block_detection_ray_icon_size": "方塊檢測射線渲染圖標大小",
+  "config.option.description.block_detection_ray_icon_size": "方塊檢測射線的圖標大小",
+
+  "config.option.render_with_alpha": "使用透明度渲染",
+  "config.option.description.render_with_alpha": "根據射線的透明度渲染爆炸威力。",
+
+  "config.option.block_destruction_render_settings": "方塊破壞渲染設定",
+
+  "config.option.block_destruction_render_color": "方塊破壞渲染顏色",
+  "config.option.description.block_destruction_render_color": "爆炸將破壞的方塊圖標的顏色",
+
+  "config.option.block_destruction_render_icon": "方塊破壞渲染圖標",
+  "config.option.description.block_destruction_render_icon": "爆炸將破壞的方塊的圖標文本",
+
+  "config.option.block_destruction_render_icon_size": "方塊破壞渲染圖標大小",
+  "config.option.description.block_destruction_render_icon_size": "爆炸將破壞的方塊的圖標大小",
+
+  "config.option.entity_sample_point_render_settings": "實體取樣點渲染設定",
+
+  "config.option.entity_sample_point_safe_color": "實體取樣點(安全)渲染顏色",
+
+  "config.option.entity_sample_point_safe_icon": "實體取樣點(安全)渲染圖標",
+
+  "config.option.entity_sample_point_danger_color": "實體取樣點(危險)渲染顏色",
+
+  "config.option.entity_sample_point_danger_icon": "實體取樣點(危險)渲染圖標",
+
+  "config.option.entity_sample_point_blocked_color": "實體取樣點(被阻擋位置)渲染顏色",
+
+  "config.option.entity_sample_point_blocked_icon": "實體取樣點(被阻擋位置)渲染圖標",
+
+  "config.option.entity_sample_point_icon_size": "實體取樣點(安全)圖標大小",
+  "config.option.description.entity_sample_point_icon_size": "實體取樣點的圖標大小"
+}
