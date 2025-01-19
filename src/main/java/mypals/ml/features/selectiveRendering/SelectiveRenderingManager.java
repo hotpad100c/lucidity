@@ -39,19 +39,19 @@ public class SelectiveRenderingManager {
     public static RenderMode entityRenderMode = RenderMode.OFF;
     public static RenderMode particleRenderMode = RenderMode.OFF;
     public enum RenderMode {
-        OFF("config.lucidity.render_mode.off","textures/gui/renderingMode/render_mode_off.png"),
-        RENDER_INSIDE_INCLUDE("config.lucidity.render_mode.render_inside_include","textures/gui/renderingMode/render_mode_1.png"),
-        RENDER_OUTSIDE_INCLUDE("config.lucidity.render_mode.render_outside_include","textures/gui/renderingMode/render_mode_2.png"),
-        RENDER_INSIDE_EXCLUDE("config.lucidity.render_mode.render_inside_exclude","textures/gui/renderingMode/render_mode_3.png"),
-        RENDER_OUTSIDE_EXCLUDE("config.lucidity.render_mode.render_outside_exclude","textures/gui/renderingMode/render_mode_4.png"),
+        OFF("config.lucidity.render_mode.off","textures/gui/rendering_mode/render_mode_off.png"),
+        RENDER_INSIDE_INCLUDE("config.lucidity.render_mode.render_inside_include","textures/gui/rendering_mode/render_mode_1.png"),
+        RENDER_OUTSIDE_INCLUDE("config.lucidity.render_mode.render_outside_include","textures/gui/rendering_mode/render_mode_2.png"),
+        RENDER_INSIDE_EXCLUDE("config.lucidity.render_mode.render_inside_exclude","textures/gui/rendering_mode/render_mode_3.png"),
+        RENDER_OUTSIDE_EXCLUDE("config.lucidity.render_mode.render_outside_exclude","textures/gui/rendering_mode/render_mode_4.png"),
         //RENDER_INSIDE_NONE("config.lucidity.render_mode.render_inside_none"),
-        RENDER_ONLY_SPECIFIC("config.lucidity.render_mode.render_only_specific","textures/gui/renderingMode/render_mode_5.png"),
+        RENDER_ONLY_SPECIFIC("config.lucidity.render_mode.render_only_specific","textures/gui/rendering_mode/render_mode_5.png"),
         //RENDER_INSIDE_ONLY("config.lucidity.render_mode.render_inside_only"),
-        RENDER_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_exclude_specific","textures/gui/renderingMode/render_mode_6.png"),
-        RENDER_INSIDE_ALL("config.lucidity.render_mode.render_inside_all","textures/gui/renderingMode/render_mode_7.png"),
-        RENDER_OUTSIDE_ALL("config.lucidity.render_mode.render_outside_all","textures/gui/renderingMode/render_mode_8.png"),
-        RENDER_INSIDE_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_inside_exclude_specific","textures/gui/renderingMode/render_mode_9.png"),
-        RENDER_OUTSIDE_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_outside_exclude_specific","textures/gui/renderingMode/render_mode_10.png");
+        RENDER_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_exclude_specific","textures/gui/rendering_mode/render_mode_6.png"),
+        RENDER_INSIDE_ALL("config.lucidity.render_mode.render_inside_all","textures/gui/rendering_mode/render_mode_7.png"),
+        RENDER_OUTSIDE_ALL("config.lucidity.render_mode.render_outside_all","textures/gui/rendering_mode/render_mode_8.png"),
+        RENDER_INSIDE_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_inside_exclude_specific","textures/gui/rendering_mode/render_mode_9.png"),
+        RENDER_OUTSIDE_EXCLUDE_SPECIFIC("config.lucidity.render_mode.render_outside_exclude_specific","textures/gui/rendering_mode/render_mode_10.png");
         private final String translationKey;
         private final String icon;
 

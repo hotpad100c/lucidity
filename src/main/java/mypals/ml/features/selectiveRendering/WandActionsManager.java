@@ -40,9 +40,9 @@ public class WandActionsManager {
 
     public static boolean deleteMode = false;
     public enum WandApplyToMode {
-        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks","textures/gui/renderingMode/wand_mode_blocks.png"),
-        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities","textures/gui/renderingMode/wand_mode_entities.png"),
-        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles","textures/gui/renderingMode/wand_mode_particles.png");
+        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks","textures/gui/rendering_mode/wand_mode_blocks.png"),
+        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities","textures/gui/rendering_mode/wand_mode_entities.png"),
+        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles","textures/gui/rendering_mode/wand_mode_particles.png");
         private final String translationKey;
         private final String icon;
 
