@@ -299,6 +299,105 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                 )
 
                                 .build()
+                ).category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.heighLightLava"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.heighLightLava"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.heighLightLava"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.heighLightLava"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.heighLightLava"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().fluidSourceHighLight, bool -> instance.instance().fluidSourceHighLight = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        )
+                                        .build()
+                                )
+
+                                .build()
+                )
+                .category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.trajectory"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.trajectory"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.trajectory"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.trajectory"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.trajectory"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderTrajectory, bool -> instance.instance().renderTrajectory = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.mob_color"))
+
+                                                        .binding(Color.orange, () -> instance.instance().mobTrajectoryColor, color -> instance.instance().mobTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.player_color"))
+
+                                                        .binding(Color.green, () -> instance.instance().selfTrajectoryColor, color -> instance.instance().selfTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.self_color"))
+
+                                                        .binding(Color.magenta, () -> instance.instance().playerTrajectoryColor, color -> instance.instance().playerTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.liner_projectiles_color"))
+
+                                                        .binding(Color.red, () -> instance.instance().linerTrajectoryColor, color -> instance.instance().linerTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.far_projectiles_color"))
+
+                                                        .binding(Color.yellow, () -> instance.instance().farTrajectoryColor, color -> instance.instance().farTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        ).option(
+                                                Option.<Color>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.near_projectiles_color"))
+
+                                                        .binding(Color.cyan, () -> instance.instance().nearTrajectoryColor, color -> instance.instance().nearTrajectoryColor = color)
+                                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                                .allowAlpha(true))
+                                                        .build()
+                                        )
+                                        .build()
+                                )
+
+                                .build()
                 )
                 .save(() -> {
                     instance.save();

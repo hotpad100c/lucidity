@@ -2,17 +2,24 @@ package mypals.ml;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
+import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.damageIndicator.DamageHandler;
 import mypals.ml.features.damageIndicator.IndicatorRenderer;
+import mypals.ml.features.highLightFluidSource.FluidSourceResourceLoader;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
 import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
+import mypals.ml.features.trajectory.TrajectoryManager;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.world.ClientWorld;
@@ -21,12 +28,12 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.BlockEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -34,11 +41,11 @@ import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import static mypals.ml.config.LucidityConfig.*;
+import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
@@ -86,13 +93,34 @@ public class Lucidity implements ModInitializer {
 
     @Override
 	public void onInitialize() {
-		loadConfig();
+		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> {
+			ResourceManagerHelper.registerBuiltinResourcePack(
+					Identifier.of(MOD_ID, "lavahighlight"),
+					container,
+					ResourcePackActivationType.NORMAL
+			);
+		});
 
-		Keybinds.initialize();
+		loadConfig();
+		TrajectoryManager.init();
+		OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(-5,0,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,0,-5));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,0,5));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,-5,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));
+		FluidSourceResourceLoader.init();
+		Keybinds.init();
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
 			KeyPressesManager.renderPressed(context);
 			WandTooltipRenderer.renderWandTooltip(context);
 			IndicatorRenderer.renderIndicators(context);
+		});
+		WorldRenderEvents.LAST.register((context) ->{
+			//OutlineManager.init();
+			OutlineManager.resolveBlocks();
+			OutlineManager.onRenderWorldLast(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
@@ -135,6 +163,7 @@ public class Lucidity implements ModInitializer {
 		if(world == null){return;}
 		assert client.player != null;
 		PlayerEntity player = client.player;
+
 		if(warningTime > 0){
 			BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(player,world);
 			//resolveBreakingSituation(player,world,blockBreakingRayCast.getBlockPos());
@@ -144,6 +173,12 @@ public class Lucidity implements ModInitializer {
 		}
 		if(enableDamageIndicator){
 			DamageHandler.PlayerHealthMonitor();
+		}
+		if(renderTrajectory){
+			TrajectoryManager.onClientTick(client);
+		}
+		if(renderMobSpawn){
+			addSpawnDataToInformationRenderer();
 		}
 	}
 	public static void UpdateTimers(){

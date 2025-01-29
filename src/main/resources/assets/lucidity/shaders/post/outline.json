@@ -1,0 +1,43 @@
+{
+    "targets": [
+        "swap",
+        "final"
+    ],
+    "passes": [{
+        "name": "block_outline",
+        "intarget": "final",
+        "outtarget": "swap",
+        "uniforms": [
+            {
+                "name": "ColorModulator",
+                "values": [0.0, 0.0, 1.0, 1.0]
+            }
+        ]
+    }, {
+        "name": "box_blur",
+        "intarget": "swap",
+        "outtarget": "final",
+        "uniforms": [{
+            "name": "BlurDir",
+            "values": [1.0, 0.0]
+        }, {
+            "name": "Radius",
+            "values": [2.0]
+        }]
+    }, {
+        "name": "box_blur",
+        "intarget": "final",
+        "outtarget": "swap",
+        "uniforms": [{
+            "name": "BlurDir",
+            "values": [0.0, 1.0]
+        }, {
+            "name": "Radius",
+            "values": [2.0]
+        }]
+    }, {
+        "name": "blit",
+        "intarget": "swap",
+        "outtarget": "final"
+    }]
+}

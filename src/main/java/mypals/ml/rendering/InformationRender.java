@@ -2,29 +2,21 @@ package mypals.ml.rendering;
 
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
-import mypals.ml.rendering.glowingMarker.GlowEffect;
-import mypals.ml.rendering.shapes.BoxShape;
-import mypals.ml.rendering.shapes.CubeShape;
-import mypals.ml.rendering.shapes.Line;
-import mypals.ml.rendering.shapes.ShineMarker;
+import mypals.ml.rendering.shapes.*;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.Lucidity.getPlayerLookedBlock;
 import static mypals.ml.config.LucidityConfig.selectInSpectator;
-import static mypals.ml.features.AdvancedContentRender.ImageRenderer.renderPicture;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.deleteMode;
@@ -37,12 +29,18 @@ public class InformationRender {
     public static List<BoxShape> boxes = new CopyOnWriteArrayList<>();
     public static List<CubeShape> cubes = new CopyOnWriteArrayList<>();
     public static List<Line> lines = new CopyOnWriteArrayList<>();
+    public static List<MultiPointLine> multiPointLines = new CopyOnWriteArrayList<>();
     public static List<ShineMarker> shineMarkers = new CopyOnWriteArrayList<>();
+    public static List<Text> texts = new CopyOnWriteArrayList<>();
+
 
 
 
     public static void addBox(BoxShape box) {
         boxes.add(box);
+    }
+    public static void addText(Text text) {
+        texts.add(text);
     }
     public static void addCube(CubeShape cube) {
         cubes.add(cube);
@@ -50,6 +48,7 @@ public class InformationRender {
     public static void addLine(Line line) {
         lines.add(line);
     }
+    public static void addLine(MultiPointLine line) {multiPointLines.add(line);}
     public static void addShineMarker(ShineMarker shineMarker,int time){
         shineMarker.lifeTime = time;
         shineMarkers.forEach(marker->{
@@ -69,6 +68,9 @@ public class InformationRender {
             for (Line line : lines) {
                 ShapeRender.drawLine(matrixStack, line.start, line.end, counter.getTickDelta(true), line.color, line.alpha);
             }
+            for (MultiPointLine line : multiPointLines) {
+                ShapeRender.drawMultiPointLine(matrixStack, line.points, counter.getTickDelta(true), line.color, line.alpha);
+            }
             for (CubeShape cube : cubes) {
                 if (cube.seeThrough)
                     ShapeRender.drawCubeSeeThrough(matrixStack, cube.pos, 0.01f, counter.getTickDelta(true), cube.color, cube.alpha);
@@ -80,7 +82,10 @@ public class InformationRender {
                 renderBeam(matrixStack, 1);
                 renderGlowEffect(matrixStack, marker.pos, marker.size, counter,
                         MinecraftClient.getInstance().cameraEntity.age, marker.lights, marker.speed, 2,
-                        marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), (int) Math.round(mapAlpha(marker.lifeTime, 0, 30) * 255), marker.seed);
+                        marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), marker.autoAlpha?(int) Math.round(mapAlpha(marker.lifeTime, 0, 30) * 255):255, marker.seed);
+            }
+            for (Text text : texts) {
+                ShapeRender.drawStringList(matrixStack,text.pos,counter.getTickDelta(true),0,(ArrayList)text.texts,text.color,text.size);
             }
             if (MinecraftClient.getInstance().player != null && (MinecraftClient.getInstance().player.getMainHandStack().getItem() == wand || (MinecraftClient.getInstance().player.isSpectator() && selectInSpectator))){
                 BlockHitResult result = getPlayerLookedBlock(MinecraftClient.getInstance().player, MinecraftClient.getInstance().world);
@@ -104,6 +109,8 @@ public class InformationRender {
         boxes.clear();
         lines.clear();
         cubes.clear();
+        texts.clear();
+        multiPointLines.clear();
         shineMarkers.forEach(marker->{
             marker.lifeTime--;
             if(marker.lifeTime <= 0){

@@ -40,9 +40,9 @@ public class WandActionsManager {
 
     public static boolean deleteMode = false;
     public enum WandApplyToMode {
-        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks","textures/gui/renderingMode/wand_mode_blocks.png"),
-        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities","textures/gui/renderingMode/wand_mode_entities.png"),
-        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles","textures/gui/renderingMode/wand_mode_particles.png");
+        APPLY_TO_BLOCKS("config.lucidity.wand.apply_to_blocks","textures/gui/rendering_mode/wand_mode_blocks.png"),
+        APPLY_TO_ENTITIES("config.lucidity.wand.apply_to_entities","textures/gui/rendering_mode/wand_mode_entities.png"),
+        APPLY_TO_PARTICLES("config.lucidity.wand.apply_to_particles","textures/gui/rendering_mode/wand_mode_particles.png");
         private final String translationKey;
         private final String icon;
 
@@ -168,6 +168,7 @@ public class WandActionsManager {
     }
     public static void switchRenderMod(boolean increase){
         LucidityConfig.CONFIG_HANDLER.instance();
+        if(selectCoolDown > 0){return;}
         switch (wandApplyToMode){
             case WandApplyToMode.APPLY_TO_BLOCKS -> {
                 if (increase) {
@@ -198,6 +199,7 @@ public class WandActionsManager {
         if(wandApplyToMode == WandApplyToMode.APPLY_TO_BLOCKS){
             onConfigUpdated();
         }
+        selectCoolDown = SELECT_COOLDOWN;
     }
     public static void switchWandMod(boolean increase){
         LucidityConfig.CONFIG_HANDLER.instance();
