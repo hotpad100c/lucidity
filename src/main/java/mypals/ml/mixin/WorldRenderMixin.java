@@ -1,6 +1,7 @@
 package mypals.ml.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.rendering.InformationRender;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,4 +33,16 @@ public class WorldRenderMixin {
 	) {
 		InformationRender.render(matrixStack,tickCounter);
 	}
+	@Inject(method = "reload(Lnet/minecraft/resource/ResourceManager;)V", at = @At("HEAD"))
+	private void reload(CallbackInfo ci
+	) {
+		OutlineManager.init();
+	}
+	@Inject(method = "onResized(II)V", at = @At("HEAD"))
+	private void resize(CallbackInfo ci
+	) {
+		OutlineManager.init();
+	}
+
+
 }

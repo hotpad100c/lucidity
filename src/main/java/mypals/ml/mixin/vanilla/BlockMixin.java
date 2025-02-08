@@ -34,35 +34,5 @@ public class BlockMixin {
                 cir.setReturnValue(false);
             }
         }
-            /*int currentBlockId = Registries.BLOCK.getRawId(state.getBlock());
-            int neighborBlockId = Registries.BLOCK.getRawId(world.getBlockState(otherPos).getBlock());
-            boolean isBlacklistedBlock = isSelectedType(currentBlockId);
-            boolean isNeighborBlacklisted = isSelectedType(neighborBlockId);
-
-            if(!invertSelectiveBlockTypes) {
-                if (isBlacklistedBlock) {
-                    return false;
-                }
-                else if (isNeighborBlacklisted) {
-                    return true;
-                }
-                else{
-                    return original.call(state, world, pos, side, otherPos);
-                }
-            }else{
-                if (!isBlacklistedBlock) {
-                    return false;
-                }
-                else if (!isNeighborBlacklisted) {
-                    return true;
-                }
-                else{
-                    return original.call(state, world, pos, side, otherPos);
-                }
-            }
-        }else{
-            return original.call(state, world, pos, side, otherPos);
-        }*/
-
     }
 }

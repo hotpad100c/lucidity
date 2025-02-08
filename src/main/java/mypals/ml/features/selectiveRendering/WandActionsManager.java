@@ -168,6 +168,7 @@ public class WandActionsManager {
     }
     public static void switchRenderMod(boolean increase){
         LucidityConfig.CONFIG_HANDLER.instance();
+        if(selectCoolDown > 0){return;}
         switch (wandApplyToMode){
             case WandApplyToMode.APPLY_TO_BLOCKS -> {
                 if (increase) {
@@ -198,6 +199,7 @@ public class WandActionsManager {
         if(wandApplyToMode == WandApplyToMode.APPLY_TO_BLOCKS){
             onConfigUpdated();
         }
+        selectCoolDown = SELECT_COOLDOWN;
     }
     public static void switchWandMod(boolean increase){
         LucidityConfig.CONFIG_HANDLER.instance();

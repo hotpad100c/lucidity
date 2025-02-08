@@ -91,5 +91,17 @@
   "config.lucidity.damageIndicator.color": "Color of the damage indicator.",
   "config.lucidity.damageIndicator.offset": "Damage indicator offset.",
   "config.lucidity.description.damageIndicator.offset": "The amount by which the damage indicator is offset from the center of the screen.",
-  "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen."
+  "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen.",
+
+  "config.lucidity.heighLightLava": "Highlight lava sources",
+  "config.lucidity.description.heighLightLava": "Gives lava source a different highlight texture.(resources/lucidity/textures/block/lava_flow & lava_still)",
+
+  "config.lucidity.trajectory": "Projectile Trajectory",
+  "config.lucidity.description.trajectory": "Display trajectory for projectiles",
+  "config.lucidity.mob_color": "Enemy mob trajectory color",
+  "config.lucidity.player_color": "Player trajectory color",
+  "config.lucidity.self_color": "Self trajectory color",
+  "config.lucidity.liner_projectiles_color": "Linear projectile trajectory color",
+  "config.lucidity.far_projectiles_color": "Far-range projectile trajectory color",
+  "config.lucidity.near_projectiles_color": "Near-range projectile trajectory color"
 }

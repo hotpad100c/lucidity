@@ -4,3 +4,4 @@ accessible class net/minecraft/client/render/chunk/RenderedChunk
 accessible field net/minecraft/client/world/ClientChunkManager chunks Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
 accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
 accessible class net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator
+accessible field net/minecraft/client/gl/PostEffectProcessor passes Ljava/util/List;

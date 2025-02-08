@@ -17,6 +17,7 @@ import org.joml.Matrix4fStack;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static mypals.ml.Lucidity.getPlayerLookedBlock;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.deleteMode;
@@ -72,20 +73,18 @@ public class ShapeRender {
     public static VertexConsumerProvider.Immediate getVertexConsumer() {
         return MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
     }
-    public static void drawStringList(MatrixStack matrices, BlockPos textPos, float tickDelta, float line, ArrayList<String> texts, ArrayList<Integer> colors, float size) {
+    public static void drawStringList(MatrixStack matrices, Vec3d textPos, float tickDelta, float line, ArrayList<String> texts, List<Color> colors, float size) {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
-        //modelViewMatrixStack modelViewMatrix = new modelViewMatrixStack(1);
-        //modelViewMatrix.identity();
 
         if (camera.isReady() && client.getEntityRenderDispatcher().gameOptions != null && client.player != null) {
             matrices.push();
             lastTickPosX = camera.getPos().getX();
             lastTickPosY = camera.getPos().getY();
             lastTickPosZ = camera.getPos().getZ();
-            float x = (float) (textPos.toCenterPos().getX() - MathHelper.lerp(tickDelta, lastTickPosX, camera.getPos().getX()));
-            float y = (float) (textPos.toCenterPos().getY() - MathHelper.lerp(tickDelta, lastTickPosY, camera.getPos().getY()));
-            float z = (float) (textPos.toCenterPos().getZ() - MathHelper.lerp(tickDelta, lastTickPosZ, camera.getPos().getZ()));
+            float x = (float) (textPos.getX() - MathHelper.lerp(tickDelta, lastTickPosX, camera.getPos().getX()));
+            float y = (float) (textPos.getY() - MathHelper.lerp(tickDelta, lastTickPosY, camera.getPos().getY()));
+            float z = (float) (textPos.getZ() - MathHelper.lerp(tickDelta, lastTickPosZ, camera.getPos().getZ()));
 
             matrices.translate(x, y, z);
             matrices.multiply(MinecraftClient.getInstance().gameRenderer.getCamera().getRotation());
@@ -107,7 +106,7 @@ public class ShapeRender {
                 float renderY = renderYBase + textRenderer.getWrappedLinesHeight(texts.get(i), Integer.MAX_VALUE) * 1.25F * i;
                 VertexConsumerProvider.Immediate immediate = getVertexConsumer();
                 textRenderer.draw(
-                        texts.get(i), renderX, renderY, colors.get(i) != null? colors.get(i) : Color.white.getRGB(), true,
+                        texts.get(i), renderX, renderY, colors.get(i) != null? colors.get(i).getRGB() : Color.white.getRGB(), true,
                         modelViewMatrix, immediate, TextRenderer.TextLayerType.SEE_THROUGH, 0,
                         0xF000F0
                 );
@@ -115,7 +114,6 @@ public class ShapeRender {
             }
             matrices.pop();
 
-            // 恢复矩阵状态
             RenderSystem.enableDepthTest();
         }
     }
@@ -325,6 +323,14 @@ public class ShapeRender {
             BufferRenderer.drawWithGlobalProgram(buffer.end());
             RenderSystem.enableDepthTest();
             matrixStack.pop();
+        }
+    }
+    public static void drawMultiPointLine(MatrixStack matrixStack, ArrayList<Vec3d> points, float tickDelta, Color color,float alpha) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        for (int i = 0; i < points.size() - 1; i++) {
+            Vec3d start = points.get(i);
+            Vec3d end = points.get(i + 1);
+            drawLine(matrixStack, start, end, tickDelta, color, alpha);
         }
     }
     public static void drawFrame(MatrixStack matrices, BlockPos pos, float length, float width, float height, float tickDelta, Color color, float alpha) {

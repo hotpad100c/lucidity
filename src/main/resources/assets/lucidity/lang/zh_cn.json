@@ -89,5 +89,17 @@
   "config.lucidity.damageIndicator.color": "伤害指示器颜色。",
   "config.lucidity.damageIndicator.offset": "伤害指示器偏移量。",
   "config.lucidity.description.damageIndicator.offset": "伤害指示器偏离屏幕中心的量。",
-  "config.lucidity.damageIndicator.time": "伤害指示器在屏幕上留存的时间。"
+  "config.lucidity.damageIndicator.time": "伤害指示器在屏幕上留存的时间。",
+
+  "config.lucidity.heighLightLava": "高亮岩浆源",
+  "config.lucidity.description.heighLightLava": "给予岩浆源可以加载特殊高亮材质的功能，若制作材质包，位于(resources/lucidity/textures/block/lava_flow & lava_still)",
+
+  "config.lucidity.trajectory": "投掷物轨迹",
+  "config.lucidity.description.trajectory": "显示投掷物的轨迹",
+  "config.lucidity.mob_color": "敌对生物轨迹颜色",
+  "config.lucidity.player_color": "玩家轨迹颜色",
+  "config.lucidity.self_color": "自身轨迹颜色",
+  "config.lucidity.liner_projectiles_color": "直线投掷物轨迹颜色",
+  "config.lucidity.far_projectiles_color": "远距离投掷物轨迹颜色",
+  "config.lucidity.near_projectiles_color": "近距离投掷物轨迹颜色"
 }
