@@ -51,7 +51,7 @@ public class KeyPressesManager {
     }
     public static void renderPressed(DrawContext context) {
         LucidityConfig.CONFIG_HANDLER.instance();
-        if (!getKeyDisplay().isEmpty() && renderKeyPresses && MinecraftClient.getInstance().options.hudHidden) {
+        if (!getKeyDisplay().isEmpty() && renderKeyPresses && !MinecraftClient.getInstance().options.hudHidden) {
             int x = MinecraftClient.getInstance().getWindow().getScaledWidth() - 110;
             int y = MinecraftClient.getInstance().getWindow().getScaledHeight() - 20;
             context.drawText(MinecraftClient.getInstance().textRenderer, getKeyDisplay(), x, y, 0xFFFFFF, true);

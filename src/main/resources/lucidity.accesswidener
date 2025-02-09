@@ -5,3 +5,5 @@ accessible field net/minecraft/client/world/ClientChunkManager chunks Lnet/minec
 accessible field net/minecraft/client/world/ClientChunkManager$ClientChunkMap chunks Ljava/util/concurrent/atomic/AtomicReferenceArray;
 accessible class net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator
 accessible field net/minecraft/client/gl/PostEffectProcessor passes Ljava/util/List;
+accessible field net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator light [I
+accessible field net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator brightness [F

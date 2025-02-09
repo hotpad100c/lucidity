@@ -1,32 +1,50 @@
 package mypals.ml.features.explosionVisualizer.simulate;
-import mypals.ml.Lucidity;
+
 import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.explosionVisualizer.explosoionBehaviors.*;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.*;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.DamagedEntityData.EntityToDamage;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.DamagedEntityData.SamplePointsData.RayCastPointInfo.RayCastData;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.DamagedEntityData.SamplePointsData.SamplePointData;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.ExplosionAffectedObjects;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.ExplosionCastLines.ExplosionCastLine;
+import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.ExplosionCastLines.PointsOnLine.CastPoint;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.projectile.BreezeWindChargeEntity;
+import net.minecraft.entity.projectile.WindChargeEntity;
+import net.minecraft.entity.projectile.WitherSkullEntity;
+import net.minecraft.entity.vehicle.TntMinecartEntity;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import mypals.ml.features.explosionVisualizer.data.ExplosionData;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 
-import static mypals.ml.features.explosionVisualizer.ExplosionVisualizer.*;
+import static mypals.ml.config.LucidityConfig.*;
 
 public class ExplosionSimulator {
 
+    @Nullable
+    private static Entity thisEntity;
     private static boolean ignorSelf = false;
     private final World world;
     private final double x, y, z;
     private final float power;
-    private final ExplosionData.ExplosionAffectedObjects affected = new ExplosionData.ExplosionAffectedObjects(null,null,null, null, null);
+    private final ExplosionAffectedObjects affected = new ExplosionAffectedObjects(null,null,null, null, null);
 
-    public ExplosionSimulator(boolean ignorSelf, World world, float x, float y, float z, float power) {
+    public ExplosionSimulator(Entity thisEntity, boolean ignorSelf, World world, float x, float y, float z, float power) {
+        this.thisEntity = thisEntity;
         this.world = world;
         this.x = x;
         this.y = y;
@@ -45,7 +63,8 @@ public class ExplosionSimulator {
 
     private void collectBlocksAndDamageEntities() {
         Set<BlockPos> blocksToDestroy = new HashSet<>();
-        ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData sampleData = new ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData(new ArrayList<>());
+        Set<BlockPos> blocksShouldBeFine = new HashSet<>();
+        SamplePointData sampleData = new SamplePointData(new ArrayList<>());
         float blastRadius = this.power * 2.0F;
         int minX = MathHelper.floor(this.x - blastRadius - 1.0);
         int maxX = MathHelper.floor(this.x + blastRadius + 1.0);
@@ -62,21 +81,23 @@ public class ExplosionSimulator {
             for (int y = 0; y < 16; ++y) {
                 for (int z = 0; z < 16; ++z) {
                     if (isEdge(x, y, z) && (showBlockDestroyInfo || showExplosionBlockDamageRayInfo)) {
-                        processExplosion(ignorSelf, explosionCenter,entities, x, y, z, blastRadius, blocksToDestroy);
+                        processExplosion(thisEntity, ignorSelf, explosionCenter,entities, x, y, z, blastRadius, blocksToDestroy, blocksShouldBeFine);
                     }
                 }
             }
         }
 
         this.affected.blocksToDestriy.addAll(blocksToDestroy);
+        this.affected.blocksShouldBeFine.addAll(blocksShouldBeFine);
         for (Entity e : entities) {
             if(showDamageInfo || showRayCastInfo) {
-                float damage = calculateDamage(explosionCenter, power, e, sampleData);
-                this.affected.entityToDamage.add(new ExplosionData.ExplosionAffectedObjects.EntityToDamage(e, damage, sampleData));
+                if(e != thisEntity){
+                    float damage = calculateDamage(explosionCenter, power, e, sampleData);
+                    this.affected.entityToDamage.add(new EntityToDamage(e, damage, sampleData));
+                }
             }
-
         }
-        for(ExplosionData.ExplosionAffectedObjects.EntityToDamage e : this.affected.entityToDamage)
+        for(EntityToDamage e : this.affected.entityToDamage)
         {
             this.affected.samplePointData.add(e.getPointData());
         }
@@ -87,20 +108,70 @@ public class ExplosionSimulator {
         return x == 0 || x == 15 || y == 0 || y == 15 || z == 0 || z == 15;
     }
 
-    private void processExplosion(boolean ignorScourcePos, Vec3d explotionScource, List<Entity> entities, int x, int y, int z, float blastRadius, Set<BlockPos> blocksToDestroy) {
+    private int getColorForRays(Vec3i p,int colorWith)
+    {
+        LucidityConfig.CONFIG_HANDLER.instance();
+        int rgb = 0;
+        switch(colorWith){
+            case 0:
+                int r = (p.getX() * 255) / 16;
+                int g = (p.getY() * 255) / 16;
+                int b = (p.getZ() * 255) / 16;
+                // 将红色、绿色和蓝色值组合成 RGB int
+                rgb = (r << 16) | (g << 8) | b;
+                break;
+            case 1:
+                if(p.getX() == 0)
+                    rgb = LucidityConfig.Colored_FRONT.getRGB();
 
-        List<ExplosionData.ExplosionAffectedObjects.ExplosionCastLine.CastPoint> castedPoints = new ArrayList<>();
+                else if(p.getX() == 15)
+                    rgb = LucidityConfig.Colored_BACK.getRGB();
 
-        int r = (x * 255) / 16;
-        int g = (y * 255) / 16;
-        int b = (z * 255) / 16;
+                else if(p.getY() == 0)
+                    rgb = LucidityConfig.Colored_DOWN.getRGB();
 
-        // 将红色、绿色和蓝色值组合成 RGB int
-        int rgb = (r << 16) | (g << 8) | b;
+                else if(p.getY() == 15)
+                    rgb = LucidityConfig.Colored_UP.getRGB();
 
-        double dx = (double) ((float) x / 15.0F * 2.0F - 1.0F);
-        double dy = (double) ((float) y / 15.0F * 2.0F - 1.0F);
-        double dz = (double) ((float) z / 15.0F * 2.0F - 1.0F);
+                else if(p.getZ() == 0)
+                    rgb = LucidityConfig.Colored_LEFT.getRGB();
+
+                else if(p.getZ() == 15)
+                    rgb = LucidityConfig.Colored_RIGHT.getRGB();
+
+                break;
+            case 2:
+                rgb = LucidityConfig.Single_Color.getRGB();
+                break;
+        }
+        return rgb;
+    }
+    public static Text getColoringTypeForRays(int colorWith)
+    {
+        Text type = Text.literal("UNKNOWN!");
+        switch (colorWith){
+            case 0:
+                type = Text.translatable("config.option.type.direction_based");
+                break;
+            case 1:
+                type = Text.translatable("config.option.type.face_based");
+                break;
+            case 2:
+                type = Text.translatable("config.option.type.single_color");
+                break;
+        }
+        return type;
+    }
+    private void processExplosion(Entity thisEntity, boolean ignorScourcePos, Vec3d explotionScource, List<Entity> entities, int x, int y, int z, float blastRadius, Set<BlockPos> blocksToDestroy, Set<BlockPos> blocksShouldBeFine) {
+
+        List<CastPoint> castedPoints = new ArrayList<>();
+
+        LucidityConfig.CONFIG_HANDLER.instance();
+        int rgb = getColorForRays(new Vec3i(x, y ,z), LucidityConfig.ColorType);
+
+        double dx = (float) x / 15.0F * 2.0F - 1.0F;
+        double dy = (float) y / 15.0F * 2.0F - 1.0F;
+        double dz = (float) z / 15.0F * 2.0F - 1.0F;
         double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
         dx /= distance;
         dy /= distance;
@@ -117,28 +188,89 @@ public class ExplosionSimulator {
             BlockState blockState = this.world.getBlockState(currentPos);
             FluidState fluidState = this.world.getFluidState(currentPos);
 
-            if((inRange(x,y,z) && inLayer(layer)) && showExplosionBlockDamageRayInfo )
-                castedPoints.add(new ExplosionData.ExplosionAffectedObjects.ExplosionCastLine.CastPoint(new Vec3d(currentX,currentY,currentZ), blastStrength));
+            if((inRange(x,y,z) && inLayer(layer)) && showExplosionBlockDamageRayInfo &&
+                    !(new Vec3d(explotionScource.x, explotionScource.y, explotionScource.z).equals(new Vec3d(currentX, currentY, currentZ)))
+                    && !(ignorScourcePos && currentPos.equals(BlockPos.ofFloored(explotionScource))))
+                castedPoints.add(new CastPoint(new Vec3d(currentX,currentY,currentZ), blastStrength));
 
             if (!this.world.isInBuildLimit(currentPos)) {
                 break;
             }
 
+            Optional<Float> blastResistance = Optional.of(0F);
+            //----------------
 
-            Optional<Float> blastResistance = getBlastResistance(currentPos, blockState, fluidState); // Mocking blast resistance
+            if(thisEntity!=null)
+            {
+                if(thisEntity instanceof TntMinecartEntity)
+                {
+                    TntMinecartExplosionBehaviorManager EManager = new TntMinecartExplosionBehaviorManager();
+                    blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
+                }
+                else if(thisEntity instanceof WitherSkullEntity)
+                {
+                    WitherSkullExplosionBehaviorManager EManager = new WitherSkullExplosionBehaviorManager();
+                    EManager.witherSkull = (WitherSkullEntity)thisEntity;
+                    blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
+                }
+                else if(thisEntity instanceof WindChargeEntity || thisEntity instanceof BreezeWindChargeEntity){
+                    WindChargeExplosionBehaviorManager EManager = new WindChargeExplosionBehaviorManager(true, Registries.BLOCK.getEntryList(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity()));
+                    blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
+                }
+                else{
+                    EntityExplosionBehaviorManager EManager = new EntityExplosionBehaviorManager();
+                    blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
+                }
+
+            }else{
+                ExplosionBehaviorManager EManager = new ExplosionBehaviorManager();
+                blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
+            }
+
+            //---------------
 
             if (blastResistance.isPresent()) {
                 boolean isSourcePos = currentPos.equals(BlockPos.ofFloored(explotionScource));
                 if (isSourcePos && ignorScourcePos) {
-                    blastStrength -=0;
+                    blastStrength -= 0F;
                 }
                 else{
                     blastStrength -= (blastResistance.get() + 0.3F) * 0.3F;
                 }
             }
-
-            if (!currentPos.equals(BlockPos.ofFloored(explotionScource)) && blastStrength > 0.0F && !blockState.isAir() && fluidState.isEmpty()) {
-                blocksToDestroy.add(currentPos);
+            //!currentPos.equals(BlockPos.ofFloored(explotionScource)) &&
+            if (blastStrength > 0.0F && !blockState.isAir() && fluidState.isEmpty()) {
+                //Can destroy!
+                if(thisEntity != null)
+                {
+                    if(thisEntity instanceof TntMinecartEntity) {
+                        //For TntMine cart entities
+                        TntMinecartExplosionBehaviorManager EManager = new TntMinecartExplosionBehaviorManager();
+                        if (EManager.canExplosionDestroyBlock(world, currentPos, world.getBlockState(currentPos))) {
+                            //Can destroy
+                            blocksToDestroy.add(currentPos);
+                        } else {
+                            // Should destroy but cant :(
+                            blocksShouldBeFine.add(currentPos);
+                        }
+                    }
+                    else if(thisEntity instanceof WindChargeEntity || thisEntity instanceof BreezeWindChargeEntity){
+                        if(WindChargeTrigger.canTriggerBlocks(currentPos,world))
+                        {
+                            blocksToDestroy.add(currentPos);
+                        }else{
+                            blocksShouldBeFine.add(currentPos);
+                        }
+                    } else{
+                        if(!(ignorScourcePos && currentPos.equals(BlockPos.ofFloored(explotionScource))))
+                            //For other entities
+                            blocksToDestroy.add(currentPos);
+                    }
+                }else {
+                    if(!(ignorScourcePos && currentPos.equals(BlockPos.ofFloored(explotionScource))))
+                        //For blosks
+                        blocksToDestroy.add(currentPos);
+                }
             }
 
             currentX += dx * 0.30000001192092896;
@@ -147,34 +279,31 @@ public class ExplosionSimulator {
             layer++;
 
         }
-        affected.blockDestructionRays.add(new ExplosionData.ExplosionAffectedObjects.ExplosionCastLine(rgb,castedPoints));
+        affected.blockDestructionRays.add(new ExplosionCastLine(initialBlastStrength,rgb,castedPoints));
     }
 
-    public float calculateDamage(Vec3d pos, float power, Entity entity, ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData sampleData) {
+    public float calculateDamage(Vec3d pos, float power, Entity entity,SamplePointData sampleData) {
         // 获取爆炸威力，并乘以一个常数因子
         float explosionPower = power * 2.0F;
 
         // 获取爆炸的位置
         Vec3d explosionPosition = pos;
 
-        // 计算实体与爆炸位置之间的距离，并归一化
         double normalizedDistance = Math.sqrt(entity.squaredDistanceTo(explosionPosition)) / (double) explosionPower;
 
         BlockPos ignor = new BlockPos((BlockPos.ofFloored(explosionPosition)));
-        // 计算暴露度影响，基于归一化距离
+
         double exposureEffect = (1.0 - normalizedDistance) * (double) getExposure(explosionPosition, entity, ignor, sampleData);
 
-        // 计算最终伤害值
         return (float) ((exposureEffect * exposureEffect + exposureEffect) / 2.0 * 7.0 * (double) explosionPower + 1.0);
     }
-    public static float getExposure(Vec3d source, Entity entity, BlockPos ignoreBlock, ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData sampleData) {
+    public static float getExposure(Vec3d source, Entity entity, BlockPos ignoreBlock, SamplePointData sampleData) {
         Box boundingBox = entity.getBoundingBox();
         double xStep = 1.0 / ((boundingBox.maxX - boundingBox.minX) * 2.0 + 1.0);
         double yStep = 1.0 / ((boundingBox.maxY - boundingBox.minY) * 2.0 + 1.0);
         double zStep = 1.0 / ((boundingBox.maxZ - boundingBox.minZ) * 2.0 + 1.0);
         double xOffset = (1.0 - Math.floor(1.0 / xStep) * xStep) / 2.0;
         double zOffset = (1.0 - Math.floor(1.0 / zStep) * zStep) / 2.0;
-
         if (xStep >= 0.0 && yStep >= 0.0 && zStep >= 0.0) {
             int visiblePointsCount = 0;
             int totalPointsCount = 0;
@@ -189,20 +318,27 @@ public class ExplosionSimulator {
                         Vec3d point = new Vec3d(x + xOffset, y, z + zOffset);
 
                         HitResult hitResult = entity.getWorld().raycast(new RaycastContext(point, source, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
-
+                        boolean isClientPlayer = (entity instanceof ClientPlayerEntity) && !MinecraftClient.getInstance().gameRenderer.getCamera().isThirdPerson();
                         if (hitResult.getType() == HitResult.Type.MISS) {
                             visiblePointsCount++;
-                            sampleData.castPointData.add(new ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData.RayCastData(point, source, true));
+                            if(!(entity instanceof ClientPlayerEntity) || !isClientPlayer){
+                                sampleData.castPointData.add(new RayCastData(point, source, true));
+                            }
+
                         } else if (hitResult.getType() == HitResult.Type.BLOCK) {
                             BlockPos hitPos = ((BlockHitResult) hitResult).getBlockPos();
 
                             // 判断是否是爆炸源方块
                             if (ignoreBlock.equals(hitPos) && ignorSelf) {
                                 visiblePointsCount++;
-                                sampleData.castPointData.add(new ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData.RayCastData(point, source, true));
+                                if(!(entity instanceof ClientPlayerEntity) ||!isClientPlayer) {
+                                    sampleData.castPointData.add(new RayCastData(point, source, true));
+                                }
                             }
                             else {
-                                sampleData.castPointData.add(new ExplosionData.ExplosionAffectedObjects.EntityToDamage.SamplePointData.RayCastData(point, hitResult.getPos(), false));
+                                if(!(entity instanceof ClientPlayerEntity) || !isClientPlayer) {
+                                    sampleData.castPointData.add(new RayCastData(point, hitResult.getPos(), false));
+                                }
                             }
 
                         }
@@ -218,11 +354,12 @@ public class ExplosionSimulator {
         }
     }
 
-    public ExplosionData.ExplosionAffectedObjects getAffected() {
+    public ExplosionAffectedObjects getAffected() {
         return affected;
     }
     public boolean inRange(int x, int y, int z)
     {
+        LucidityConfig.CONFIG_HANDLER.instance();
         if(LucidityConfig.invert)
             return !((Xmin <= x && Xmax >= x) && (Ymin <= y && Ymax >= y) && (Zmin <= z && Zmax >= z));
         else

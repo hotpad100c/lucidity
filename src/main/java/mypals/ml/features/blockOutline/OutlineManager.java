@@ -3,6 +3,7 @@ package mypals.ml.features.blockOutline;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.rendering.ShapeRender;
+import mypals.ml.rendering.shapes.CubeShape;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -61,7 +62,7 @@ public class OutlineManager {
             shaderEffect = null;
         }
     }
-    public static void onRenderWorldLast(WorldRenderContext context){
+    public static void onRenderWorldLast(MatrixStack matrixStack){
         if(shaderEffect == null)return;
         if (blockToRenderer.isEmpty()) return;
 
@@ -78,8 +79,6 @@ public class OutlineManager {
 
 
 
-
-        MatrixStack matrixStack = context.matrixStack();
         BlockRenderManager dispatcher = mc.getBlockRenderManager();
         Camera view = mc.gameRenderer.getCamera();
         BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
@@ -125,11 +124,11 @@ public class OutlineManager {
                     OverlayTexture.DEFAULT_UV);
 
             matrixStack.pop();*/
-            ShapeRender.drawCubeSeeThrough(matrixStack,blockPos,0f,0, Color.MAGENTA,1);
+            CubeShape.draw(matrixStack,blockPos,0f,0, Color.RED,1,true);
         }
         //BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
         //BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        shaderEffect.render(context.tickCounter().getTickDelta(false));
+        shaderEffect.render(0);
 
         mc.getFramebuffer().beginWrite(false);
 
@@ -138,6 +137,8 @@ public class OutlineManager {
                 GlStateManager.SrcFactor.SRC_ALPHA,
                 GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
                 GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShaderColor(1,1,1,1);
         framebuffer.draw(width, height, false);
         //clean up
         RenderSystem.disableBlend();

@@ -32,7 +32,7 @@ public class FluidRenderMixin {
     private static void isSideCovered(BlockView world, Direction direction, float height, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if(!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
             if(!shouldRenderBlock(world.getBlockState(pos.offset(direction)),pos.offset(direction)))
-                cir.setReturnValue(true);
+                cir.setReturnValue(false);
         }
     }
 }

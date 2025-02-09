@@ -31,7 +31,7 @@ public class oreResolver {
                     Block block = world.getBlockState(pos).getBlock();
                     if (MineralFinder.isExposedMineral(world, pos)) {
                         InformationRender.addShineMarker(new ShineMarker(pos.toCenterPos(),MineralFinder.MINERAL_BLOCKS.get(block),0.4f,
-                                random.nextInt(1,3), random.nextInt(5,7),pos.hashCode(),true),30);
+                                random.nextInt(1,3), random.nextInt(5,7),pos.hashCode(),true,false),30);
                     }
                 }
             }

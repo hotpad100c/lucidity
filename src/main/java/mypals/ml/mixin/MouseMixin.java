@@ -45,7 +45,7 @@ public class MouseMixin {
         if (window == this.client.getWindow().getHandle()) {
             if (this.client.player != null) {
                 ItemStack mainHand = this.client.player.getMainHandStack();
-                if ((mainHand.isOf(wand) || (this.client.player.isSpectator() && LucidityConfig.selectInSpectator) && switchRenderMode.isPressed())) { // 替换 YOUR_ITEM 为你的物品
+                if (((mainHand.isOf(wand) || (this.client.player.isSpectator() && LucidityConfig.selectInSpectator)) && switchRenderMode.isPressed())) {
                     double sensitivity = this.client.options.getMouseWheelSensitivity().getValue();
                     double scrollAmount = (this.client.options.getDiscreteMouseScroll().getValue() ?
                             Math.signum(vertical) : vertical) * sensitivity;

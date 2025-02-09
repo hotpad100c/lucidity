@@ -43,8 +43,8 @@ import static mypals.ml.features.renderMobSpawn.EntitySpawnChacker.isInRightDime
 
 public class PossibleSpawnChecker {
 
-    public static List<String> getPossibleSpawnsAt(ClientWorld world, BlockPos pos) {
-        List<String> result = new ArrayList<>();
+    public static ArrayList<String> getPossibleSpawnsAt(ClientWorld world, BlockPos pos) {
+        ArrayList<String> result = new ArrayList<>();
         if(world.getBlockState(pos.down()).isAir()){return result;}
         if(!(world.getBlockState(pos).isSolidBlock(world,pos) || world.getBlockState(pos).isFullCube(world,pos) || world.getBlockState(pos).isAir())){return result;}
         LocalFakeSpawnRestriction.RESTRICTIONS.entrySet().forEach(entry->{

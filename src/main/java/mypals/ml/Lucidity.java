@@ -5,6 +5,7 @@ import mypals.ml.config.Keybinds;
 import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.damageIndicator.DamageHandler;
 import mypals.ml.features.damageIndicator.IndicatorRenderer;
+import mypals.ml.features.explosionVisualizer.ExplosionVisualizer;
 import mypals.ml.features.highLightFluidSource.FluidSourceResourceLoader;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
 import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -44,12 +46,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static mypals.ml.command.CommandRegister.registerCommands;
 import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.*;
+import static mypals.ml.features.worldEaterHelper.MineralFinder.parseSelectedBlocks;
 import static mypals.ml.features.worldEaterHelper.oreResolver.scanForMineralsOptimized;
 
 public class Lucidity implements ModInitializer {
@@ -65,15 +69,14 @@ public class Lucidity implements ModInitializer {
 
     public static void onConfigUpdated() {
 		MinecraftClient client = MinecraftClient.getInstance();
-        LucidityConfig.CONFIG_HANDLER.instance();
 		updateChunks(client);
-		loadConfig();
-		resolveSettings();
+		updateConfig();
     }
 	private static void resolveSettings(){
 		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
 		resolveSelectedEntityTypesFromString(LucidityConfig.selectedEntityTypes);
 		resolveSelectedParticleTypesFromString(LucidityConfig.selectedParticleTypes);
+		parseSelectedBlocks();
 
 		resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
 		resolveSelectedWandFromString(LucidityConfig.wand);
@@ -84,9 +87,10 @@ public class Lucidity implements ModInitializer {
 	public static void updateChunks(MinecraftClient client){
 		client.worldRenderer.reload();
 	}
-	public static void loadConfig(){
+	public static void updateConfig(){
 		var instance = LucidityConfig.CONFIG_HANDLER;
 		instance.load();
+		ExplosionVisualizer.FixRangeIssue();
 		LucidityConfig.CONFIG_HANDLER.instance();
 		resolveSettings();
 	}
@@ -100,8 +104,9 @@ public class Lucidity implements ModInitializer {
 					ResourcePackActivationType.NORMAL
 			);
 		});
+		registerCommands();
 
-		loadConfig();
+		updateConfig();
 		TrajectoryManager.init();
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
@@ -119,8 +124,6 @@ public class Lucidity implements ModInitializer {
 		});
 		WorldRenderEvents.LAST.register((context) ->{
 			//OutlineManager.init();
-			OutlineManager.resolveBlocks();
-			OutlineManager.onRenderWorldLast(context);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
@@ -131,6 +134,13 @@ public class Lucidity implements ModInitializer {
 		});
 		ClientTickEvents.END_WORLD_TICK.register(t->{
 			extraActions();
+		});
+		UseBlockCallback.EVENT.register((player, world, hand, pos) -> {
+			warningTime = WARNING_TIME;
+			if (world.isClient && player.getStackInHand(hand).getItem() == wand && player.isCreative()) {
+				return ActionResult.FAIL;
+			}
+			return ActionResult.PASS;
 		});
 		AttackBlockCallback.EVENT.register((player, world, hand, pos,dir) -> {
 			warningTime = WARNING_TIME;
@@ -179,6 +189,9 @@ public class Lucidity implements ModInitializer {
 		}
 		if(renderMobSpawn){
 			addSpawnDataToInformationRenderer();
+		}
+		if(enableExplosionVisualizer){
+			ExplosionVisualizer.tick(client);
 		}
 	}
 	public static void UpdateTimers(){

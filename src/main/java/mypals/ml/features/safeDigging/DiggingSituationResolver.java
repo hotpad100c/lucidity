@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 
 import java.awt.*;
 
-import static mypals.ml.rendering.InformationRender.mapAlpha;
+import static mypals.ml.rendering.shapes.ShineMarker.mapAlpha;
 
 public class DiggingSituationResolver {
     public static int WARNING_TIME = 50;

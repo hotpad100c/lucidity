@@ -28,7 +28,7 @@ public class SpaceScanner {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     BlockPos pos = new BlockPos(x, y, z);
-                    List<String> mobs = PossibleSpawnChecker.getPossibleSpawnsAt((ClientWorld) world, pos);
+                    ArrayList<String> mobs = PossibleSpawnChecker.getPossibleSpawnsAt((ClientWorld) world, pos);
                     if(!mobs.isEmpty()) {
                         InformationRender.addCube(new CubeShape(pos,0.05f,Color.yellow,true));
                         InformationRender.addText(new Text(mobs, pos.toCenterPos(), LucidityConfig.renderMobSpawnSize, assignRainbowColors(mobs), 1, true));
@@ -49,8 +49,8 @@ public class SpaceScanner {
         ClientWorld world = client.world;
         findExposedTopSurfaces(world, client.player.getBlockPos(), LucidityConfig.renderMobSpawnRange);
     }
-    public static List<Color> assignRainbowColors(List<String> items) {
-        List<Color> result = new ArrayList<>(items.size());
+    public static ArrayList<Color> assignRainbowColors(List<String> items) {
+        ArrayList<Color> result = new ArrayList<>(items.size());
         int n = items.size();
         if (n == 0) {
             return result;

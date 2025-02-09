@@ -7,6 +7,8 @@
   "config.lucidity.option.oreHighlight": "Enable Ore Highlight",
   "config.lucidity.description.oreHighlight": "Highlights ores on world surface.",
   "config.lucidity.option.oreHighlightRange": "Ore Highlight Range",
+  "config.lucidity.option.palette": "HexColor palette",
+
 
 
   "config.lucidity.category.selectiveRenderings": "Selective Renderings",
@@ -93,8 +95,8 @@
   "config.lucidity.description.damageIndicator.offset": "The amount by which the damage indicator is offset from the center of the screen.",
   "config.lucidity.damageIndicator.time": "Time the damage indicator stays on the screen.",
 
-  "config.lucidity.heighLightLava": "Highlight lava sources",
-  "config.lucidity.description.heighLightLava": "Gives lava source a different highlight texture.(resources/lucidity/textures/block/lava_flow & lava_still)",
+  "config.lucidity.heighLightLava": "Highlight Fluid Sources",
+  "config.lucidity.description.heighLightLava": "Gives fluids source a different highlight texture.(resources/lucidity/textures/block/lava_flow & lava_still)",
 
   "config.lucidity.trajectory": "Projectile Trajectory",
   "config.lucidity.description.trajectory": "Display trajectory for projectiles",
@@ -103,5 +105,130 @@
   "config.lucidity.self_color": "Self trajectory color",
   "config.lucidity.liner_projectiles_color": "Linear projectile trajectory color",
   "config.lucidity.far_projectiles_color": "Far-range projectile trajectory color",
-  "config.lucidity.near_projectiles_color": "Near-range projectile trajectory color"
+  "config.lucidity.near_projectiles_color": "Near-range projectile trajectory color",
+
+
+
+
+  "command.explosion-visualizer.main_render": "ExplosionVisualizer: Main render -> %s",
+  "command.explosion-visualizer.entity_damage_render": "ExplosionVisualizer: Entity damage render -> %s",
+  "command.explosion-visualizer.entity_ray_cast": "ExplosionVisualizer: Entity damage ray/sample-point render -> %s",
+  "command.explosion-visualizer.block_destruction_render": "ExplosionVisualizer: Block destruction render -> %s",
+  "command.explosion-visualizer.block_detection_ray_render": "ExplosionVisualizer: Block detection ray render -> %s",
+  "command.explosion-visualizer.block_damage_ray_range_updated": "ExplosionVisualizer: Block detection ray render range updated.",
+  "command.explosion-visualizer.block_damage_ray_layer_updated": "ExplosionVisualizer: Block detection ray render layer updated.",
+  "command.explosion-visualizer.block_detection_ray_settings_reset": "ExplosionVisualizer: Block detection ray render settings reset!",
+  "command.explosion-visualizer.block_detection_ray_layer_reset": "ExplosionVisualizer: Block detection ray render layer reset!",
+  "command.explosion-visualizer.block_detection_ray_range_reset": "ExplosionVisualizer: Block detection ray render range reset!",
+  "command.explosion-visualizer.fake_explosion_add": "ExplosionVisualizer: Fake explosion: %s was added at %s with power of %s",
+  "command.explosion-visualizer.fake_explosion_duplicate": "ExplosionVisualizer: Failed to add fake explosion %s at %s: duplicate naming!",
+  "command.explosion-visualizer.fake_explosion_remove": "ExplosionVisualizer: Removed fake explosion: %s",
+  "command.explosion-visualizer.fake_explosion_clear": "ExplosionVisualizer: Cleared all fake explosions",
+
+  "config.title.explosion_visualizer": "Explosion Visualizer",
+  "config.category.explosion_visualizer": "Explosion Visualizer",
+  "config.group.renders": "Renders",
+  "config.description.main_features": "Main features",
+
+  "config.option.main_render": "Main render",
+  "config.option.description.main_render": "This is the main render. Make sure to turn this on first!",
+
+  "config.option.block_destruction": "Block destruction",
+  "config.option.description.block_destruction": "Render the blocks to be destroyed by explosion.",
+
+  "config.option.block_detection_ray": "Block detection ray",
+  "config.option.description.block_detection_ray": "Render the detection rays for detecting the blocks to be destroyed by explosion.",
+
+  "config.option.sample_points": "Sample-points",
+  "config.option.description.sample_points": "Render in range entity's sample-points for ray-cast in explosion.",
+
+  "config.option.explosion_damage": "Explosion damage",
+  "config.option.description.explosion_damage": "Render explosion damage for in-range entities.",
+
+  "config.title.settings": "Settings",
+  "config.category.settings": "Settings",
+
+  "config.group.block_detection_ray_settings": "Block detection ray settings",
+  "config.description.block_detection_ray_settings": "In Minecraft, 1532 rays are emitted from the center of the explosion towards the outermost layer of a 16x16x16 voxel grid surrounding the explosion center. \n(See\" https://minecraft.fandom.com/wiki/Explosion\" for details.)\n\nDisplaying them all together can look very cluttered. This command allows you to slice these rays for easier viewing.",
+
+  "config.option.x_min": "X-min",
+  "config.option.description.x_min": "(0~16)",
+
+  "config.option.x_max": "X-max",
+  "config.option.description.x_max": "(0~16)",
+
+  "config.option.y_min": "Y-min",
+  "config.option.description.y_min": "(0~16)",
+
+  "config.option.y_max": "Y-max",
+  "config.option.description.y_max": "(0~16)",
+
+  "config.option.z_min": "Z-min",
+  "config.option.description.z_min": "(0~16)",
+
+  "config.option.z_max": "Z-max",
+  "config.option.description.z_max": "(0~16)",
+
+  "config.option.invert": "Invert",
+  "config.option.description.invert": "Invert the render range.",
+
+  "config.option.layer_min": "Layer-min",
+  "config.option.description.layer_min": "Minimal rendering layer",
+
+  "config.option.layer_max": "Layer-max",
+  "config.option.description.layer_max": "Maximum rendering layer",
+
+  "config.option.block_detection_ray_icon": "Block detection ray render icon",
+  "config.option.description.block_detection_ray_icon": "Text of the icon for the detection rays",
+
+  "config.option.block_detection_ray_icon_size": "Block detection ray render icon size",
+  "config.option.description.block_detection_ray_icon_size": "Size of the icon for the detection rays",
+
+  "config.option.render_with_alpha": "Render with alpha",
+  "config.option.description.render_with_alpha": "Render explosion power by ray's alpha.",
+
+  "config.option.type": "Coloring",
+  "config.option.description.type": "Switch coloring pattern.",
+  "config.option.x+": "+x(Face Coloring)",
+  "config.option.x-": "-x(Face Coloring)",
+  "config.option.y+": "+y(Face Coloring)",
+  "config.option.yx-": "-y(Face Coloring)",
+  "config.option.z+": "+z(Face Coloring)",
+  "config.option.z-": "-z(Face Coloring)",
+  "config.option.single_color":"Color(Single color)",
+  "config.option.type.direction_based": "Directional Coloring",
+  "config.option.type.face_based": "Face Coloring",
+  "config.option.type.single_color": "Single color",
+
+
+  "config.option.block_destruction_render_settings": "Block-destruction render settings",
+
+  "config.option.block_destruction_render_color": "Block destruction render color",
+  "config.option.description.block_destruction_render_color": "Color of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.option.block_destruction_render_icon": "Block destruction render icon",
+  "config.option.description.block_destruction_render_icon": "Text of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.option.block_destruction_render_icon_size": "Block destruction render icon size",
+  "config.option.description.block_destruction_render_icon_size": "Size of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.option.entity_sample_point_render_settings": "Entity sample-point render settings",
+
+  "config.option.entity_sample_point_safe_color": "Entity sample-point (safe) render color",
+
+  "config.option.entity_sample_point_safe_icon": "Entity sample-point (safe) render icon",
+
+  "config.option.entity_sample_point_danger_color": "Entity sample-point (danger) render color",
+
+  "config.option.entity_sample_point_danger_icon": "Entity sample-point (danger) render icon",
+
+  "config.option.entity_sample_point_blocked_color": "Entity sample-point (blocked position) render color",
+
+  "config.option.entity_sample_point_blocked_icon": "Entity sample-point (blocked position) render icon",
+
+  "config.option.entity_sample_point_icon_size": "Entity sample-point (safe) icon size",
+  "config.option.description.entity_sample_point_icon_size": "Size of the icon for the blocks that will be destroyed by the explosion",
+
+  "config.option.see_Throw": "Visible throw walls",
+  "config.option.description.see_Throw": "Icon visible throw walls"
 }

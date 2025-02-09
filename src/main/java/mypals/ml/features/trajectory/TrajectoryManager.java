@@ -2,7 +2,6 @@ package mypals.ml.features.trajectory;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.rendering.InformationRender;
-import mypals.ml.rendering.shapes.Line;
 import mypals.ml.rendering.shapes.MultiPointLine;
 import mypals.ml.rendering.shapes.ShineMarker;
 import net.minecraft.client.MinecraftClient;
@@ -219,7 +218,7 @@ public class TrajectoryManager {
                 HitResult hitResult = world.raycast(new RaycastContext(new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z), new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z).add(Velocity), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, modleEntity));
                 if (hitResult.getType() != HitResult.Type.MISS) {
                     hitPoint = new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
-                    InformationRender.addShineMarker(new ShineMarker(new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z),colorHit,0.1f,2,30,114514,false),1);
+                    InformationRender.addShineMarker(new ShineMarker(new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z),colorHit,0.1f,2,30,114514,false,false),1);
                     break;
                 }
 
@@ -253,7 +252,7 @@ public class TrajectoryManager {
                     entity));
 
             if (hitResult.getType() != HitResult.Type.MISS) {
-                InformationRender.addShineMarker(new ShineMarker(new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z),colorHit,0.1f,2,30,114514,false),1);
+                InformationRender.addShineMarker(new ShineMarker(new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z),colorHit,0.1f,2,30,114514,false,false),1);
                 break;
             }
             trajectoryPoints.add(newPosition);
@@ -329,17 +328,17 @@ public class TrajectoryManager {
         for (Entity projectile : projectilesSimple) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.nearTrajectoryColor, projectile, world, 0.03f, 0.99f);
             world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
-            InformationRender.addLine(new MultiPointLine(points, Color.YELLOW,0.9f));
+            InformationRender.addLine(new MultiPointLine(points, Color.YELLOW,0.9f,false));
         }
         for (Entity projectile : projectilesComplex) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.farTrajectoryColor, projectile, world,0.05f, 0.99f);
             world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
-            InformationRender.addLine(new MultiPointLine(points, Color.RED,0.9f));
+            InformationRender.addLine(new MultiPointLine(points, Color.RED,0.9f,false));
         }
         for (Entity projectile : projectilesStrate) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.linerTrajectoryColor, projectile, world,0f, 0.99f);
             world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
-            InformationRender.addLine(new MultiPointLine(points, Color.CYAN,0.9f));
+            InformationRender.addLine(new MultiPointLine(points, Color.CYAN,0.9f,false));
         }
     }
 
@@ -351,6 +350,6 @@ public class TrajectoryManager {
             else
                 points = applyRightOffset(owner, points, -1f);
         }
-        InformationRender.addLine(new MultiPointLine(points, colorTrace,1f));
+        InformationRender.addLine(new MultiPointLine(points, colorTrace,1f,false));
     }
 }

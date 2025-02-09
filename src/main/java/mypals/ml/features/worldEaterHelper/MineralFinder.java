@@ -2,39 +2,84 @@ package mypals.ml.features.worldEaterHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
+
+import static mypals.ml.config.LucidityConfig.selectedBlocksToHighLight;
 
 public class MineralFinder {
-    public static final Map<Block, Color> MINERAL_BLOCKS = new HashMap<>();
+    public static Map<Block, Color> MINERAL_BLOCKS = new HashMap<>();
+    public static final List<String> DEFAULT_SELECTED = Arrays.asList(
+            "minecraft:coal_ore;#000000",
+            "minecraft:iron_ore;#D8D8D8",
+            "minecraft:gold_ore;#FFD700",
+            "minecraft:diamond_ore;#00FFFF",
+            "minecraft:emerald_ore;#009900",
+            "minecraft:redstone_ore;#FF0000",
+            "minecraft:lapis_ore;#0000FF",
+            "minecraft:copper_ore;#FFA500",
+            "minecraft:nether_quartz_ore;#FFF0DC",
+            "minecraft:nether_gold_ore;#FFA500",
+            "minecraft:ancient_debris;#804020",
+            "minecraft:obsidian;#200040",
+            "minecraft:deepslate_coal_ore;#101010",
+            "minecraft:deepslate_iron_ore;#BFBFBF",
+            "minecraft:deepslate_gold_ore;#FFD700",
+            "minecraft:deepslate_diamond_ore;#00CCCC",
+            "minecraft:deepslate_emerald_ore;#009900",
+            "minecraft:deepslate_redstone_ore;#990000",
+            "minecraft:deepslate_lapis_ore;#000099",
+            "minecraft:deepslate_copper_ore;#FFA500"
+    );
 
-    static {
-        MINERAL_BLOCKS.put(Blocks.COAL_ORE, Color.BLACK);
-        MINERAL_BLOCKS.put(Blocks.IRON_ORE, new Color(216, 216, 216));
-        MINERAL_BLOCKS.put(Blocks.GOLD_ORE, Color.YELLOW);
-        MINERAL_BLOCKS.put(Blocks.DIAMOND_ORE, new Color(0, 255, 255));
-        MINERAL_BLOCKS.put(Blocks.EMERALD_ORE, Color.GREEN);
-        MINERAL_BLOCKS.put(Blocks.REDSTONE_ORE, Color.RED);
-        MINERAL_BLOCKS.put(Blocks.LAPIS_ORE, Color.BLUE);
-        MINERAL_BLOCKS.put(Blocks.COPPER_ORE, Color.ORANGE);
-        MINERAL_BLOCKS.put(Blocks.NETHER_QUARTZ_ORE, new Color(255, 240, 220));
-        MINERAL_BLOCKS.put(Blocks.NETHER_GOLD_ORE, Color.ORANGE);
-        MINERAL_BLOCKS.put(Blocks.ANCIENT_DEBRIS, new Color(128, 64, 32));
-        MINERAL_BLOCKS.put(Blocks.OBSIDIAN, new Color(32, 0, 64));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_COAL_ORE, new Color(16, 16, 16));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_IRON_ORE, new Color(191, 191, 191));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_GOLD_ORE, new Color(255, 215, 0));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_DIAMOND_ORE, new Color(0, 204, 204));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_EMERALD_ORE, new Color(0, 153, 0));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_REDSTONE_ORE, new Color(153, 0, 0));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_LAPIS_ORE, new Color(0, 0, 153));
-        MINERAL_BLOCKS.put(Blocks.DEEPSLATE_COPPER_ORE, Color.ORANGE);
+    public static void parseSelectedBlocks() {
+        MINERAL_BLOCKS.clear();
+        for (String entry : selectedBlocksToHighLight) {
+            String[] parts = entry.split(";");
+            if (parts.length != 2) continue;
+
+            String blockId = parts[0].trim();
+            if (!blockId.contains(":")) {
+                blockId = "minecraft:" + blockId;
+            }
+            String hexColor = parts[1].trim();
+
+            // 解析颜色
+            Color color = parseHexColor(hexColor);
+            if (color == null) continue;
+
+            // 解析方块
+            Optional<Block> block = Registries.BLOCK.getOrEmpty(Identifier.of(blockId));
+            if (block.isEmpty()) continue; // 确保是有效的方块
+
+            MINERAL_BLOCKS.put(block.get(), color);
+        }
+    }
+
+    private static Color parseHexColor(String hex) {
+        try {
+            if (!hex.startsWith("#") || hex.length() != 7) {
+                System.err.println("Bad HexColor: " + hex);
+                return new Color(255, 255, 255);
+            }
+
+
+            int r = Integer.parseInt(hex.substring(1, 3), 16);
+            int g = Integer.parseInt(hex.substring(3, 5), 16);
+            int b = Integer.parseInt(hex.substring(5, 7), 16);
+
+            return new Color(r, g, b);
+        } catch (Exception e) {
+            System.err.println("parse HexColor faild: " + hex);
+            return new Color(255, 255, 255);
+        }
+
     }
 
     public static boolean isMineral(Block block) {
