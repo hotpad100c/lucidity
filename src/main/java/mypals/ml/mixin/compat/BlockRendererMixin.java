@@ -46,14 +46,11 @@ public abstract class BlockRendererMixin extends AbstractBlockRenderContext {
         BlockPos pos = ((AbstractBlockRenderContextAccessor) this).getPos();
         BlockRenderView world = ((AbstractBlockRenderContextAccessor) this).getLevel();
 
-        // 获取当前 Quad 的朝向
         Direction quadDirection = Direction.byId(quad.getFaceNormal());
 
-        // 计算当前 Quad 所面向的邻近方块
         BlockPos neighborPos = pos.offset(quadDirection);
         BlockState neighborState = world.getBlockState(neighborPos);
 
-        // 如果 shouldRenderBlock 返回 true，则强制最大光照
         if (!shouldRenderBlock(neighborState, neighborPos)) {
             for (int i = 0; i < 4; i++) {
                 quad.lightmap(i, 0xF000F0);

@@ -51,7 +51,7 @@ public class PossibleSpawnChecker {
             if(isInRightDimension(entry.getKey())) {
 
                 if (canSpawnHere(world, entry.getKey(), pos)) {
-                    String idStr = Text.translatable(Registries.ENTITY_TYPE.getId(entry.getKey()).toTranslationKey()).getString();
+                    String idStr = Text.translatable(entry.getKey().getTranslationKey()).getString();
                     result.add(idStr);
                 }
             }
@@ -66,9 +66,6 @@ public class PossibleSpawnChecker {
         if (!LocalFakeSpawnRestriction.canSpawn(type, world, SpawnReason.NATURAL, pos, world.random)) {
             return false;
         }
-
-        // 2) 方块空间检查 => isSpaceEmpty
-        //   计算生成碰撞箱 center=(x+0.5, y, z+0.5)
         Vec3d spawnCenter = new Vec3d(
                 pos.getX() + 0.5,
                 pos.getY(),

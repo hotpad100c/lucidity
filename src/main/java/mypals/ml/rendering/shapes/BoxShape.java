@@ -48,13 +48,6 @@ public class BoxShape{
 
             matrices.translate(x, y, z);
             Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
-            if(seeThrough)
-                RenderSystem.disableDepthTest();
-            RenderSystem.enableBlend();
-
-            //VertexConsumerProvider.Immediate immediate = getVertexConsumer();
-            //VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getDebugQuads());
-
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -105,14 +98,20 @@ public class BoxShape{
             buffer.vertex(modelViewMatrix, xMax, yMin, zMax).color(red, green, blue, alpha);
             buffer.vertex(modelViewMatrix, xMin, yMin, zMax).color(red, green, blue, alpha);
 
+
+            if(seeThrough)
+                RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.disableCull();
+
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             BufferRenderer.drawWithGlobalProgram(buffer.end());
-            matrices.pop();
 
-            if(seeThrough)
-                RenderSystem.enableDepthTest();
+            RenderSystem.enableDepthTest();
+            RenderSystem.enableCull();
             RenderSystem.disableBlend();
+            matrices.pop();
         }
     }
 }

@@ -2,11 +2,14 @@ package mypals.ml;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
-import mypals.ml.features.blockOutline.OutlineManager;
+import mypals.ml.config.LucidityModMenuIntegration;
+import mypals.ml.features.arrowCamera.ArrowCamera;
+import mypals.ml.features.commandHelper.ChatCommandScreenObserver;
 import mypals.ml.features.damageIndicator.DamageHandler;
 import mypals.ml.features.damageIndicator.IndicatorRenderer;
 import mypals.ml.features.explosionVisualizer.ExplosionVisualizer;
 import mypals.ml.features.highLightFluidSource.FluidSourceResourceLoader;
+import mypals.ml.features.mobFollowRange.MobFollowRangeScanner;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
 import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
@@ -47,6 +50,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static mypals.ml.command.CommandRegister.registerCommands;
+import static mypals.ml.config.Keybinds.openConfigKey;
 import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
@@ -108,13 +112,15 @@ public class Lucidity implements ModInitializer {
 
 		updateConfig();
 		TrajectoryManager.init();
-		OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
+		new ArrowCamera();
+		ArrowCamera.onInitialize();
+		/*OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(-5,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,-5));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,5));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,-5,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));*/
 		FluidSourceResourceLoader.init();
 		Keybinds.init();
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
@@ -128,9 +134,13 @@ public class Lucidity implements ModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
 			wandActions(MinecraftClient.getInstance());
-			//resolveEntities(client,50);
 			resolveEnviroment(client);
+			resolveEntities(client,50);
 			UpdateTimers();
+			if (openConfigKey.wasPressed()) {
+				openConfigScreen(client);
+			}
+
 		});
 		ClientTickEvents.END_WORLD_TICK.register(t->{
 			extraActions();
@@ -150,22 +160,35 @@ public class Lucidity implements ModInitializer {
 			return ActionResult.PASS;
 		});
 	}
+	private void openConfigScreen(MinecraftClient client) {
+		client.execute(() -> {
+			if (client.currentScreen == null) {
+				client.setScreen(LucidityModMenuIntegration.getConfigScreen(client.currentScreen));
+			}
+		});
+	}
 	private static void extraActions(){
 		LucidityConfig.CONFIG_HANDLER.instance();
 		if(!blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player != null){
 			MinecraftClient.getInstance().player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,10000,5,true,false,false));
         }
 	}
-	private static void resolveEntities(MinecraftClient client, double range){
+	private static void resolveEntities(MinecraftClient client, int scanRadius){
 		ClientWorld world = client.world;
 		if(world == null){return;}
         assert client.player != null;
-        Box searchBox = new Box(
-				client.player.getX() - range, client.player.getY() - range, client.player.getZ() - range,
-				client.player.getX() + range, client.player.getY() + range, client.player.getZ() + range
-		);
-		world.getEntitiesByClass(WardenEntity.class,searchBox,warden -> true)
-				.forEach(WardenStateResolver::resolveWardenState);
+		if(renderWardenAttackRange) {
+			Box searchBox = new Box(
+					client.player.getX() - scanRadius, client.player.getY() - scanRadius, client.player.getZ() - scanRadius,
+					client.player.getX() + scanRadius, client.player.getY() + scanRadius, client.player.getZ() + scanRadius
+			);
+			world.getEntitiesByClass(WardenEntity.class, searchBox, warden -> true)
+					.forEach(WardenStateResolver::resolveWardenState);
+		}
+
+		if(renderMobChaseRange){
+			MobFollowRangeScanner.onClientTick(scanRadius);
+		}
 		
 	}
 	private static void resolveEnviroment(MinecraftClient client){
@@ -193,6 +216,11 @@ public class Lucidity implements ModInitializer {
 		if(enableExplosionVisualizer){
 			ExplosionVisualizer.tick(client);
 		}
+		if(commandHelper){
+			ChatCommandScreenObserver.onClientTick();
+		}
+		ArrowCamera.onClientTick();
+		//TreeSearchManager.onClientTick();
 	}
 	public static void UpdateTimers(){
 		warningTime = warningTime <= 0? 0 : warningTime-1;

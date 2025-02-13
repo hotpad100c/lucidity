@@ -18,7 +18,9 @@ public class AreaBox {
     public BlockPos maxPos;
 
     public Color color;
-    public AreaBox(BlockPos a, BlockPos b,Color color){
+    public float alpha = 0.2f;
+    public boolean seeThrough = false;
+    public AreaBox(BlockPos a, BlockPos b,Color color, float alpha, boolean seeThrough){
         this.minPos = new BlockPos(
                 Math.min(a.getX(), b.getX()),
                 Math.min(a.getY(), b.getY()),
@@ -30,14 +32,16 @@ public class AreaBox {
                 Math.max(a.getZ(), b.getZ())
         );
         this.color = color;
+        this.alpha = alpha;
+        this.seeThrough = seeThrough;
     }
-    public void draw(MatrixStack matrices, float alpha,boolean seeThrough) {
-        draw(matrices, this.minPos, this.maxPos,0, this.color, alpha, seeThrough);
+    public void draw(MatrixStack matrices,boolean seeThrough) {
+        draw(matrices, this.minPos, this.maxPos, this.color, this.alpha, seeThrough);
     }
     public void draw(MatrixStack matrices, Color color, float alpha,boolean seeThrough) {
-        draw(matrices, this.minPos, this.maxPos,0, color, alpha, seeThrough);
+        draw(matrices, this.minPos, this.maxPos, color, alpha, seeThrough);
     }
-    public static void draw(MatrixStack matrices, BlockPos minPos, BlockPos maxPos, float tickDelta, Color color, float alpha, boolean seeThrough) {
+    public static void draw(MatrixStack matrices, BlockPos minPos, BlockPos maxPos, Color color, float alpha, boolean seeThrough) {
         double midX = ((maxPos.getX() + 1f) + (minPos.getX())) / 2.0;
         double midY = ((maxPos.getY() + 1f) + (minPos.getY())) / 2.0;
         double midZ = ((maxPos.getZ() + 1f) + (minPos.getZ())) / 2.0;
@@ -75,6 +79,6 @@ public class AreaBox {
         LineShape.draw(matrices,  v3, v7, color, 1,true);
         LineShape.draw(matrices,  v4, v8, color, 1,true);
 
-        BoxShape.draw(matrices,midpos,length+1.01f,width+1.01f,height+1.01f,tickDelta,color,alpha,false);
+        BoxShape.draw(matrices,midpos,length+1.01f,width+1.01f,height+1.01f,0,color,alpha,seeThrough);
     }
 }

@@ -1,18 +1,14 @@
 package mypals.ml.rendering;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -36,45 +32,49 @@ public class InformationRender {
     public static List<MultiPointLine> multiPointLines = new CopyOnWriteArrayList<>();
     public static List<ShineMarker> shineMarkers = new CopyOnWriteArrayList<>();
     public static List<Text> texts = new CopyOnWriteArrayList<>();
-
+    public static List<AreaBox> areaBoxes = new CopyOnWriteArrayList<>();
+    public static List<OnGroundMarker> onGroundMarkers = new CopyOnWriteArrayList<>();
 
 
 
     public static void addBox(BoxShape box) {
-        boxes.add(box);
+        if(!boxes.contains(box)){
+            boxes.add(box);
+        }
     }
     public static void addText(Text text) {
         texts.add(text);
     }
     public static void addCube(CubeShape cube) {
-        cubes.add(cube);
+        if(!cubes.contains(cube)){
+            cubes.add(cube);
+        }
     }
     public static void addLine(LineShape line) {
         lines.add(line);
     }
-    public static void addLine(MultiPointLine line) {multiPointLines.add(line);}
+    public static void addLine(MultiPointLine line) {
+        multiPointLines.add(line);
+    }
 
-    public static void addBoxs(List<BoxShape> box) {
-        boxes.addAll(box);
+        public static void addShineMarker(ShineMarker shineMarker,int time){
+        if(!shineMarkers.contains(shineMarker)){
+            shineMarker.lifeTime = time;
+            shineMarkers.forEach(marker->{
+                if(shineMarker.pos == marker.pos){
+                    marker.lifeTime = time;
+                }
+            });
+            shineMarkers.add(shineMarker);
+        }
     }
-    public static void addTexts(List<Text> text) {
-        texts.addAll(text);
+    public static void addAreaBox(AreaBox areaBox){
+        areaBoxes.add(areaBox);
     }
-    public static void addCubes(List<CubeShape> cube) {
-        cubes.addAll(cube);
-    }
-    public static void addLines(List<LineShape> line) {
-        lines.addAll(line);
-    }
-    public static void addMultiPointLines(List<MultiPointLine> line) {multiPointLines.addAll(line);}
-    public static void addShineMarker(ShineMarker shineMarker,int time){
-        shineMarker.lifeTime = time;
-        shineMarkers.forEach(marker->{
-            if(shineMarker.pos == marker.pos){
-                marker.lifeTime = time;
-            }
-        });
-        shineMarkers.add(shineMarker);
+    public static void addOnGroundMarker(OnGroundMarker onGroundMarker){
+        if(!onGroundMarkers.contains(onGroundMarker)){
+            onGroundMarkers.add(onGroundMarker);
+        }
     }
     public static void render(MatrixStack matrixStack, RenderTickCounter counter){
         Tessellator tessellator = Tessellator.getInstance();
@@ -88,18 +88,22 @@ public class InformationRender {
                 for (CubeShape cube : cubes) {
                     cube.draw(matrixStack, cube.pos, 0.01f, counter.getTickDelta(true), cube.color, cube.alpha, cube.seeThrough);
                 }
+                for (OnGroundMarker marker : onGroundMarkers) {
+                    marker.draw(matrixStack);
+                }
                 drawLines(matrixStack);
                 drawMarkers(matrixStack);
                 for (Text text : texts) {
                     text.draw(matrixStack, text.pos, counter.getTickDelta(true), (ArrayList) text.texts, text.color, text.size, text.seeThrough);
+                }
+                for (AreaBox areaBox: areaBoxes) {
+                    areaBox.draw(matrixStack, false);
                 }
                 drawSelectedAreas(matrixStack);
             }catch (Exception e){
                 LOGGER.info(e.toString());
             }
         }
-        //OutlineManager.resolveBlocks();
-        //OutlineManager.onRenderWorldLast(matrixStack);
     }
     public static void clear(){
         boxes.clear();
@@ -107,6 +111,8 @@ public class InformationRender {
         cubes.clear();
         texts.clear();
         multiPointLines.clear();
+        areaBoxes.clear();
+        onGroundMarkers.clear();
         shineMarkers.forEach(marker->{
             marker.lifeTime--;
             if(marker.lifeTime <= 0){
@@ -130,7 +136,7 @@ public class InformationRender {
                 }
             }
             for (AreaBox selectedArea : selectedAreas) {
-                selectedArea.draw(matrixStack, 0.05f, false);
+                selectedArea.draw(matrixStack, false);
             }
         }
 

@@ -91,8 +91,7 @@ public class CubeShape {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
 
-            if(seeThrough)
-                RenderSystem.enableDepthTest();
+            RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
     }

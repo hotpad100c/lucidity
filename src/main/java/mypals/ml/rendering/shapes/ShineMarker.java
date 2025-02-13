@@ -5,10 +5,9 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.Random;
@@ -43,13 +42,7 @@ public class ShineMarker {
     public static void draw(MatrixStack matrixStack, Vec3d pos, float size, float tickDelta, float time, int lights, float rotSpeed, float rotOffset,
                                         int colorR, int colorG, int colorB, int alpha, long seed,boolean seeThrough) {
         Random random = new Random(seed);
-        float time1 = time * rotSpeed * 0.3F;
-        float time2 = time * 0.1F + random.nextInt();
-        //VertexConsumerProvider.Immediate immediate = getVertexConsumer();
-        //VertexConsumer vertexConsumer = immediate.getBuffer(RenderLayer.getDragonRays());
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
+        float time1 = time * rotSpeed * 0.05F;
 
         Camera cam = MinecraftClient.getInstance().gameRenderer.getCamera();
         float scale = Math.min(size, calculateScale(MinecraftClient.getInstance().getCameraEntity().getPos(),pos))*
@@ -63,85 +56,75 @@ public class ShineMarker {
 
         matrixStack.push();
         matrixStack.translate(x,y,z);
-        Quaternionf camera = MinecraftClient.getInstance().getEntityRenderDispatcher().camera.getRotation();
-        //matrixStack.multiply(camera);
-        //matrixStack.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(rotOffset));
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-        if(seeThrough)
-            RenderSystem.disableDepthTest();
-        RenderSystem.enableBlend();
+        Vector3f vector3f = new Vector3f(0,0,0);
+        Vector3f vector3f2 = new Vector3f();
+        Vector3f vector3f3 = new Vector3f();
+        Vector3f vector3f4 = new Vector3f();
+        Quaternionf quaternionf = new Quaternionf();
+
+
 
         for (int i = 0; i < lights; i++) {
-            float length = (float) (7F + Math.sin(time2 + i * 2 + random.nextFloat())) * scale;
-            float width = (float) (2F - 0.2F * Math.abs(Math.cos(time2 - i * Math.PI * 0.5F + random.nextFloat()))) * scale;
-
             matrixStack.push();
-            Quaternionf quaternionf = new Quaternionf();
-            //matrixStack.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(rotOffset));
-            quaternionf
-                    .rotationXYZ(
-                            random.nextFloat() * (float) (Math.PI * 2),
-                            random.nextFloat() * (float) (Math.PI * 2),
-                            random.nextFloat() * (float) (Math.PI * 2)
-                    ).rotateXYZ(
-                            random.nextFloat() * (float) (Math.PI * 2),
-                            random.nextFloat() * (float) (Math.PI * 2),
-                            random.nextFloat() * (float) (Math.PI * 2)
-                    );
+            quaternionf.rotationXYZ(
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.1),
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.1),
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.2)
+            ).rotateXYZ(
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.15),
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.15),
+                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.2)
+            );
+            float length = random.nextFloat(0.6f,1f) * 2.0F;
+            float width = random.nextFloat(0.6f,1f) * 6.0F;
 
-            matrixStack.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(time1 - (i / (float) lights * 360)));
+            vector3f2.set(-HALF_SQRT_3 * length, width, -0.5F * length);
+            vector3f3.set(HALF_SQRT_3 * length, width, -0.5F * length);
+            vector3f4.set(0.0F, width, 0.5F* length);
+
             matrixStack.multiply(quaternionf);
-            MatrixStack.Entry positionMatrix = matrixStack.peek();
-            Matrix4f matrix4f = positionMatrix.getPositionMatrix();
+            matrixStack.scale(scale,scale,scale);
 
-            drawVertex(buffer, matrix4f, positionMatrix, colorR, colorG, colorB, alpha, length, width,0);
+            MatrixStack.Entry positionMatrix = matrixStack.peek();
+
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0);
+
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0);
+
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
+            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0);
+
             matrixStack.pop();
         }
 
+        if(seeThrough)
+            RenderSystem.disableDepthTest();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
 
         BufferRenderer.drawWithGlobalProgram(buffer.end());
 
-        if(seeThrough)
-            RenderSystem.enableDepthTest();
+        RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
-        RenderSystem.enableCull();
         matrixStack.pop();
     }
 
 
-    private static void drawVertex(BufferBuilder vc, Matrix4f matrix4f, MatrixStack.Entry entry, int colorR, int colorG, int colorB, int alpha, float length, float width,float zOffset) {
-        float u = 0.1F;
-        float v = 0.1F;
-        // Origin Vertex
-        vc.vertex(matrix4f, 0.0F, 0.0F, 0.0F)
-                .color(255, 255, 255, alpha)
-                .texture(u, v)
-                .overlay(0)
-                .light(240)
-                .normal(entry, 0.0F, 1.0F, 0.0F);
-
-        // Left Corner Vertex
-        vc.vertex(matrix4f, -HALF_SQRT_3 * width, length, zOffset)
-                .color(colorR, colorG, colorB, 0)
-                .texture(u - 0.5F, v + 1.0F)
-                .overlay(OverlayTexture.DEFAULT_UV)
-                .light(240)
-                .normal(entry, 0.0F, -1.0F, 0.0F);
-
-        // Right Corner Vertex
-        vc.vertex(matrix4f, HALF_SQRT_3 * width, length, zOffset)
-                .color(colorR, colorG, colorB, 0)
-                .texture(u + 0.5F, v + 1.0F)
-                .overlay(OverlayTexture.DEFAULT_UV)
-                .light(240)
-                .normal(entry, 0.0F, -1.0F, 0.0F);
-    }
     public static float calculateScale(Vec3d viewPos,Vec3d pos) {
-        double maxDist = 200;
+        double maxDist = 500;
         double dist = Math.min(viewPos.distanceTo(pos), maxDist);
         float f = (float) Math.pow(Math.sin(dist / maxDist * Math.PI), 0.5F);
         return f * 3F;

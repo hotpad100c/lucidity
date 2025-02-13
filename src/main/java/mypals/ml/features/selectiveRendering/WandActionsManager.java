@@ -102,7 +102,7 @@ public class WandActionsManager {
     public static void cutAreaAction(PlayerEntity player) {
         if (pos1 != null && pos2 !=null) {
             LucidityConfig.CONFIG_HANDLER.instance();
-            AreaBox cutBox = new AreaBox(pos1,pos2, Color.RED);
+            AreaBox cutBox = new AreaBox(pos1,pos2, Color.RED,0.2f,true);
             List<AreaBox> remainingBoxes = new ArrayList<>();
             AtomicBoolean deletedSomething = new AtomicBoolean(false);
 

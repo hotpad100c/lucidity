@@ -2,17 +2,21 @@ package mypals.ml.features.renderMobSpawn;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.HuskEntity;
 import net.minecraft.entity.mob.StrayEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.DimensionTypes;
 
 import java.util.Set;
 
@@ -80,9 +84,7 @@ public class EntitySpawnChacker {
             EntityType.ENDERMAN
     );
     public static boolean canSpawnInDark(EntityType<? extends HostileEntity> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
-        return world.getDifficulty() != Difficulty.PEACEFUL
-                && (isSpawnDark(world, pos, random))
-                && canMobSpawn(type, world, spawnReason, pos, random);
+        return canMobSpawn(type, world, spawnReason, pos, random);
     }
     public static boolean canMobSpawn(EntityType<?> type, WorldAccess world, SpawnReason spawnReason, BlockPos pos, Random random) {
         if(!isInRightDimension(type)){return false;}
@@ -90,10 +92,11 @@ public class EntitySpawnChacker {
         return world.getBlockState(blockPos).allowsSpawning(world, blockPos, type);
     }
     public static boolean isInRightDimension(EntityType<?> type) {
-        var dimensionKey = MinecraftClient.getInstance().world.getRegistryKey();
-        if (dimensionKey == World.NETHER) {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        RegistryKey dimension = player.getWorld().getDimensionEntry().getKey().get();
+        if (dimension == DimensionTypes.THE_NETHER) {
             return NETHER_ENTITIES.contains(type) || UNIVERSAL_ENTITIES.contains(type);
-        } else if (dimensionKey == World.END) {
+        } else if (dimension == DimensionTypes.THE_END) {
             return END_ENTITIES.contains(type) || UNIVERSAL_ENTITIES.contains(type);
         } else {
             return OVERWORLD_ENTITIES.contains(type) || UNIVERSAL_ENTITIES.contains(type);

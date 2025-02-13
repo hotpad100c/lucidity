@@ -27,7 +27,7 @@ public class IntersectionResolver {
                 Math.min(target.maxPos.getY(), cut.maxPos.getY()),
                 Math.min(target.maxPos.getZ(), cut.maxPos.getZ())
         );
-        return new AreaBox(overlapMin, overlapMax, Color.RED);
+        return new AreaBox(overlapMin, overlapMax, Color.RED,0.1f,false);
     }
 
     /*public static List<AreaBox> cutBox(AreaBox target, AreaBox cut) {
@@ -92,14 +92,14 @@ public class IntersectionResolver {
             result.add(new AreaBox(
                     target.minPos,
                     new BlockPos(overlap.minPos.getX() - 1, target.maxPos.getY(), target.maxPos.getZ())
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
         if (target.maxPos.getX() > overlap.maxPos.getX()) {
             result.add(new AreaBox(
                     new BlockPos(overlap.maxPos.getX() + 1, target.minPos.getY(), target.minPos.getZ()),
                     target.maxPos
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
 
@@ -107,14 +107,14 @@ public class IntersectionResolver {
             result.add(new AreaBox(
                     new BlockPos(Math.max(target.minPos.getX(), overlap.minPos.getX()), target.minPos.getY(), target.minPos.getZ()),
                     new BlockPos(Math.min(target.maxPos.getX(), overlap.maxPos.getX()), overlap.minPos.getY() - 1, target.maxPos.getZ())
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
         if (target.maxPos.getY() > overlap.maxPos.getY()) {
             result.add(new AreaBox(
                     new BlockPos(Math.max(target.minPos.getX(), overlap.minPos.getX()), overlap.maxPos.getY() + 1, target.minPos.getZ()),
                     new BlockPos(Math.min(target.maxPos.getX(), overlap.maxPos.getX()), target.maxPos.getY(), target.maxPos.getZ())
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
 
@@ -122,14 +122,14 @@ public class IntersectionResolver {
             result.add(new AreaBox(
                     new BlockPos(Math.max(target.minPos.getX(), overlap.minPos.getX()), Math.max(target.minPos.getY(), overlap.minPos.getY()), target.minPos.getZ()),
                     new BlockPos(Math.min(target.maxPos.getX(), overlap.maxPos.getX()), Math.min(target.maxPos.getY(), overlap.maxPos.getY()), overlap.minPos.getZ() - 1)
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
         if (target.maxPos.getZ() > overlap.maxPos.getZ()) {
             result.add(new AreaBox(
                     new BlockPos(Math.max(target.minPos.getX(), overlap.minPos.getX()), Math.max(target.minPos.getY(), overlap.minPos.getY()), overlap.maxPos.getZ() + 1),
                     new BlockPos(Math.min(target.maxPos.getX(), overlap.maxPos.getX()), Math.min(target.maxPos.getY(), overlap.maxPos.getY()), target.maxPos.getZ())
-                    ,target.color
+                    ,target.color,0.1f,false
             ));
         }
 

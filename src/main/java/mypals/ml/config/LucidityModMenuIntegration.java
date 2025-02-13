@@ -7,6 +7,7 @@ import dev.isxander.yacl3.api.controller.*;
 import mypals.ml.Lucidity;
 import mypals.ml.features.explosionVisualizer.simulate.ExplosionSimulator;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -20,36 +21,40 @@ import static mypals.ml.features.worldEaterHelper.MineralFinder.DEFAULT_SELECTED
 public class LucidityModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
+
+        return screen -> getConfigScreen(screen);
+    }
+    public static Screen getConfigScreen(Screen screen){
         var instance = LucidityConfig.CONFIG_HANDLER;
-        return screen -> YetAnotherConfigLib.createBuilder()
+        return YetAnotherConfigLib.createBuilder()
                 .title(Text.translatable("config.lucidity.title"))
                 .category(
                         ConfigCategory.createBuilder()
-                        .name(Text.translatable("config.lucidity.category.selectiveRenderings"))
-                        //==================================================
-                        .group(ListOption.<String>createBuilder()
-                                .name(Text.translatable("config.lucidity.category.selectedBlock"))
-                                .description
-                                        (OptionDescription.createBuilder()
-                                                .text(Text.translatable("config.lucidity.description.selectiveRenderings"))
-                                                //.image(Lucidity.id("textures/main-render.png"), 192, 108)
-                                                .build()
+                                .name(Text.translatable("config.lucidity.category.selectiveRenderings"))
+                                //==================================================
+                                .group(ListOption.<String>createBuilder()
+                                        .name(Text.translatable("config.lucidity.category.selectedBlock"))
+                                        .description
+                                                (OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.selectiveRenderings"))
+                                                        //.image(Lucidity.id("textures/main-render.png"), 192, 108)
+                                                        .build()
+                                                )
+                                        .binding(
+                                                new ArrayList<>(),
+                                                () -> {
+                                                    // 返回配置值，确保非空
+                                                    if (instance.instance().selectedBlockTypes == null) {
+                                                        LucidityConfig.selectedBlockTypes = new ArrayList<>();
+                                                    }
+                                                    return instance.instance().selectedBlockTypes;
+                                                },
+                                                list -> instance.instance().selectedBlockTypes = list
                                         )
-                                .binding(
-                                        new ArrayList<>(),
-                                        () -> {
-                                            // 返回配置值，确保非空
-                                            if (instance.instance().selectedBlockTypes == null) {
-                                                LucidityConfig.selectedBlockTypes = new ArrayList<>();
-                                            }
-                                            return instance.instance().selectedBlockTypes;
-                                        },
-                                        list -> instance.instance().selectedBlockTypes = list
-                                )
-                                .controller(StringControllerBuilder::create)
-                                .initial("")
-                                .build()
-                        ).group(ListOption.<String>createBuilder()
+                                        .controller(StringControllerBuilder::create)
+                                        .initial("")
+                                        .build()
+                                ).group(ListOption.<String>createBuilder()
                                         .name(Text.translatable("config.lucidity.category.selectedEntity"))
                                         .description
                                                 (OptionDescription.createBuilder()
@@ -71,7 +76,7 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
                                         .build()
-                        ).group(ListOption.<String>createBuilder()
+                                ).group(ListOption.<String>createBuilder()
                                         .name(Text.translatable("config.lucidity.category.selectedParticle"))
                                         .description
                                                 (OptionDescription.createBuilder()
@@ -92,96 +97,96 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
                                         .build()
-                        ).group(ListOption.<String>createBuilder()
-                                .name(Text.translatable("config.lucidity.option.selectedAreaRender"))
-                                .description
-                                (OptionDescription.createBuilder()
-                                        .text(Text.translatable("config.lucidity.description.selectiveAreaRender"))
-                                        .build()
-                                )
-                                .binding(
-                                        new ArrayList<>(),
-                                        () -> {
-                                            // 返回配置值，确保非空
-                                            if (instance.instance().selectedAreasSaved == null) {
-                                                LucidityConfig.selectedAreasSaved = new ArrayList<>();
-                                            }
-                                            return instance.instance().selectedAreasSaved;
-                                            },
-                                        list -> instance.instance().selectedAreasSaved = list
-                                )
-                                .controller(StringControllerBuilder::create)
-                                .initial("")
-                                .build()
-                        )
-                        //==================================================
-                        .group(OptionGroup.createBuilder()
-                                .name(Text.translatable("config.lucidity.category.selectiveRenderings"))
-                                .description(
-                                        OptionDescription.createBuilder()
-                                                .text(Text.translatable("config.lucidity.description.selectiveRenderings"))
-                                                .build()
-                                ).option(
-                                        Option.<Boolean>createBuilder()
-                                                .name(Text.translatable("config.lucidity.option.spectator_select"))
-                                                .description(OptionDescription.createBuilder()
-                                                        .text(Text.translatable("config.lucidity.description.spectator_select"))
-                                                        //.image(Lucidity.id(""), 192, 108)
+                                ).group(ListOption.<String>createBuilder()
+                                        .name(Text.translatable("config.lucidity.option.selectedAreaRender"))
+                                        .description
+                                                (OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.selectiveAreaRender"))
                                                         .build()
                                                 )
-                                                .binding(true, () -> instance.instance().selectInSpectator, bool -> instance.instance().selectInSpectator = bool)
-                                                .controller(BooleanControllerBuilder::create)
+                                        .binding(
+                                                new ArrayList<>(),
+                                                () -> {
+                                                    // 返回配置值，确保非空
+                                                    if (instance.instance().selectedAreasSaved == null) {
+                                                        LucidityConfig.selectedAreasSaved = new ArrayList<>();
+                                                    }
+                                                    return instance.instance().selectedAreasSaved;
+                                                },
+                                                list -> instance.instance().selectedAreasSaved = list
+                                        )
+                                        .controller(StringControllerBuilder::create)
+                                        .initial("")
+                                        .build()
+                                )
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.category.selectiveRenderings"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.selectiveRenderings"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.option.spectator_select"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.spectator_select"))
+                                                                //.image(Lucidity.id(""), 192, 108)
+                                                                .build()
+                                                        )
+                                                        .binding(true, () -> instance.instance().selectInSpectator, bool -> instance.instance().selectInSpectator = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        )
+                                        .option(Option.<String>createBuilder()
+                                                .name(Text.translatable("config.lucidity.option.wand"))
+                                                .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand")))
+                                                .binding("minecraft:breeze_rod", () -> instance.instance().wand, s -> instance.instance().wand = s)
+                                                .controller(opt -> StringControllerBuilder.create(opt))
                                                 .build()
-                                )
-                                .option(Option.<String>createBuilder()
-                                        .name(Text.translatable("config.lucidity.option.wand"))
-                                        .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand")))
-                                        .binding("minecraft:breeze_rod", () -> instance.instance().wand, s -> instance.instance().wand = s)
-                                        .controller(opt -> StringControllerBuilder.create(opt))
-                                        .build()
-                                ).option(Option.<Integer>createBuilder()
-                                        .name(Text.translatable("config.lucidity.option.wand_apply"))
-                                        .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand_apply")))
-                                        .binding(0, () -> instance.instance().wandApplyMode, v -> instance.instance().wandApplyMode = v)
-                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, WandActionsManager.WandApplyToMode.values().length-1)
-                                                .step(1)
-                                                .formatValue(val -> Text.translatable(resolveWandMode(val))))
-                                        .build()
-                                ).option(Option.<Integer>createBuilder()
-                                        .name(Text.translatable("config.lucidity.render_mode.rendering_mode_block"))
-                                        .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_block")))
-                                        .binding(0, () -> instance.instance().renderModeBlock, v -> instance.instance().renderModeBlock = v)
-                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, RenderMode.values().length-1)
-                                                .step(1)
-                                                .formatValue(val -> Text.translatable(resolveSelectiveBlockRenderingMode(val))))
-                                        .build()
-                                )
-                                .option(Option.<Integer>createBuilder()
-                                        .name(Text.translatable("config.lucidity.render_mode.rendering_mode_entity"))
-                                        .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_entity")))
-                                        .binding(0, () -> instance.instance().renderModeEntity, v -> instance.instance().renderModeEntity = v)
-                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, RenderMode.values().length-1)
-                                                .step(1)
-                                                .formatValue(val -> Text.translatable(resolveSelectiveEntityRenderingMode(val))))
-                                        .build()
-                                )
-                                .option(Option.<Integer>createBuilder()
-                                        .name(Text.translatable("config.lucidity.render_mode.rendering_mode_particle"))
-                                        .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_particle")))
-                                        .binding(0, () -> instance.instance().renderModeParticle, v -> instance.instance().renderModeParticle = v)
-                                        .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                .range(0, RenderMode.values().length-1)
-                                                .step(1)
-                                                .formatValue(val -> Text.translatable(resolveSelectiveParticleRenderingMode(val))))
+                                        ).option(Option.<Integer>createBuilder()
+                                                .name(Text.translatable("config.lucidity.option.wand_apply"))
+                                                .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand_apply")))
+                                                .binding(0, () -> instance.instance().wandApplyMode, v -> instance.instance().wandApplyMode = v)
+                                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                        .range(0, WandActionsManager.WandApplyToMode.values().length-1)
+                                                        .step(1)
+                                                        .formatValue(val -> Text.translatable(resolveWandMode(val))))
+                                                .build()
+                                        ).option(Option.<Integer>createBuilder()
+                                                .name(Text.translatable("config.lucidity.render_mode.rendering_mode_block"))
+                                                .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_block")))
+                                                .binding(0, () -> instance.instance().renderModeBlock, v -> instance.instance().renderModeBlock = v)
+                                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                        .range(0, RenderMode.values().length-1)
+                                                        .step(1)
+                                                        .formatValue(val -> Text.translatable(resolveSelectiveBlockRenderingMode(val))))
+                                                .build()
+                                        )
+                                        .option(Option.<Integer>createBuilder()
+                                                .name(Text.translatable("config.lucidity.render_mode.rendering_mode_entity"))
+                                                .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_entity")))
+                                                .binding(0, () -> instance.instance().renderModeEntity, v -> instance.instance().renderModeEntity = v)
+                                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                        .range(0, RenderMode.values().length-1)
+                                                        .step(1)
+                                                        .formatValue(val -> Text.translatable(resolveSelectiveEntityRenderingMode(val))))
+                                                .build()
+                                        )
+                                        .option(Option.<Integer>createBuilder()
+                                                .name(Text.translatable("config.lucidity.render_mode.rendering_mode_particle"))
+                                                .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_particle")))
+                                                .binding(0, () -> instance.instance().renderModeParticle, v -> instance.instance().renderModeParticle = v)
+                                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                                        .range(0, RenderMode.values().length-1)
+                                                        .step(1)
+                                                        .formatValue(val -> Text.translatable(resolveSelectiveParticleRenderingMode(val))))
+                                                .build()
+                                        )
                                         .build()
                                 )
-                                .build()
-                        )
 
-                        .build()
+                                .build()
                 ).category(
                         ConfigCategory.createBuilder()
                                 .name(Text.translatable("config.lucidity.category.oreHighlight"))
@@ -436,7 +441,7 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                 //.description(OptionDescription.of(Text.literal("Main mod features")))
                                 .description(OptionDescription.createBuilder()
                                         .text(Text.translatable("config.description.main_features"))
-                                        .image(Lucidity.id("textures/all-explosives.png"), 192, 108)
+                                        //.image(Lucidity.id("textures/all-explosives.png"), 192, 108)
                                         .build())
 
                                 .option(Option.<Boolean>createBuilder()
@@ -795,12 +800,90 @@ public class LucidityModMenuIntegration implements ModMenuApi {
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
-
-
-
                                 .build()
                         )
-                        .build())
+                        .build()
+                ).category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.mod_debugs"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.mod_debugs"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.mod_debugs"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.mob_chase_range"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.mob_chase_range"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderMobChaseRange, bool -> instance.instance().renderMobChaseRange = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.mob_eye-line"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.mob_eye-line"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderMobEyeLineConnection, bool -> instance.instance().renderMobEyeLineConnection = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.mob_spawn"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.mob_spawn.warden_attack_range"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderMobSpawn, bool -> instance.instance().renderMobSpawn = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.warden_attack_range"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.warden_attack_range"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().renderWardenAttackRange, bool -> instance.instance().renderWardenAttackRange = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        )
+                                        .build()
+                                )
+
+                                .build()
+                ).category(
+                        ConfigCategory.createBuilder()
+                                .name(Text.translatable("config.lucidity.command_helper"))
+                                //==================================================
+                                .group(OptionGroup.createBuilder()
+                                        .name(Text.translatable("config.lucidity.command_helper"))
+                                        .description(
+                                                OptionDescription.createBuilder()
+                                                        .text(Text.translatable("config.lucidity.description.command_helper"))
+                                                        .build()
+                                        ).option(
+                                                Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.command_helper"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.command_helper"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> instance.instance().commandHelper, bool -> instance.instance().commandHelper = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        )
+                                        .build()
+                                )
+
+                                .build()
+                )
 
 
                 .save(() -> {

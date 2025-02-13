@@ -2,6 +2,7 @@
   "warn.lucidity.photosensitive-seizure-warning": "Photosensitive seizure warning\nA very small percentage of people may experience a seizure when exposed to certain visual images, including flashing lights or patterns that may appear in video games. Even people who have no history of seizures or epilepsy may have an undiagnosed condition that can cause these “photosensitive epileptic seizures” while playing video games.\nImmediately stop playing and consult a doctor if you experience any symptoms.\nThese seizures may have a variety of symptoms, including lightheadedness, altered vision, eye or face twitching, jerking or shaking of arms or legs, disorientation, confusion, or momentary loss of awareness. Seizures may also cause loss of consciousness or convulsions that can lead to injury from falling down or striking nearby objects.\nParents should watch for or ask their children about the above symptoms. Children and teenagers are more likely than adults to experience these seizures.\nYou may reduce risk of photosensitive epileptic seizures by taking the following precautions:\n1.Play in a well-lit room.\n2.Do not play if you are drowsy or fatigued.\nIf you or any of your relatives have a history of seizures or epilepsy, consult a doctor before playing video games.",
 
   "config.lucidity.title": "Lucidity",
+  "key.lucidity.open_config": "Open Config Menu",
 
   "config.lucidity.category.oreHighlight": "Ore Highlight",
   "config.lucidity.option.oreHighlight": "Enable Ore Highlight",
@@ -230,5 +231,23 @@
   "config.option.description.entity_sample_point_icon_size": "Size of the icon for the blocks that will be destroyed by the explosion",
 
   "config.option.see_Throw": "Visible throw walls",
-  "config.option.description.see_Throw": "Icon visible throw walls"
+  "config.option.description.see_Throw": "Icon visible throw walls",
+
+  "config.lucidity.mod_debugs": "Mob Debug Renders",
+  "config.lucidity.description.mod_debugs": "Some debug renders for mob",
+
+  "config.lucidity.mob_chase_range": "Mob Chase Range",
+  "config.lucidity.description.mob_chase_range": "Mob's \"view distance\"",
+
+  "config.lucidity.mob_spawn": "Mob Spawn",
+  "config.lucidity.description.mob_spawn": "Types of mobs that can Spawn on block surfaces.",
+
+  "config.lucidity.mob_eye-line": "Mob Eye-line connection",
+  "config.lucidity.description.mob_eye-line": "When the monster's eyes can be connected to yours, it will see you!",
+
+  "config.lucidity.warden_attack_range": "Sonic-Boom Attack Range",
+  "config.lucidity.description.warden_attack_range": "Sonic-Boom valid range",
+
+  "config.lucidity.command_helper": "CommandHelper",
+  "config.lucidity.description.command_helper": "Some command effect visualizations(Currently only supports /fill & /clone command)"
 }

@@ -244,7 +244,7 @@ public class SelectiveRenderingManager {
             return new AreaBox(
                     new BlockPos(Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2)),
                     new BlockPos(Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2))
-                    ,color
+                    ,color,0.2f,false
             );
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid number format in input: " + areaString, e);

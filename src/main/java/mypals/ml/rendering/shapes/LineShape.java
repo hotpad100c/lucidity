@@ -42,7 +42,6 @@ public class LineShape {
             matrixStack.push();
             matrixStack.translate(x, y, z);
             Matrix4f modelViewMatrix = matrixStack.peek().getPositionMatrix();
-            RenderSystem.disableDepthTest();
 
             buffer.vertex(modelViewMatrix, 0.0F, 0.0F, 0.0F)
                     .color(red, green, blue, alpha)
@@ -55,6 +54,8 @@ public class LineShape {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
+            RenderSystem.lineWidth(2f);
+            RenderSystem.getShaderLineWidth();
             if(seeThrough)
                 RenderSystem.disableDepthTest();
             BufferRenderer.drawWithGlobalProgram(buffer.end());

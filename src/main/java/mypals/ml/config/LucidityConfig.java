@@ -112,14 +112,6 @@ public class LucidityConfig {
     @SerialEntry
     public static boolean guiInPortals = true;
 
-    //mob spawn
-    @SerialEntry
-    public static boolean renderMobSpawn = false;
-    @SerialEntry
-    public static int renderMobSpawnRange = 2;
-    @SerialEntry
-    public static float renderMobSpawnSize = 0.0025f;
-
     //explosion visualizer
     @SerialEntry
     public static boolean enableExplosionVisualizer = false;
@@ -193,9 +185,25 @@ public class LucidityConfig {
     public static String EntitySamplePoion_Blocked_Icon = "❖";
     @SerialEntry
     public static float EntitySamplePoionIconSize = 0.01F;
-
     @SerialEntry
     public static ArrayList<FakeExplosion> fakeExplosions = new ArrayList<FakeExplosion>();
 
+    //mob spawn
+    @SerialEntry
+    public static boolean renderMobSpawn = false;
+    @SerialEntry
+    public static int renderMobSpawnRange = 2;
+    @SerialEntry
+    public static float renderMobSpawnSize = 0.0025f;
+
+    @SerialEntry
+    public static boolean renderMobChaseRange = false;
+    @SerialEntry
+    public static boolean renderMobEyeLineConnection = false;
+    @SerialEntry
+    public static boolean renderWardenAttackRange = false;
+
+    @SerialEntry
+    public static boolean commandHelper = false;
 
 }
