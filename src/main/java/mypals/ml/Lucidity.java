@@ -4,15 +4,19 @@ import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
 import mypals.ml.config.LucidityModMenuIntegration;
 import mypals.ml.features.arrowCamera.ArrowCamera;
+import mypals.ml.features.betterBarrier.BetterBarrier;
 import mypals.ml.features.commandHelper.ChatCommandScreenObserver;
 import mypals.ml.features.damageIndicator.DamageHandler;
 import mypals.ml.features.damageIndicator.IndicatorRenderer;
 import mypals.ml.features.explosionVisualizer.ExplosionVisualizer;
 import mypals.ml.features.highLightFluidSource.FluidSourceResourceLoader;
 import mypals.ml.features.mobFollowRange.MobFollowRangeScanner;
+import mypals.ml.features.pastBlockEvents.ClientsideBlockEventManager;
 import mypals.ml.features.renderKeyPresses.KeyPressesManager;
+import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
 import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
+import mypals.ml.features.soundListener3D.SoundListener;
 import mypals.ml.features.trajectory.TrajectoryManager;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
@@ -34,11 +38,11 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -52,6 +56,7 @@ import java.util.function.Predicate;
 import static mypals.ml.command.CommandRegister.registerCommands;
 import static mypals.ml.config.Keybinds.openConfigKey;
 import static mypals.ml.config.LucidityConfig.*;
+import static mypals.ml.features.betterBarrier.BetterBarrier.checkForBetterRenderersEnabled;
 import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
@@ -61,6 +66,7 @@ import static mypals.ml.features.worldEaterHelper.MineralFinder.parseSelectedBlo
 import static mypals.ml.features.worldEaterHelper.oreResolver.scanForMineralsOptimized;
 
 public class Lucidity implements ModInitializer {
+	private static SoundListener soundListener  = new SoundListener();
 	public static final String MOD_ID = "lucidity";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final SimpleOption<Double> GAMMA_BYPASS = new SimpleOption<>("options.gamma", SimpleOption.emptyTooltip(), (optionText, value) -> Text.empty(), SimpleOption.DoubleSliderCallbacks.INSTANCE.withModifier(
@@ -101,6 +107,10 @@ public class Lucidity implements ModInitializer {
 
     @Override
 	public void onInitialize() {
+
+
+
+		BetterBarrier.init();
 		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> {
 			ResourceManagerHelper.registerBuiltinResourcePack(
 					Identifier.of(MOD_ID, "lavahighlight"),
@@ -112,6 +122,7 @@ public class Lucidity implements ModInitializer {
 
 		updateConfig();
 		TrajectoryManager.init();
+		new SoundListener();
 		new ArrowCamera();
 		ArrowCamera.onInitialize();
 		/*OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
@@ -121,6 +132,11 @@ public class Lucidity implements ModInitializer {
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,5));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,-5,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));*/
+
+		SelectiveRenderingManager.resolveSelectiveBlockRenderingMode(renderModeBlock);
+		SelectiveRenderingManager.resolveSelectiveEntityRenderingMode(renderModeEntity);
+		SelectiveRenderingManager.resolveSelectiveParticleRenderingMode(renderModeParticle);
+
 		FluidSourceResourceLoader.init();
 		Keybinds.init();
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
@@ -169,7 +185,7 @@ public class Lucidity implements ModInitializer {
 	}
 	private static void extraActions(){
 		LucidityConfig.CONFIG_HANDLER.instance();
-		if(!blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player != null){
+		if(!blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player != null && autoNightVision){
 			MinecraftClient.getInstance().player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION,10000,5,true,false,false));
         }
 	}
@@ -186,7 +202,7 @@ public class Lucidity implements ModInitializer {
 					.forEach(WardenStateResolver::resolveWardenState);
 		}
 
-		if(renderMobChaseRange){
+		if(renderMobChaseRange || renderMobEyeLineConnection){
 			MobFollowRangeScanner.onClientTick(scanRadius);
 		}
 		
@@ -196,7 +212,9 @@ public class Lucidity implements ModInitializer {
 		if(world == null){return;}
 		assert client.player != null;
 		PlayerEntity player = client.player;
-
+		if(betterLight || betterBarrier || betterStructureVoid) {
+			BetterBarrier.checkForBetterRenderersEnabled();
+		}
 		if(warningTime > 0){
 			BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(player,world);
 			//resolveBreakingSituation(player,world,blockBreakingRayCast.getBlockPos());
@@ -219,7 +237,13 @@ public class Lucidity implements ModInitializer {
 		if(commandHelper){
 			ChatCommandScreenObserver.onClientTick();
 		}
-		ArrowCamera.onClientTick();
+		if(arrowcam){
+			ArrowCamera.onClientTick();
+		}
+		soundListener.onClientTick();
+		if(renderBlockEvents){
+			ClientsideBlockEventManager.onClientTick();
+		}
 		//TreeSearchManager.onClientTick();
 	}
 	public static void UpdateTimers(){

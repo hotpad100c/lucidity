@@ -1,5 +1,6 @@
 package mypals.ml.rendering.shapes;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -56,6 +57,7 @@ public class ShineMarker {
 
         matrixStack.push();
         matrixStack.translate(x,y,z);
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
@@ -113,7 +115,7 @@ public class ShineMarker {
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
+        RenderSystem.defaultBlendFunc();
 
         BufferRenderer.drawWithGlobalProgram(buffer.end());
 

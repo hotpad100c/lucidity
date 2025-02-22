@@ -3,10 +3,15 @@ package mypals.ml.features.commandHelper.CommandParsers;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.CubeShape;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import java.awt.*;
 import java.util.ArrayList;
+
+import static mypals.ml.features.commandHelper.CommandParsers.BasicParsers.parseCoordinate;
+import static mypals.ml.features.commandHelper.CommandParsers.BasicParsers.parseCoordinateInt;
 
 public class CloneCommandParser {
 
@@ -26,13 +31,21 @@ public class CloneCommandParser {
         ArrayList<BlockPos> positions = new ArrayList<>();
         String[] tokens = command.split("\\s+");
         ArrayList<Integer> numbers = new ArrayList<>();
-
+        PlayerEntity playerEntity = MinecraftClient.getInstance().player;
         // 提取所有整数
-        for (String token : tokens) {
-            try {
-                numbers.add(Integer.parseInt(token));
-            } catch (NumberFormatException ignored) {}
-        }
+        try {
+            numbers.add((int)parseCoordinateInt(tokens[1],playerEntity,0));
+            numbers.add((int)parseCoordinateInt(tokens[2],playerEntity,1));
+            numbers.add((int)parseCoordinateInt(tokens[3],playerEntity,2));
+
+            numbers.add((int)parseCoordinateInt(tokens[4],playerEntity,0));
+            numbers.add((int)parseCoordinateInt(tokens[5],playerEntity,1));
+            numbers.add((int)parseCoordinateInt(tokens[6],playerEntity,2));
+
+            numbers.add((int)parseCoordinateInt(tokens[7],playerEntity,0));
+            numbers.add((int)parseCoordinateInt(tokens[8],playerEntity,1));
+            numbers.add((int)parseCoordinateInt(tokens[9],playerEntity,2));
+        }catch (NumberFormatException ignored) {}
 
         if (numbers.size() >= 9) {
             // 角点1

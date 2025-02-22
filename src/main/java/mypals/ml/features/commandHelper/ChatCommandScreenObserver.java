@@ -2,6 +2,7 @@ package mypals.ml.features.commandHelper;
 
 import mypals.ml.features.commandHelper.CommandParsers.CloneCommandParser;
 import mypals.ml.features.commandHelper.CommandParsers.FillCommandParser;
+import mypals.ml.features.commandHelper.CommandParsers.ParticleCommandParser;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.rendering.InformationRender;
 import net.minecraft.client.MinecraftClient;
@@ -25,6 +26,9 @@ public class ChatCommandScreenObserver {
                 }
                 if (currentInput.startsWith("/clone ")) {
                     CloneCommandParser.parseCloneCommand(currentInput);
+                }
+                if(currentInput.startsWith("/particle ")) {
+                    ParticleCommandParser.parseParticleCommand(currentInput);
                 }
             } catch (Exception ignored) {}
         }

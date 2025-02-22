@@ -34,7 +34,7 @@ public class Text {
         this.seeThrough = seeThrough;
     }
     public void draw(MatrixStack matrices, float size) {
-        draw(matrices,this.pos, 0,this.texts,this.color,size,this.seeThrough);
+        draw(matrices,this.pos, 0,this.texts,this.color,this.size,this.seeThrough);
     }
     public static void draw(MatrixStack matrices, Vec3d textPos, float tickDelta, ArrayList<String> texts, List<Color> colors, float size, boolean seeThrough) {
         MinecraftClient client = MinecraftClient.getInstance();

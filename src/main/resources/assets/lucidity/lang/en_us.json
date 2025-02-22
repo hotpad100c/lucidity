@@ -4,6 +4,8 @@
   "config.lucidity.title": "Lucidity",
   "key.lucidity.open_config": "Open Config Menu",
 
+
+
   "config.lucidity.category.oreHighlight": "Ore Highlight",
   "config.lucidity.option.oreHighlight": "Enable Ore Highlight",
   "config.lucidity.description.oreHighlight": "Highlights ores on world surface.",
@@ -15,6 +17,11 @@
   "config.lucidity.category.selectiveRenderings": "Selective Renderings",
   "config.lucidity.group.selectiveRenderings": "Selective Renderings",
   "config.lucidity.description.selectiveRenderings": "Render only blocks, entities, and particles that players wish to render.",
+
+  "config.lucidity.renderSelectionMarker": "Select Block Marker",
+  "config.lucidity.description.renderSelectionMarker": "Mark the space of the block that will be selected.",
+  "config.lucidity.autoNightVision": "Auto Night Vision",
+  "config.lucidity.description.autoNightVision": "When selective rendering is enabled, the player will automatically receive a night vision effect. This is to prevent block cross-sections from being too dark.",
 
   "config.lucidity.option.wand": "Selection Wand",
   "config.lucidity.option.spectator_select": "Selection in spectator",
@@ -248,6 +255,39 @@
   "config.lucidity.warden_attack_range": "Sonic-Boom Attack Range",
   "config.lucidity.description.warden_attack_range": "Sonic-Boom valid range",
 
+  "config.lucidity.creative_helper": "Creative Helper",
+  "config.lucidity.description.creative_helper": "Some command, block visualizations.",
   "config.lucidity.command_helper": "CommandHelper",
-  "config.lucidity.description.command_helper": "Some command effect visualizations(Currently only supports /fill & /clone command)"
+  "config.lucidity.description.command_helper": "Some command effect visualizations.",
+
+  "config.lucidity.arrowcam": "ArrowCamera",
+  "config.lucidity.description.arrowcam": "Press ctrl while shooting out a projectile will bind your camera on to that projectile, press shift to reset you camera.",
+
+  "config.lucidity.betterStructureVoidBlock": "Better Structure Void Block",
+  "config.lucidity.description.betterStructureVoidBlock": "Structure void block will be rendered in a better look.",
+
+  "config.lucidity.betterBarrierBlock": "Better Barrier Block",
+  "config.lucidity.description.betterBarrierBlock": "Barrier block will be rendered in a better look.",
+
+  "config.lucidity.betterLightBlock": "Better Light Block",
+  "config.lucidity.description.betterLightBlock": "Light block will be rendered in a better look.",
+
+  "config.lucidity.forceTechnicalBlocksToRender": "Force Technical Blocks Render",
+  "config.lucidity.description.forceTechnicalBlocksToRender": "Force technical blocks(barrier,structure void,light...) to render.",
+
+  "config.lucidity.fun": "FUN!",
+  "config.lucidity.description.fun": "Fun stuff :D",
+  "config.lucidity.clientsideDamageCalculation": "Clientside Damage Calculation",
+  "config.lucidity.description.clientsideDamageCalculation": "Calculate basic damage on client side(May not accurate!).",
+  "info.lucidity.clientsideDamageCalculation.damageDealing": "deal:",
+  "info.lucidity.clientsideDamageCalculation.damageToEnemy": "take:",
+  "config.lucidity.soundEventRender": "SoundEventVisualizer",
+  "config.lucidity.description.soundEventRender": "Render sound events around player",
+  "config.lucidity.soundEventRenderColor": "SoundEventVisualizerColor",
+  "config.lucidity.soundEventsExpiredTime": "soundEventRenderExpiredTime",
+
+  "config.lucidity.blockEventRender": "BlockEventVisualizer",
+  "config.lucidity.description.blockEventRender": "Render block events happened.(Directly intercepting server packets does not guarantee the accuracy of the observation. The actual order should be based on the server.)",
+  "config.lucidity.blockEventRenderColor": "SoundEventVisualizerColor",
+  "config.lucidity.blockEventsExpiredTime": "soundEventRenderExpiredTime"
 }

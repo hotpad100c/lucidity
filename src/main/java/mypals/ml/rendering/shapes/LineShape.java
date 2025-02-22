@@ -27,9 +27,9 @@ public class LineShape {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
         if (camera.isReady() && client.getEntityRenderDispatcher().gameOptions != null && client.player != null) {
-            float x = (float) (start.getX() - camera.getPos().getX());
-            float y = (float) (start.getY() - camera.getPos().getY());
-            float z = (float) (start.getZ() - camera.getPos().getZ());
+            double x =  (start.getX() - camera.getPos().getX());
+            double y =  (start.getY() - camera.getPos().getY());
+            double z =  (start.getZ() - camera.getPos().getZ());
             float red = ((color.getRGB() >> 16) & 0xFF) / 255.0f;
             float green = ((color.getRGB() >> 8) & 0xFF) / 255.0f;
             float blue = (color.getRGB() & 0xFF) / 255.0f;
@@ -44,11 +44,9 @@ public class LineShape {
             Matrix4f modelViewMatrix = matrixStack.peek().getPositionMatrix();
 
             buffer.vertex(modelViewMatrix, 0.0F, 0.0F, 0.0F)
-                    .color(red, green, blue, alpha)
-                    .normal(normalX, normalY, normalZ);
+                    .color(red, green, blue, alpha);
             buffer.vertex(modelViewMatrix, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z))
-                    .color(red, green, blue, alpha)
-                    .normal(normalX, normalY, normalZ);
+                    .color(red, green, blue, alpha);
 
             RenderSystem.setShader(GameRenderer::getPositionColorProgram);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

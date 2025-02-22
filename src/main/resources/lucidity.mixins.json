@@ -3,7 +3,10 @@
   "package": "mypals.ml.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BarrierBlockMixin",
+    "BlocksMixin",
     "ItemMixin",
+    "StructureVoidBlockMixin",
     "compat.ChunkBuilderMeshingTaskMixin",
     "compat.DefaultFluidRendererMixin",
     "compat.MixinBlockOcclusionCacheMixin",
@@ -16,6 +19,7 @@
   "client": [
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkMixin",
+    "ClientWorldMixin",
     "HandledScreenMixin",
     "KeyboardMixin",
     "LightmapTextureManagerMixin",

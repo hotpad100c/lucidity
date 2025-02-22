@@ -7,6 +7,7 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import mypals.ml.Lucidity;
 import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.FakeExplosion;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.world.ClientWorld;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -37,6 +38,10 @@ public class LucidityConfig {
     @SerialEntry
     public static String wand = "minecraft:breeze_rod";
     @SerialEntry
+    public static boolean renderSelectionMarker = false;
+    @SerialEntry
+    public static boolean autoNightVision = true;
+    @SerialEntry
     public static int renderModeBlock = 0;
     @SerialEntry
     public static int renderModeEntity = 0;
@@ -53,31 +58,10 @@ public class LucidityConfig {
 
     @SerialEntry
     public static boolean renderKeyPresses = false;
-    public static List<String> selectedBlocksToHighLight = Arrays.asList(
-            "minecraft:coal_ore;#000000",
-            "minecraft:iron_ore;#D8D8D8",
-            "minecraft:gold_ore;#FFD700",
-            "minecraft:diamond_ore;#00FFFF",
-            "minecraft:emerald_ore;#009900",
-            "minecraft:redstone_ore;#FF0000",
-            "minecraft:lapis_ore;#0000FF",
-            "minecraft:copper_ore;#FFA500",
-            "minecraft:nether_quartz_ore;#FFF0DC",
-            "minecraft:nether_gold_ore;#FFA500",
-            "minecraft:ancient_debris;#804020",
-            "minecraft:obsidian;#200040",
-            "minecraft:deepslate_coal_ore;#101010",
-            "minecraft:deepslate_iron_ore;#BFBFBF",
-            "minecraft:deepslate_gold_ore;#FFD700",
-            "minecraft:deepslate_diamond_ore;#00CCCC",
-            "minecraft:deepslate_emerald_ore;#009900",
-            "minecraft:deepslate_redstone_ore;#990000",
-            "minecraft:deepslate_lapis_ore;#000099",
-            "minecraft:deepslate_copper_ore;#FFA500"
-    );
+    @SerialEntry
+    public static List<String> selectedBlocksToHighLight = new ArrayList<>();
     @SerialEntry
     public static Color colorPalette = Color.white;
-
     //indicator
     @SerialEntry
     public static boolean enableDamageIndicator = false;
@@ -87,6 +71,8 @@ public class LucidityConfig {
     public static int indicatorOffset = 0;
     @SerialEntry
     public static Color indicatorColor = Color.red;
+    @SerialEntry
+    public static boolean damageCaculator = false;
 
     //fluid
     @SerialEntry
@@ -205,5 +191,30 @@ public class LucidityConfig {
 
     @SerialEntry
     public static boolean commandHelper = false;
+    @SerialEntry
+    public static boolean betterStructureVoid = false;
+    @SerialEntry
+    public static boolean betterBarrier = false;
+    @SerialEntry
+    public static boolean betterLight = false;
+    @SerialEntry
+    public static boolean forceRenderTechnicalBlocks = false;
+
+    @SerialEntry
+    public static boolean arrowcam = false;
+
+    @SerialEntry
+    public static boolean renderSoundEvents = false;
+    @SerialEntry
+    public static int renderSoundEventsExpiredTime = 1000;
+    @SerialEntry
+    public static Color renderSoundEventsColor = new Color(191, 255, 0,100);
+
+    @SerialEntry
+    public static boolean renderBlockEvents = false;
+    @SerialEntry
+    public static int renderBlockEventsExpiredTime = 1000;
+    @SerialEntry
+    public static Color renderBlockEventsColor = new Color(255,165,0,100);
 
 }

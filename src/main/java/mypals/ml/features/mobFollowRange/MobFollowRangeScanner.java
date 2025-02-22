@@ -5,7 +5,10 @@ import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.LineShape;
 import mypals.ml.rendering.shapes.OnGroundMarker;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.pathing.NavigationType;
+import net.minecraft.entity.ai.pathing.PathNodeType;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.mob.MobEntity;
@@ -25,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static mypals.ml.config.LucidityConfig.renderMobChaseRange;
 
 public class MobFollowRangeScanner {
 
@@ -52,13 +57,17 @@ public class MobFollowRangeScanner {
 
         for (MobEntity mob : mobs) {
             double followRange = getFollowRangeEstimate(mob);
-            BlockPos mobPos = mob.getBlockPos();
+            if(renderMobChaseRange) {
 
-            List<BlockPos> circleBlocks = getCircleBlocks(mobPos, followRange);
-            for (BlockPos blockPos : circleBlocks) {
-                BlockPos surfacePos = findClosestSurface(world, blockPos);
-                if (surfacePos != null) {
-                    blockSurfaceMap.put(blockPos, surfacePos);
+                BlockPos mobPos = mob.getBlockPos();
+
+                List<BlockPos> circleBlocks = getCircleBlocks(mobPos, followRange);
+                for (BlockPos blockPos : circleBlocks) {
+                    BlockPos surfacePos = findClosestSurface(world, blockPos);
+                    boolean pathfindThrough = mob.getWorld().getBlockState(blockPos).canPathfindThrough(NavigationType.LAND);
+                    if (surfacePos != null && pathfindThrough) {
+                        blockSurfaceMap.put(blockPos, surfacePos);
+                    }
                 }
             }
 
@@ -72,15 +81,15 @@ public class MobFollowRangeScanner {
                         if(target == player){
                             Vec3d targetPos = getTargetPosition(player);
                             if (hitResult.getType() == HitResult.Type.MISS) {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), targetPos, Color.RED, 0.5f, true));
+                                InformationRender.addLine(new LineShape(mob.getEyePos(), targetPos, Color.GREEN, 1f, true));
                             }else {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.GREEN, 1, true));
+                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.RED, 1, true));
                             }
                         }else {
                             if (mob != target && hitResult.getType() == HitResult.Type.MISS) {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), target.getEyePos(), Color.RED, 1, true));
+                                InformationRender.addLine(new LineShape(mob.getEyePos(), target.getEyePos(), Color.GREEN, 1, true));
                             } else {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.GREEN, 1, true));
+                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.RED, 1, true));
                             }
                         }
                     }

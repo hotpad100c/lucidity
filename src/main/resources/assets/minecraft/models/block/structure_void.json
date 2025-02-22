@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "lucidity:block/structure_void"
+  },
+  "render_type": "translucent"
+}

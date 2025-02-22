@@ -24,6 +24,9 @@ public class CubeShape {
         this.color = color;
         this.seeThrough = seeThrough;
     }
+    public void draw(MatrixStack matrices,float sizeAdd, float tickDelta) {
+        draw(matrices, this.pos, sizeAdd, tickDelta, this.color,this.alpha,this.seeThrough);
+    }
     public static void draw(MatrixStack matrices, BlockPos pos, float sizeAdd, float tickDelta, Color color, float alpha,boolean seeThrough) {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();

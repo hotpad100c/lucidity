@@ -13,3 +13,6 @@ accessible field net/minecraft/world/gen/foliage/FoliagePlacer radius Lnet/minec
 accessible field net/minecraft/world/gen/root/MangroveRootPlacer mangroveRootPlacement Lnet/minecraft/world/gen/root/MangroveRootPlacement;
 accessible field net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator light [I
 accessible field net/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator brightness [F
+accessible field net/minecraft/entity/LivingEntity riptideAttackDamage F
+accessible method net/minecraft/entity/player/PlayerEntity getDamageAgainst (Lnet/minecraft/entity/Entity;FLnet/minecraft/entity/damage/DamageSource;)F
+accessible method net/minecraft/server/network/ServerPlayerEntity getDamageAgainst (Lnet/minecraft/entity/Entity;FLnet/minecraft/entity/damage/DamageSource;)F

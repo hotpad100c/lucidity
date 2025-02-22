@@ -327,17 +327,17 @@ public class TrajectoryManager {
 
         for (Entity projectile : projectilesSimple) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.nearTrajectoryColor, projectile, world, 0.03f, 0.99f);
-            world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
+
             InformationRender.addLine(new MultiPointLine(points, Color.YELLOW,0.9f,false));
         }
         for (Entity projectile : projectilesComplex) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.farTrajectoryColor, projectile, world,0.05f, 0.99f);
-            world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
+
             InformationRender.addLine(new MultiPointLine(points, Color.RED,0.9f,false));
         }
         for (Entity projectile : projectilesStrate) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.linerTrajectoryColor, projectile, world,0f, 0.99f);
-            world.addParticle(mark, projectile.getPos().x, projectile.getPos().y, projectile.getPos().z, 0, 0, 0);
+
             InformationRender.addLine(new MultiPointLine(points, Color.CYAN,0.9f,false));
         }
     }
