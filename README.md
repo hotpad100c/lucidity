@@ -1,4 +1,4 @@
-8# lucidity
+# lucidity
 ![](https://count.getloli.com/@lucidity?name=lucidity&theme=3d-num&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto)
 # Feature Introduction! 🚀
 
@@ -50,9 +50,12 @@ Indicates the source of damage
 Calculates potential damage
 
 
-## Fluid Highlighting
+### Fluid Highlighting
 
-Applies a special highlight texture to fluid blocks.
+Applies a special highlight texture to fluid blocks from texture packs.
+
+- Fluid source direction 
+- Bubble column direction
 
 ### Projectile Trajectory
 
