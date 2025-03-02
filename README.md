@@ -86,10 +86,11 @@ A powerful tool that simulates and visualizes explosion details in real time, in
 - Sample points of affected entities
 
 
-# Mob Debug Rendering
+### Mob Debug Renderings
 
-Visualizes areas where entities can detect you.
-- Displays a line when an entity can see you.
+- Visualizes areas where entities can detect target.
+- Displays spawnable entities on blocks around the player(not alwaysaccurate).
+- Displays a line between entity's eye and its target's eye.
 - Shows the effective attack range of sonic booms.
 
 ### Creative Helper
