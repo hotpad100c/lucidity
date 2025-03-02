@@ -1,4 +1,4 @@
-# lucidity
+8# lucidity
 ![](https://count.getloli.com/@lucidity?name=lucidity&theme=3d-num&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto)
 # Feature Introduction! 🚀
 
@@ -100,7 +100,7 @@ Visualizes areas where entities can detect you.
 - Forces the rendering of some technical blocks (barriers, structure voids, etc.)
 
 
-Other Fun Features! 
+### Other Fun Features! 
 
 - Press Ctrl while firing a projectile to switch your view to the projectile's perspective (press Shift to reset view)
 
