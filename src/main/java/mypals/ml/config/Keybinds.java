@@ -12,6 +12,7 @@ public class Keybinds {
     public static KeyBinding switchRenderMode;
     public static KeyBinding deleteArea;
     public static KeyBinding openConfigKey;
+    public static KeyBinding openImageRenderingsConfigKey;
 
 
     public static void init() {
@@ -38,6 +39,12 @@ public class Keybinds {
                 "key.lucidity.open_config",
                 InputUtil.Type.KEYSYM,
                 GLFW_KEY_F12,
+                "config.lucidity.title"
+        ));
+        openImageRenderingsConfigKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.lucidity.open_image_rendering_config",
+                InputUtil.Type.KEYSYM,
+                GLFW_KEY_F10,
                 "config.lucidity.title"
         ));
 

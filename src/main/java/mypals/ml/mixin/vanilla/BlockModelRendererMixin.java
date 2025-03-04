@@ -9,6 +9,7 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
@@ -38,7 +39,6 @@ public class BlockModelRendererMixin {
 
             // 计算当前 Quad 紧邻的方块位置
             BlockPos neighborPos = pos.offset(quadDirection);
-
             // 获取紧邻方块的 BlockState
             BlockState neighborState = world.getBlockState(neighborPos);
 
@@ -80,30 +80,25 @@ public class BlockModelRendererMixin {
     ) {
         // 遍历所有传入的四边形（BakedQuads）
         for (BakedQuad bakedQuad : quads) {
-            // 如果需要使用世界光照
             if (useWorldLight) {
                 getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
 
                 BlockPos blockPos = flags.get(0) ? pos.offset(bakedQuad.getFace()) : pos;
                 BlockState neighborState = world.getBlockState(blockPos);
 
-                // 默认获取光照值
                 light = WorldRenderer.getLightmapCoordinates(world, state, blockPos);
 
-                // 如果 shouldRenderBlock 检测到该方块不符合渲染要求，则强制最大光照
                 if (shouldRenderBlock(neighborState, blockPos)) {
                     light = 0xF000F0;
                 }
             }
 
-            // 获取该 Quad 在世界中的亮度，影响整体渲染的明暗程度
             float f = world.getBrightness(bakedQuad.getFace(), bakedQuad.hasShade());
 
-            // 渲染当前 Quad
             renderQuad(
                     world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
-                    f, f, f, f,   // 使用相同的亮度值
-                    light, light, light, light,  // 应用计算出的光照值
+                    f, f, f, f,
+                    light, light, light, light,
                     overlay
             );
         }

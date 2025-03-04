@@ -1,31 +1,29 @@
 package mypals.ml.rendering;
 
-import com.jcraft.jorbis.Block;
 import com.mojang.blaze3d.systems.RenderSystem;
+import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector2d;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static mypals.ml.Lucidity.LOGGER;
-import static mypals.ml.Lucidity.getPlayerLookedBlock;
-import static mypals.ml.config.LucidityConfig.renderSelectionMarker;
-import static mypals.ml.config.LucidityConfig.selectInSpectator;
+import static mypals.ml.Lucidity.*;
+import static mypals.ml.config.LucidityConfig.*;
+import static mypals.ml.features.ImageRendering.ImageRenderer.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.deleteMode;
@@ -92,7 +90,28 @@ public class InformationRender {
 
         if(MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().gameRenderer.getCamera().isReady()) {
             try {
-                //renderPicture(matrixStack, Identifier.of(MOD_ID,"textures/DebugPNG.png"),new Vec3d(0,0,0),1,240, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
+
+                //renderPictureFromIdentifier(matrixStack, Identifier.of(MOD_ID,"textures/examples/ray.png"),new Vec3d(0,0,0),new Vec3d(45,90,16),new Vec2f(0.05f,0.05f),0.05f,15728880, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
+                //renderPictureFromPath(matrixStack, "C:/Users/Ryan/Downloads/lost-file.png/",new Vec3d(9,0,0),new Vec3d(45,0,90),new Vec2f(0.09f,0.09f),0.1f,15720000, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
+
+                /*List<String> pictures = new ArrayList<>();
+                pictures.add("C:\\Users\\Ryan\\Downloads\\test-transparent.png;p1;[0,0,0];[0,90.3,45];[0.04,0.04]");
+                pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
+                */
+                for(String imageName : ImageDataParser.images.keySet()){
+                    Map.Entry<Identifier, ImageDataParser.ImageData> image = ImageDataParser.images.get(imageName);
+
+                    ImageDataParser.ImageData data = image.getValue();
+                    if(data == null){
+                        continue;
+                    }
+                    renderPictureWorldSpace(matrixStack, image.getKey(),
+                            new Vec3d(data.getPos()[0],data.getPos()[1],data.getPos()[2]),
+                            new Vec3d(data.getRotation()[0],data.getRotation()[1],data.getRotation()[2]),
+                            new Vector2d(data.getScale()[0],data.getScale()[1]),
+                            pixelsPerBlock,15720000, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true),false);
+                }
+                //parse()
                 for (BoxShape box : boxes) {
                     box.draw(matrixStack);
                 }

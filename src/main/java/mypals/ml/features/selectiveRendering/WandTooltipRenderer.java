@@ -106,7 +106,6 @@ public class WandTooltipRenderer {
         if (!shouldSelect || client.options.hudHidden) {
             return;
         }
-
         generateTooltip();
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();

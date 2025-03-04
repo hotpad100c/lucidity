@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import mypals.ml.command.lib.CommandBuilder;
 import mypals.ml.command.lib.CommandExecutor;
 import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.ImageRendering.configuration.ImageConfigCommands;
+import mypals.ml.features.ImageRendering.configuration.ImageConfigScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.server.world.ServerWorld;

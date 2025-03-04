@@ -3,7 +3,7 @@
 
   "config.lucidity.title": "Lucidity",
   "key.lucidity.open_config": "Open Config Menu",
-
+  "key.lucidity.open_image_rendering_config": "Open Image Renderings Config Menu",
 
 
   "config.lucidity.category.oreHighlight": "Ore Highlight",
@@ -288,6 +288,53 @@
 
   "config.lucidity.blockEventRender": "BlockEventVisualizer",
   "config.lucidity.description.blockEventRender": "Render block events happened.(Directly intercepting server packets does not guarantee the accuracy of the observation. The actual order should be based on the server.)",
-  "config.lucidity.blockEventRenderColor": "SoundEventVisualizerColor",
-  "config.lucidity.blockEventsExpiredTime": "soundEventRenderExpiredTime"
+  "config.lucidity.blockEventRenderColor": "BlockEventVisualizerColor",
+  "config.lucidity.blockEventsExpiredTime": "BlockEventRenderExpiredTime",
+
+  "config.lucidity.advancedAdvancedToolTips": "AdvancedAdvancedToolTips",
+
+  "block.mapColorProvider": "Map Color Provider",
+  "block.collidable": "Collidable",
+  "block.soundGroup": "Sound Group",
+  "block.luminance": "Luminance",
+  "block.resistance": "Resistance",
+  "block.hardness": "Hardness",
+  "block.toolRequired": "Tool Required",
+  "block.randomTicks": "Random Ticks",
+  "block.slipperiness": "Slipperiness",
+  "block.velocityMultiplier": "Velocity Multiplier",
+  "block.jumpVelocityMultiplier": "Jump Velocity Multiplier",
+  "block.lootTableKey": "Loot Table Key",
+  "block.opaque": "Opaque",
+  "block.isAir": "Is Air",
+  "block.burnable": "Burnable",
+  "block.forceSolid": "Force Solid",
+  "block.pistonBehavior": "Piston Behavior",
+  "block.blockBreakParticles": "Has Block Break Particles",
+  "block.instrument": "Instrument",
+  "block.replaceable": "Replaceable",
+  "block.allowsSpawningPredicate": "Allows Spawning Predicate",
+  "block.solidBlockPredicate": "Solid Block Predicate",
+  "block.suffocationPredicate": "Suffocation Predicate",
+  "block.blockVisionPredicate": "Block Vision Predicate",
+  "block.postProcessPredicate": "Post Process Predicate",
+  "block.emissiveLightingPredicate": "Emissive Lighting Predicate",
+  "block.dynamicBounds": "Dynamic Bounds",
+  "block.requiredFeatures": "Required Features",
+  "block.offsetter": "Offsetter",
+  "piston_behavior.normal": "normal",
+  "piston_behavior.destroy": "destroy",
+  "piston_behavior.block": "block",
+  "piston_behavior.ignore": "ignore",
+  "piston_behavior.push_only": "push_only",
+  "tools.need": "need[",
+  "tools.mineable": "mineable | ",
+  "tools.tool": "]tool",
+
+  "config.lucidity.category.pictureRenderings":"PictureRenderings",
+  "config.lucidity.pictures":"Pictures",
+
+  "config.lucidity.pixel_per_block":"PixelsPerBlock",
+  "config.lucidity.description.pixel_per_block":"How many pixels should be rendered inside a block.(default = 377.95)"
+
 }

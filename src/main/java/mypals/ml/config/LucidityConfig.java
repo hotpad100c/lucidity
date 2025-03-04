@@ -7,7 +7,9 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import mypals.ml.Lucidity;
 import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.FakeExplosion;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.BlockItem;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -217,4 +219,37 @@ public class LucidityConfig {
     @SerialEntry
     public static Color renderBlockEventsColor = new Color(255,165,0,100);
 
+    @SerialEntry
+    public static boolean advancedAdvancedToolTips = false;
+    @SerialEntry
+    public static List<String> blockToolTipAttributes = Arrays.asList(
+            "mapColorProvider",
+            "collidable",
+            "soundGroup",
+            "luminance",
+            "resistance",
+            "hardness",
+            "toolRequired",
+            "randomTicks",
+            "slipperiness",
+            "velocityMultiplier",
+            "jumpVelocityMultiplier",
+            "lootTableKey",
+            "opaque",
+            "isAir",
+            "burnable",
+            "forceSolid",
+            "pistonBehavior",
+            "blockBreakParticles",
+            "instrument",
+            "replaceable",
+            "solidBlockPredicate",
+            "dynamicBounds",
+            "offsetter"
+    );
+    //picture renderings
+    @SerialEntry
+    public static List<String> picturesToRender = new ArrayList<>();
+    @SerialEntry
+    public static float pixelsPerBlock = 377.95f;
 }

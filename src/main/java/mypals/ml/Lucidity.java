@@ -3,6 +3,10 @@ package mypals.ml;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
 import mypals.ml.config.LucidityModMenuIntegration;
+import mypals.ml.config.ScreenGenerator;
+import mypals.ml.features.ImageRendering.configuration.ImageConfigCommands;
+import mypals.ml.features.ImageRendering.configuration.ImageConfigScreen;
+import mypals.ml.features.advancedAdvancedTooltip.AdvancedAdvancedToolTip;
 import mypals.ml.features.arrowCamera.ArrowCamera;
 import mypals.ml.features.betterBarrier.BetterBarrier;
 import mypals.ml.features.commandHelper.ChatCommandScreenObserver;
@@ -21,6 +25,7 @@ import mypals.ml.features.trajectory.TrajectoryManager;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -50,12 +55,17 @@ import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import static mypals.ml.command.CommandRegister.registerCommands;
 import static mypals.ml.config.Keybinds.openConfigKey;
+import static mypals.ml.config.Keybinds.openImageRenderingsConfigKey;
 import static mypals.ml.config.LucidityConfig.*;
+import static mypals.ml.features.ImageRendering.ImageDataParser.prepareImages;
+import static mypals.ml.features.ImageRendering.ImageDataParser.test;
+import static mypals.ml.features.ImageRendering.configuration.ImageConfigCommands.openImageRenderingConfigGUI;
 import static mypals.ml.features.betterBarrier.BetterBarrier.checkForBetterRenderersEnabled;
 import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
@@ -80,14 +90,20 @@ public class Lucidity implements ModInitializer {
     public static void onConfigUpdated() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		updateChunks(client);
-		updateConfig();
+		try {
+			updateConfig();
+		}catch (Exception e){
+			LOGGER.error(e.toString());
+			e.printStackTrace();
+		}
+
     }
 	private static void resolveSettings(){
 		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
 		resolveSelectedEntityTypesFromString(LucidityConfig.selectedEntityTypes);
 		resolveSelectedParticleTypesFromString(LucidityConfig.selectedParticleTypes);
 		parseSelectedBlocks();
-
+		prepareImages();
 		resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
 		resolveSelectedWandFromString(LucidityConfig.wand);
 		if(blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
@@ -97,7 +113,7 @@ public class Lucidity implements ModInitializer {
 	public static void updateChunks(MinecraftClient client){
 		client.worldRenderer.reload();
 	}
-	public static void updateConfig(){
+	public static void updateConfig() {
 		var instance = LucidityConfig.CONFIG_HANDLER;
 		instance.load();
 		ExplosionVisualizer.FixRangeIssue();
@@ -107,9 +123,6 @@ public class Lucidity implements ModInitializer {
 
     @Override
 	public void onInitialize() {
-
-
-
 		BetterBarrier.init();
 		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> {
 			ResourceManagerHelper.registerBuiltinResourcePack(
@@ -118,13 +131,13 @@ public class Lucidity implements ModInitializer {
 					ResourcePackActivationType.NORMAL
 			);
 		});
+		ImageConfigCommands.register();
 		registerCommands();
-
-		updateConfig();
 		TrajectoryManager.init();
 		new SoundListener();
 		new ArrowCamera();
 		ArrowCamera.onInitialize();
+		AdvancedAdvancedToolTip.onInitialize();
 		/*OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(-5,0,0));
@@ -136,8 +149,7 @@ public class Lucidity implements ModInitializer {
 		SelectiveRenderingManager.resolveSelectiveBlockRenderingMode(renderModeBlock);
 		SelectiveRenderingManager.resolveSelectiveEntityRenderingMode(renderModeEntity);
 		SelectiveRenderingManager.resolveSelectiveParticleRenderingMode(renderModeParticle);
-
-		FluidSourceResourceLoader.init();
+        FluidSourceResourceLoader.init();
 		Keybinds.init();
 		HudRenderCallback.EVENT.register((context, tickDelta) -> {
 			KeyPressesManager.renderPressed(context);
@@ -147,14 +159,21 @@ public class Lucidity implements ModInitializer {
 		WorldRenderEvents.LAST.register((context) ->{
 			//OutlineManager.init();
 		});
+		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+			updateConfig();
+		});
+
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
 			InformationRender.clear();
-			wandActions(MinecraftClient.getInstance());
+			wandActions(client);
 			resolveEnviroment(client);
 			resolveEntities(client,50);
 			UpdateTimers();
 			if (openConfigKey.wasPressed()) {
 				openConfigScreen(client);
+			}
+			if (openImageRenderingsConfigKey.wasPressed()) {
+				openImageRenderingConfigGUI("image renderings");
 			}
 
 		});
@@ -179,7 +198,7 @@ public class Lucidity implements ModInitializer {
 	private void openConfigScreen(MinecraftClient client) {
 		client.execute(() -> {
 			if (client.currentScreen == null) {
-				client.setScreen(LucidityModMenuIntegration.getConfigScreen(client.currentScreen));
+				client.setScreen(ScreenGenerator.getConfigScreen(client.currentScreen));
 			}
 		});
 	}
