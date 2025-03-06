@@ -2,10 +2,8 @@ package mypals.ml;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
-import mypals.ml.config.LucidityModMenuIntegration;
 import mypals.ml.config.ScreenGenerator;
 import mypals.ml.features.ImageRendering.configuration.ImageConfigCommands;
-import mypals.ml.features.ImageRendering.configuration.ImageConfigScreen;
 import mypals.ml.features.advancedAdvancedTooltip.AdvancedAdvancedToolTip;
 import mypals.ml.features.arrowCamera.ArrowCamera;
 import mypals.ml.features.betterBarrier.BetterBarrier;
@@ -22,6 +20,7 @@ import mypals.ml.features.selectiveRendering.WandTooltipRenderer;
 import mypals.ml.features.sonicBoomDetection.WardenStateResolver;
 import mypals.ml.features.soundListener3D.SoundListener;
 import mypals.ml.features.trajectory.TrajectoryManager;
+import mypals.ml.features.OreFinder.OreResolver;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
 
@@ -55,7 +54,6 @@ import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -64,16 +62,14 @@ import static mypals.ml.config.Keybinds.openConfigKey;
 import static mypals.ml.config.Keybinds.openImageRenderingsConfigKey;
 import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.ImageRendering.ImageDataParser.prepareImages;
-import static mypals.ml.features.ImageRendering.ImageDataParser.test;
 import static mypals.ml.features.ImageRendering.configuration.ImageConfigCommands.openImageRenderingConfigGUI;
-import static mypals.ml.features.betterBarrier.BetterBarrier.checkForBetterRenderersEnabled;
 import static mypals.ml.features.renderMobSpawn.SpaceScanner.addSpawnDataToInformationRenderer;
 import static mypals.ml.features.safeDigging.DiggingSituationResolver.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.*;
-import static mypals.ml.features.worldEaterHelper.MineralFinder.parseSelectedBlocks;
-import static mypals.ml.features.worldEaterHelper.oreResolver.scanForMineralsOptimized;
+import static mypals.ml.features.OreFinder.MineralFinder.iterateBlocksWithinDistance;
+import static mypals.ml.features.OreFinder.MineralFinder.parseSelectedBlocks;
 
 public class Lucidity implements ModInitializer {
 	private static SoundListener soundListener  = new SoundListener();
@@ -90,6 +86,11 @@ public class Lucidity implements ModInitializer {
     public static void onConfigUpdated() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		updateChunks(client);
+		if(!enableWorldEaterHelper) {
+			OreResolver.recordedOres.clear();
+		}else{
+			iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
+		}
 		try {
 			updateConfig();
 		}catch (Exception e){
@@ -238,9 +239,6 @@ public class Lucidity implements ModInitializer {
 			BlockHitResult blockBreakingRayCast = getPlayerLookedBlock(player,world);
 			//resolveBreakingSituation(player,world,blockBreakingRayCast.getBlockPos());
 		}
-		if(enableWorldEaterHelper) {
-			scanForMineralsOptimized(hightLightRange);
-		}
 		if(enableDamageIndicator){
 			DamageHandler.PlayerHealthMonitor();
 		}
@@ -252,6 +250,9 @@ public class Lucidity implements ModInitializer {
 		}
 		if(enableExplosionVisualizer){
 			ExplosionVisualizer.tick(client);
+		}
+		if(enableWorldEaterHelper) {
+			OreResolver.onClientTick();
 		}
 		if(commandHelper){
 			ChatCommandScreenObserver.onClientTick();

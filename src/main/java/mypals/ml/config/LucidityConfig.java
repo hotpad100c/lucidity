@@ -7,9 +7,6 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import mypals.ml.Lucidity;
 import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.FakeExplosion;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.BlockItem;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -56,7 +53,7 @@ public class LucidityConfig {
     @SerialEntry
     public static Boolean enableWorldEaterHelper = false;
     @SerialEntry
-    public static int hightLightRange = 30;
+    public static int oreHighlightRange = 30;
 
     @SerialEntry
     public static boolean renderKeyPresses = false;

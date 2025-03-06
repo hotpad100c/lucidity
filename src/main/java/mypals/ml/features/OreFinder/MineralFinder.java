@@ -1,17 +1,22 @@
-package mypals.ml.features.worldEaterHelper;
+package mypals.ml.features.OreFinder;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 import static mypals.ml.config.LucidityConfig.selectedBlocksToHighLight;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
+import static mypals.ml.features.OreFinder.OreResolver.tryAddToRecordedOreListOrRemove;
 
 public class MineralFinder {
     public static Map<Block, Color> MINERAL_BLOCKS = new HashMap<>();
@@ -88,15 +93,32 @@ public class MineralFinder {
 
     public static boolean isExposedMineral(World world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
-
         if (!isMineral(block)) {
             return false;
         }
-        for (BlockPos offset : BlockPos.iterate(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
-            if (world.getBlockState(offset).isAir() || !world.getBlockState(offset).isSolidBlock(world,offset)) {
+        for (Direction direction : Direction.values()) {
+            boolean isExposed = !(world.getBlockState(pos.offset(direction)).getBlock() == Blocks.VOID_AIR) &&
+                    (!world.getBlockState(pos.offset(direction)).isFullCube(world,pos.offset(direction)));
+            if (isExposed || !shouldRenderBlock(world.getBlockState(pos.offset(direction)),pos.offset(direction))){
                 return true;
             }
         }
         return false;
+    }
+    public static void iterateBlocksWithinDistance(BlockPos centerPos, double radius) {
+        int r = (int) Math.ceil(radius);
+        for (int x = -r; x <= r; x++) {
+            for (int z = -r; z <= r; z++) {
+                BlockPos blockPos = new BlockPos(centerPos.getX() + x, 0, centerPos.getZ() + z);
+                Chunk chunk = MinecraftClient.getInstance().world.getChunk(blockPos);
+                for (int y = chunk.getBottomY(); y <= chunk.getTopY(); y++) {
+                    blockPos = new BlockPos(centerPos.getX() + x, centerPos.getY() + y, centerPos.getZ() + z);
+                    double distance = centerPos.getSquaredDistance(blockPos);
+                    if (distance <= radius * radius) {
+                        tryAddToRecordedOreListOrRemove(blockPos);
+                    }
+                }
+            }
+        }
     }
 }

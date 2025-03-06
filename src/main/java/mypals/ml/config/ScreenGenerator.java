@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static mypals.ml.features.advancedAdvancedTooltip.AdvancedAdvancedToolTip.DEFAULT_TOOLTIP_OPTIONS;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.*;
 import static mypals.ml.features.selectiveRendering.WandActionsManager.resolveWandMode;
-import static mypals.ml.features.worldEaterHelper.MineralFinder.DEFAULT_SELECTED;
+import static mypals.ml.features.OreFinder.MineralFinder.DEFAULT_SELECTED;
 
 public class ScreenGenerator {
     public static Screen getConfigScreen(Screen screen){
@@ -254,7 +254,7 @@ public class ScreenGenerator {
                                                         .build()
                                         ).option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.option.oreHighlightRange"))
-                                                .binding(20, () -> instance.instance().hightLightRange, v -> instance.instance().hightLightRange = v)
+                                                .binding(20, () -> instance.instance().oreHighlightRange, v -> instance.instance().oreHighlightRange = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                         .range(0, 100)
                                                         .step(1)

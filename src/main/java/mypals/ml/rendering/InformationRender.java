@@ -74,6 +74,7 @@ public class InformationRender {
     public static void addShineMarker(ShineMarker shineMarker,int time){
         if(shineMarkers.containsKey(shineMarker.pos)){
             shineMarkers.get(shineMarker.pos).lifeTime = time;
+            shineMarkers.get(shineMarker.pos).color = shineMarker.color;
         }else{
             shineMarker.lifeTime = time;
             shineMarkers.put(shineMarker.pos, shineMarker);

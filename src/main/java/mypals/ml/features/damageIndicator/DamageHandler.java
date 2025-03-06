@@ -14,7 +14,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.DamageTypeTags;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
@@ -27,21 +26,21 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class DamageHandler {
     private static float lastHealth = 114514.0F;
-    public static class Indicaor{
+    public static class Indicator {
         @Nullable
         public Vec3d pos;
         public boolean isSourceMovable;
         @Nullable
         public DamageSource source;
         public long lifeTime;
-        public Indicaor(@Nullable Vec3d pos, @Nullable DamageSource source,boolean isSourceMovable ,long lifeTime){
+        public Indicator(@Nullable Vec3d pos, @Nullable DamageSource source, boolean isSourceMovable , long lifeTime){
             this.pos = pos;
             this.source = source;
             this.isSourceMovable = isSourceMovable;
             this.lifeTime = lifeTime;
         }
     }
-    public static ArrayList<Indicaor> indicaors = new ArrayList<>();
+    public static ArrayList<Indicator> indicaors = new ArrayList<>();
 
     public static void PlayerHealthMonitor(){
         MinecraftClient client = MinecraftClient.getInstance();
@@ -55,7 +54,7 @@ public class DamageHandler {
             if(damageSource == null || client.world == null) return;
             Vec3d pos = damageSource.getPosition()!= null?damageSource.getPosition():player.getPos();
             boolean isSourceMovable = damageSource.getSource() != null;
-            Indicaor i = new Indicaor(pos, damageSource,isSourceMovable,client.world.getTime() + LucidityConfig.damageIndicatorLifeTime);
+            Indicator i = new Indicator(pos, damageSource,isSourceMovable,client.world.getTime() + LucidityConfig.damageIndicatorLifeTime);
             indicaors.add(i);
         }
         updateIndicators();
@@ -65,7 +64,7 @@ public class DamageHandler {
         if(client.world == null) return;
         long currentTime = client.world.getTime();
         for(int i = indicaors.size() - 1; i >= 0; i--){
-            Indicaor indicaor = indicaors.get(i);
+            Indicator indicaor = indicaors.get(i);
             if(indicaor.lifeTime < currentTime){
                 indicaors.remove(i);
             }
@@ -91,7 +90,6 @@ public class DamageHandler {
     }
 
     private static float modifyAppliedDamage(DamageSource source, float amount, LivingEntity target) {
-        // 只处理没有绕过效果的伤害
         if (source.isIn(DamageTypeTags.BYPASSES_EFFECTS)) {
             return amount;
         }

@@ -74,39 +74,41 @@ public class IndicatorRenderer {
     }
     private static void renderIndicators(MinecraftClient client, DrawContext context, float r, float g, float b) {
         DamageHandler.indicaors.forEach(indicator -> {
-            Vec3d playerPos = client.player.getPos();
-            Vec3d damagePos = indicator.isSourceMovable && indicator.source != null
-                    ? indicator.source.getAttacker().getPos()
-                    : indicator.pos;
+            if(client.player != null) {
+                Vec3d playerPos = client.player.getPos();
+                Vec3d damagePos = indicator.isSourceMovable && indicator.source != null
+                        ? indicator.source.getAttacker().getPos()
+                        : indicator.pos;
 
-            double finalAngle = calculateFinalAngle(client.player.getRotationVec(1.0F), playerPos, damagePos);
-            float radians = (float) Math.toRadians(finalAngle);
-            float radians2 = (float) Math.toRadians(finalAngle - 90.0D);
+                double finalAngle = calculateFinalAngle(client.player.getRotationVec(1.0F), playerPos, damagePos);
+                float radians = (float) Math.toRadians(finalAngle);
+                float radians2 = (float) Math.toRadians(finalAngle - 90.0D);
 
-            int textureWidth = 100;
-            int distanceFromCenter = (int) LucidityConfig.indicatorOffset;
+                int textureWidth = 100;
+                int distanceFromCenter = (int) LucidityConfig.indicatorOffset;
 
-            int x = client.getWindow().getScaledWidth() / 2;
-            int y = client.getWindow().getScaledHeight() / 2;
-            float indicatorX = x + (float) (distanceFromCenter * Math.cos(radians2));
-            float indicatorY = y + (float) (distanceFromCenter * Math.sin(radians2));
+                int x = client.getWindow().getScaledWidth() / 2;
+                int y = client.getWindow().getScaledHeight() / 2;
+                float indicatorX = x + (float) (distanceFromCenter * Math.cos(radians2));
+                float indicatorY = y + (float) (distanceFromCenter * Math.sin(radians2));
 
-            float lifeTimeAlphaFactor = (float) indicator.lifeTime / LucidityConfig.damageIndicatorLifeTime;
-            float a = MathHelper.clamp(lifeTimeAlphaFactor, 0.0F, LucidityConfig.indicatorColor.getAlpha() / 255.0F);
+                float a = calculateAlpha(client.world.getTime(),indicator.lifeTime,LucidityConfig.damageIndicatorLifeTime) / 255f;
 
-            context.setShaderColor(r, g, b, a);
 
-            context.getMatrices().push();
-            context.getMatrices().translate(indicatorX, indicatorY, 0.0F);
-            context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation(radians));
-            context.getMatrices().translate(-indicatorX, -indicatorY, 0.0F);
+                context.setShaderColor(r, g, b, a);
 
-            RenderSystem.enableBlend();
-            context.drawTexture(indicatorTexture,
-                    (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth);
-            RenderSystem.disableBlend();
-            context.getMatrices().pop();
-            context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                context.getMatrices().push();
+                context.getMatrices().translate(indicatorX, indicatorY, 0.0F);
+                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation(radians));
+                context.getMatrices().translate(-indicatorX, -indicatorY, 0.0F);
+
+                RenderSystem.enableBlend();
+                context.drawTexture(indicatorTexture,
+                        (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth);
+                RenderSystem.disableBlend();
+                context.getMatrices().pop();
+                context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            }
         });
     }
     private static double calculateFinalAngle(Vec3d playerForward, Vec3d playerPosition, Vec3d damagePosition) {
@@ -115,5 +117,15 @@ public class IndicatorRenderer {
         double enemyAngle = Math.atan2(enemyVec.x, enemyVec.y) * 180.0D / Math.PI;
         double finalAngle = enemyAngle - playerAngle;
         return -finalAngle;
+    }
+    public static float calculateAlpha(long currentTime, long lifeTime, long maxLifetime) {
+        long remainingTime = lifeTime - currentTime;
+
+        remainingTime = Math.max(0, remainingTime);
+
+        float alpha = (float) remainingTime / maxLifetime;
+
+        int alphaValue = (int) (alpha * LucidityConfig.indicatorColor.getAlpha());
+        return alphaValue;
     }
 }
