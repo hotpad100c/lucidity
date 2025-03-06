@@ -25,6 +25,7 @@
     "LightmapTextureManagerMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "TextureManagerMixin",
     "WorldRenderMixin",
     "vanilla.EntityRenderDispatcherMixin",
     "vanilla.ParticleManagerMixin",
