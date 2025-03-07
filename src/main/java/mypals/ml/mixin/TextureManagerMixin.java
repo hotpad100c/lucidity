@@ -12,9 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 @Mixin(TextureManager.class)
@@ -26,18 +24,37 @@ public abstract class TextureManagerMixin  implements ITextureManagerMixin {
     @Shadow @Final private static Logger LOGGER;
 
     @Override
-    public void lucidity$destroyAll(Identifier identifier) {
+    public void lucidity$destroyAll(ArrayList<Identifier> identifiers) {
+        identifiers.forEach(this::destroyTexture);
+
+    }
+    @Override
+    public ArrayList<Identifier> lucidity$getAll(Identifier identifier) {
         String targetPath = identifier.getPath();
-        List<Identifier> needsToRemove = new ArrayList<>();
+        ArrayList<Identifier> needsToRemove = new ArrayList<>();
         this.textures.forEach(((identifier1, abstractTexture) -> {
             String path = identifier1.getPath();
             boolean bl = path.startsWith(targetPath);
             if(bl){
                 LOGGER.info("Destroyed " + identifier1.getPath());
                 needsToRemove.add(identifier1);
-                //this.destroyTexture(identifier1);
+            }
+        }));
+        return needsToRemove;
+    }
+    @Override
+    public void lucidity$destroyAllExcept(Identifier identifierPath, ArrayList<Identifier> identifiers) {
+        ArrayList<Identifier> needsToRemove = new ArrayList<>();
+        this.textures.forEach(((current, abstractTexture) -> {
+            String targetPath = identifierPath.getPath();
+            String path = current.getPath();
+            boolean bl = path.startsWith(targetPath) && !identifiers.contains(current);
+            if(bl){
+                needsToRemove.add(current);
             }
         }));
         needsToRemove.forEach(this::destroyTexture);
+
     }
+
 }

@@ -7,31 +7,41 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.TheEndBiomeCreator;
+import org.joml.Vector2d;
+import org.joml.Vector2i;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static mypals.ml.Lucidity.LOGGER;
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
 
 public class ImageDataParser {
-
+    private static final Object IMAGES_LOCK = new Object();
+    private static final Identifier LOST = Identifier.of(MOD_ID, "textures/lost-file.png");
     public static final String TEMP_TEXTURE_PATH = "textures/temp/";
     private static final String GENERATED_PATH = "assets/" + MOD_ID + "/textures/generated/";
-    public static ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> images = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> images = new ConcurrentHashMap<>();
 
     public static class ImageData {
+        public boolean enabled;
+        public enum Type{
+            IMAGE,
+            GIF,
+            VIDEO
+        };
+        public Type type;
         public int index;
         public String path;
         public String name;
@@ -39,19 +49,25 @@ public class ImageDataParser {
         public double[] rotation;
         public double[] scale;
 
-        public ImageData(int index, String path, String name, double[] pos, double[] rotation, double[] scale) {
+        public ImageData(int index, String path, String name, double[] pos, double[] rotation, double[] scale, boolean enabled) {
             this.index = index;
             this.path = path;
             this.name = name;
             this.pos = pos;
             this.rotation = rotation;
             this.scale = scale;
+            this.enabled = enabled;
         }
 
         public String getPath() {
             return path;
         }
-
+        public boolean isEnabled() {
+            return enabled;
+        }
+        public Type getFileType() {
+            return type;
+        }
         public String getName() {
             return name;
         }
@@ -74,13 +90,19 @@ public class ImageDataParser {
 
         @Override
         public String toString() {
-            return String.format("%s;%s;%s;%s;%s",
+            return String.format("%s;%s;%s;%s;%s;%s",
                     path,
                     name,
                     Arrays.toString(pos),
                     Arrays.toString(rotation),
-                    Arrays.toString(scale)
+                    Arrays.toString(scale),
+                    enabled
             );
+        }
+    }
+    public static ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> getImages() {
+        synchronized (IMAGES_LOCK) {
+        return images;
         }
     }
 
@@ -91,36 +113,45 @@ public class ImageDataParser {
         MinecraftClient client = MinecraftClient.getInstance();
         TextureManager textureManager = client.getTextureManager();
 
-        // Destroy existing textures
-        ((ITextureManagerMixin)textureManager).lucidity$destroyAll(Identifier.of(MOD_ID, TEMP_TEXTURE_PATH));
-        images.clear();
-
-        // Prepare new images
-        for (String pic : picturesToRender) {
-            ImageData data = parse(pic, picturesToRender.indexOf(pic));
-            if (data != null) {
-                if (data.getPath().startsWith("https://")) {
-                    Map.Entry<String, ImageData> converted = prepareOnlineImage(pic, data);
-                    if (converted != null) {
-                        prepareLocalImage(pic, converted.getKey(), converted.getValue());
+        ArrayList<Identifier> identifiers = new ArrayList<>();
+        ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> newImages = new ConcurrentHashMap<>();
+        List<String> newPicturesToRender = picturesToRender;
+        new Thread(()->{
+            for (int i = 0; i < picturesToRender.size(); i++) {
+                String pic = picturesToRender.get(i);
+                ImageData data = parse(pic, i);
+                if (data != null) {
+                    Identifier id;
+                    if (data.getPath().startsWith("https://")) {
+                        id = prepareOnlineImage(newPicturesToRender, newImages, pic, data);
+                    } else {
+                        id = prepareLocalImage(newPicturesToRender, newImages, pic, data);
                     }
-                } else {
-                    prepareLocalImage(pic, pic, data);
+                    identifiers.add(id);
                 }
+
             }
-        }
+            synchronized (IMAGES_LOCK) {
+                images.clear();
+                images.putAll(newImages);
+                picturesToRender = newPicturesToRender;
+            }
+
+            ((ITextureManagerMixin)textureManager).lucidity$destroyAllExcept(Identifier.of(MOD_ID, TEMP_TEXTURE_PATH), identifiers);
+        }).start();
+
     }
 
     /**
      * Prepare a local image and add it to the texture manager.
      */
-    public static void prepareLocalImage(String old, String converted, ImageData data) {
+    public static Identifier prepareLocalImage(List<String> picturesToRender, ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> images, String converted, ImageData data) {
         Random random = new Random();
-        Identifier imageCreatedId = Identifier.of(MOD_ID, "textures/lost-file.png");
+        Identifier imageCreatedId = LOST;
         try {
             if (images.get(data.getName()) != null) {
                 String oldName = data.getName();
-                data.name = data.getName() + random.nextInt();
+                data.name = data.getName() + "_";
                 picturesToRender.set(picturesToRender.indexOf(converted), data.toString());
                 changeMapKey(images, oldName, data.name);
                 LucidityConfig.CONFIG_HANDLER.save();
@@ -130,13 +161,14 @@ public class ImageDataParser {
             e.printStackTrace();
         }
         images.put(data.getName(), Map.entry(imageCreatedId, data));
+        return imageCreatedId;
     }
 
     /**
      * Download an image from a URL and save it locally.
      */
-    public static boolean downloadPicture(ImageData data) {
-        Path gameDir = FabricLoader.getInstance().getGameDir();
+    public static Identifier downloadPicture(ImageData data) {
+       /* Path gameDir = FabricLoader.getInstance().getGameDir();
         File generatedDir = new File(String.valueOf(gameDir), GENERATED_PATH);
         File file = new File(generatedDir.getPath() + "/" + data.getName() + ".png");
         if (!file.exists()) {
@@ -152,31 +184,35 @@ public class ImageDataParser {
             }
         } else {
             return true;
+        }*/
+        String nickName = data.getName();
+        try (InputStream inputStream = new URL(data.getPath()).openStream()) {
+            TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+            NativeImage image = NativeImage.read(inputStream);
+            textureManager.registerTexture(Identifier.of(MOD_ID, TEMP_TEXTURE_PATH + nickName), new NativeImageBackedTexture(image));
+            return Identifier.of(MOD_ID, TEMP_TEXTURE_PATH + nickName);
+        } catch (IOException e) {
+            System.err.println("Error downloading image: " + e.getMessage());
+            e.printStackTrace();
+            return LOST;
         }
     }
 
     /**
      * Prepare an online image by downloading it and then treating it as a local image.
      */
-    public static Map.Entry<String, ImageData> prepareOnlineImage(String pic, ImageData data) {
+    public static Identifier prepareOnlineImage(List<String> picturesToRender,ConcurrentHashMap<String, Map.Entry<Identifier, ImageData>> images,String pic, ImageData data) {
         Random random = new Random();
         if (images.get(data.getName()) != null) {
             String oldName = data.getName();
-            data.name = data.getName() + random.nextInt();
+            data.name = data.getName() + "_";
             picturesToRender.set(picturesToRender.indexOf(pic), data.toString());
             changeMapKey(images, oldName, data.name);
             LucidityConfig.CONFIG_HANDLER.save();
         }
-
-        if (downloadPicture(data)) {
-            data.path = GENERATED_PATH + data.getName() + ".png";
-            picturesToRender.set(picturesToRender.indexOf(pic), data.toString());
-            Identifier imageCreatedId = createTexture(data.getPath(), data.getName());
-            images.put(data.name, Map.entry(imageCreatedId, data));
-            return Map.entry(data.toString(), data);
-        }
-        images.put(data.name, Map.entry(Identifier.of(MOD_ID, "textures/lost-file.png"), data));
-        return null;
+        Identifier imageCreatedId = downloadPicture(data);
+        images.put(data.name, Map.entry(imageCreatedId, data));
+        return imageCreatedId;
     }
 
     /**
@@ -198,7 +234,7 @@ public class ImageDataParser {
         File generatedDir = new File(String.valueOf(gameDir), GENERATED_PATH);
         generatedDir.mkdirs();
         if (!file.exists()) {
-            return Identifier.of(MOD_ID, "textures/lost-file.png");
+            return LOST;
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
@@ -230,7 +266,7 @@ public class ImageDataParser {
      */
     public static ImageData parse(String input, int index) {
         String[] parts = input.split(";");
-        if (parts.length != 5) {
+        if (parts.length != 6) {
             return null;
         }
 
@@ -239,7 +275,15 @@ public class ImageDataParser {
         double[] pos = parseArray(parts[2], 3);
         double[] rotation = parseArray(parts[3], 3);
         double[] scale = parseArray(parts[4], 2);
+        boolean enabled = Boolean.parseBoolean(parts[5]);
 
-        return new ImageData(index, path, name, pos, rotation, scale);
+        return new ImageData(index, path, name, pos, rotation, scale, enabled);
+    }
+    public static  Vector2d toBlockScale(float ppb, Vector2d scale, Vector2i size) {
+
+        double blocksX = (size.x * scale.x) / ppb;
+        double blocksY = (size.y * scale.y) / ppb;
+
+        return new Vector2d(blocksX, blocksY);
     }
 }

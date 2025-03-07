@@ -22,6 +22,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2d;
+import org.joml.Vector2i;
 
 import java.awt.*;
 import java.io.IOException;
@@ -29,11 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
-import static mypals.ml.features.ImageRendering.ImageDataParser.TEMP_TEXTURE_PATH;
-import static mypals.ml.features.ImageRendering.ImageDataParser.prepareImages;
+import static mypals.ml.features.ImageRendering.ImageDataParser.*;
 
 public class ImageConfigScreen extends Screen {
     protected int backgroundWidth = 500;
@@ -69,9 +70,11 @@ public class ImageConfigScreen extends Screen {
     private static int PREVIEW_SCALE = 5;
 
     public ImageEntry currentImage;
+    public ImageEntry imageOriginal;
 
     public ScrollableWidget scrollableWidget1;
     public ButtonWidget saveButton;
+    public CyclingButtonWidget<Boolean> enableButton;
     public ButtonWidget lookAtPlayerButton;
     public ButtonWidget moveToPlayerButton;
     public ButtonWidget cancelButton;
@@ -110,12 +113,13 @@ public class ImageConfigScreen extends Screen {
     @Override
     protected void init() {
 
-        for (Map.Entry<String, Map.Entry<Identifier, ImageDataParser.ImageData>> entry : ImageDataParser.images.entrySet()) {
+        for (Map.Entry<String, Map.Entry<Identifier, ImageDataParser.ImageData>> entry : ImageDataParser.getImages().entrySet()) {
             imageEntries.add(new ImageEntry(entry.getValue().getValue().index, entry.getKey(),entry.getValue().getKey(),entry.getValue().getValue()){
                 @Override
                 protected void onClicked() {
                     System.out.println("You clicked " + this.getName());
                     currentImage = this;
+                    imageOriginal = this;
                     this.setSelected(true);
                     scaleXF.active = true;
                     scaleYF.active = true;
@@ -126,11 +130,13 @@ public class ImageConfigScreen extends Screen {
                     rotYF.active = true;
                     rotZF.active = true;
                     nameF.active = true;
+                    enableButton.active = true;
                     cancelButton.active = true;
                     saveButton.active = true;
                     moveToPlayerButton.active = true;
                     lookAtPlayerButton.active = true;
 
+                    enableButton.setValue(this.getData().isEnabled());
                     pathF.setText(this.getData().getPath());
 
                     rotXF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getData().getRotation()[0]))));
@@ -157,7 +163,7 @@ public class ImageConfigScreen extends Screen {
             int spacing = 5;
             @Override
             protected int getContentsHeight() {
-                return (boxHeight + spacing) * ImageDataParser.images.size() - spacing;
+                return (boxHeight + spacing) * ImageDataParser.getImages().size() - spacing;
             }
 
             @Override
@@ -177,10 +183,12 @@ public class ImageConfigScreen extends Screen {
                     int cx = (boxWidth) / 2;
                     int cy = y + 30;
 
-                    double[] normalizedScale = getNormalizedSize(getTextureSize(entry.getTexture())[0], getTextureSize(entry.getTexture())[1],
+                    int[] pictureSize = getTextureSize(entry.getTexture());
+
+                    double[] normalizedScale = getNormalizedSize(pictureSize[0], pictureSize[1],
                             entry.getData().getScale()[0],entry.getData().getScale()[1]);
 
-                    float ppb = getTextureSize(entry.getTexture())[0] / (float) PREVIEW_SCALE;
+                    float ppb = pictureSize[0] / (float) PREVIEW_SCALE;
 
                     try {
                         ImageRenderer.renderPicture(context.getMatrices(), entry.getTexture(),
@@ -201,7 +209,11 @@ public class ImageConfigScreen extends Screen {
 
 
 
-                    context.drawText(MinecraftClient.getInstance().textRenderer, entry.getName(), x + 5, y + 5, 0xFFFFFF, false);
+                    context.drawText(MinecraftClient.getInstance().textRenderer, entry.getName() + (entry.data.isEnabled() ? " ☑":" ☐"), x + 5, y + 5, 0xFFFFFF, false);
+
+                    Vector2d blockScale = toBlockScale(LucidityConfig.pixelsPerBlock, new Vector2d(entry.getData().getScale()[0],entry.getData().getScale()[1]), new Vector2i(pictureSize[0], pictureSize[1]));
+
+                    context.drawText(MinecraftClient.getInstance().textRenderer, "[ " + String.format("%.2f", blockScale.x) + ", " + String.format("%.2f", blockScale.y) + " ] Block(s)", x + 5, y+40, 0xFFFFFF, false);
 
                     index++;
                 }
@@ -236,6 +248,11 @@ public class ImageConfigScreen extends Screen {
             }
         });
 
+        this.addDrawableChild(enableButton = CyclingButtonWidget.onOffBuilder(Text.literal("Enabled"),Text.literal("Disabled"))
+                .build(this.width / 2 + 60 , this.height - (this.height - 30),
+                        50, 15,Text.literal(""), (button, value) -> {
+                            currentImage.getData().enabled = value;
+                        }));
         this.addDrawableChild(saveButton = ButtonWidget.builder(Text.literal("Save"), button -> {
                     saveData();
         })
@@ -357,6 +374,7 @@ public class ImageConfigScreen extends Screen {
         rotYF.active = false;
         rotZF.active = false;
         nameF.active = false;
+        enableButton.active = false;
         //cancelButton.active = false;
         saveButton.active = false;
         moveToPlayerButton.active = false;
@@ -464,18 +482,37 @@ public class ImageConfigScreen extends Screen {
 
             double pos[] = new double[3];
             double rot[] = new double[3];
-            double scal[] = new double[3];
-
-            pos[0] = Double.parseDouble(posXF.getText());
-            pos[1] = Double.parseDouble(posYF.getText());
-            pos[2] = Double.parseDouble(posZF.getText());
+            double scal[] = new double[2];
 
             rot[0] = rotX;
             rot[1] = rotY;
             rot[2] = rotZ;
 
-            scal[0] = Double.parseDouble(scaleXF.getText());
-            scal[1] = Double.parseDouble(scaleYF.getText());
+            double orPos[] = currentImage.getData().pos;
+
+            try {
+                pos[0] = Double.parseDouble(posXF.getText());
+                pos[1] = Double.parseDouble(posYF.getText());
+                pos[2] = Double.parseDouble(posZF.getText());
+                currentImage.getData().pos = pos;
+            }catch (Exception e){
+                currentImage.getData().scale = orPos;
+                scal = orPos;
+
+            }
+
+
+            double orScale[] = currentImage.getData().scale;
+
+            try {
+                scal[0] = Double.parseDouble(scaleXF.getText());
+                scal[1] = Double.parseDouble(scaleYF.getText());
+                currentImage.getData().scale = scal;
+            }catch (Exception e){
+                currentImage.getData().scale = orScale;
+                scal = orScale;
+
+            }
 
             ImageDataParser.ImageData newData = new ImageDataParser.ImageData(currentImage.getData().getIndex(),
                     pathF.getText(),
@@ -483,11 +520,13 @@ public class ImageConfigScreen extends Screen {
                     pos,
                     rot,
                     scal
+                    ,currentImage.getData().isEnabled()
             );
 
             picturesToRender.set(currentImage.getData().getIndex(),newData.toString());
             LucidityConfig.CONFIG_HANDLER.save();
-            prepareImages();
+
+            //prepareImages();
 
             Lucidity.updateConfig();
         }

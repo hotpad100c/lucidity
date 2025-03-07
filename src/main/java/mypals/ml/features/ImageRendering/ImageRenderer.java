@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static mypals.ml.Lucidity.LOGGER;
 import static mypals.ml.Lucidity.MOD_ID;
 
 public class ImageRenderer {
@@ -74,7 +75,7 @@ public class ImageRenderer {
         float y = (float) (pos.getY() - MathHelper.lerp(tickDelta, lastTickPosY, camera.getPos().getY()));
         float z = (float) (pos.getZ() - MathHelper.lerp(tickDelta, lastTickPosZ, camera.getPos().getZ()));
 
-        renderPicture(matrixStack,textureId,new Vec3d(x,y,z),rotation,scale,pixelsPerBlock,light,overlay,tickDelta, disableDepthTest);
+        //renderPicture(matrixStack,textureId,new Vec3d(x,y,z),rotation,scale,pixelsPerBlock,light,overlay,tickDelta, disableDepthTest);
 
     }
 
@@ -121,8 +122,14 @@ public class ImageRenderer {
         //RenderSystem.setShader(isIrisShaderUsed()?ImageRenderer.pictureShader.program : GameRenderer::getPositionColorTexLightmapProgram);
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 
-        RenderSystem.setShaderTexture(0, textureId);
-        RenderSystem.setShaderColor(1,1,1,1);
+        try {
+            RenderSystem.setShaderTexture(0, textureId);
+            RenderSystem.setShaderColor(1, 1, 1, 1);
+        }catch (Exception e){
+            System.out.println("Failed to set shader texture: " + textureId);
+            e.printStackTrace();
+            return;
+        }
         if(disableDepthTest)
             RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();

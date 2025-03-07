@@ -99,13 +99,14 @@ public class InformationRender {
                 pictures.add("C:\\Users\\Ryan\\Downloads\\test-transparent.png;p1;[0,0,0];[0,90.3,45];[0.04,0.04]");
                 pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
                 */
-                for(String imageName : ImageDataParser.images.keySet()){
-                    Map.Entry<Identifier, ImageDataParser.ImageData> image = ImageDataParser.images.get(imageName);
+                for(String imageName : ImageDataParser.getImages().keySet()){
+                    Map.Entry<Identifier, ImageDataParser.ImageData> image = ImageDataParser.getImages().get(imageName);
 
                     ImageDataParser.ImageData data = image.getValue();
-                    if(data == null){
+                    if(data == null || !data.isEnabled()){
                         continue;
                     }
+                    LOGGER.info(data.toString());
                     renderPictureWorldSpace(matrixStack, image.getKey(),
                             new Vec3d(data.getPos()[0],data.getPos()[1],data.getPos()[2]),
                             new Vec3d(data.getRotation()[0],data.getRotation()[1],data.getRotation()[2]),
