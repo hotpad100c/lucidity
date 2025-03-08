@@ -2,6 +2,7 @@ package mypals.ml.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.features.ImageRendering.ImageDataParser;
+import mypals.ml.features.ImageRendering.configuration.ImageEntry;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
@@ -99,17 +100,11 @@ public class InformationRender {
                 pictures.add("C:\\Users\\Ryan\\Downloads\\test-transparent.png;p1;[0,0,0];[0,90.3,45];[0.04,0.04]");
                 pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
                 */
-                for(String imageName : ImageDataParser.images.keySet()){
-                    Map.Entry<Identifier, ImageDataParser.ImageData> image = ImageDataParser.images.get(imageName);
-
-                    ImageDataParser.ImageData data = image.getValue();
-                    if(data == null){
-                        continue;
-                    }
-                    renderPictureWorldSpace(matrixStack, image.getKey(),
-                            new Vec3d(data.getPos()[0],data.getPos()[1],data.getPos()[2]),
-                            new Vec3d(data.getRotation()[0],data.getRotation()[1],data.getRotation()[2]),
-                            new Vector2d(data.getScale()[0],data.getScale()[1]),
+                for(ImageEntry image : ImageDataParser.images.values()){
+                    renderPictureWorldSpace(matrixStack, image.getTexture(),
+                            new Vec3d(image.getPos()[0],image.getPos()[1],image.getPos()[2]),
+                            new Vec3d(image.getRotation()[0],image.getRotation()[1],image.getRotation()[2]),
+                            new Vector2d(image.getScale()[0],image.getScale()[1]),
                             pixelsPerBlock,15720000, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true),false);
                 }
                 //parse()
