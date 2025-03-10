@@ -6,6 +6,8 @@ import mypals.ml.features.ImageRendering.configuration.ImageEntry;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
+import net.fabricmc.loader.api.FabricLoader;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -53,7 +55,12 @@ public class InformationRender {
         }
     };
 
-
+    public static boolean isIrisShaderUsed(){
+        if( FabricLoader.getInstance().isModLoaded("iris")) {
+            return IrisApi.getInstance() != null && IrisApi.getInstance().isShaderPackInUse();
+        }
+        return false;
+    }
     public static void addBox(BoxShape box) {
         if(!boxes.contains(box)){
             boxes.add(box);
@@ -101,7 +108,7 @@ public class InformationRender {
                 pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
                 */
                 for(ImageEntry image : ImageDataParser.images.values()){
-                    renderPictureWorldSpace(matrixStack, image.getTexture(),
+                    renderPictureWorldSpace(matrixStack, image,
                             new Vec3d(image.getPos()[0],image.getPos()[1],image.getPos()[2]),
                             new Vec3d(image.getRotation()[0],image.getRotation()[1],image.getRotation()[2]),
                             new Vector2d(image.getScale()[0],image.getScale()[1]),

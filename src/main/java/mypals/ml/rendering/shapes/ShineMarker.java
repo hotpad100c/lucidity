@@ -2,6 +2,7 @@ package mypals.ml.rendering.shapes;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,6 +14,7 @@ import org.joml.Vector3f;
 import java.awt.*;
 import java.util.Random;
 
+import static mypals.ml.rendering.InformationRender.isIrisShaderUsed;
 import static mypals.ml.rendering.ShapeRender.*;
 
 public class ShineMarker {
@@ -59,7 +61,9 @@ public class ShineMarker {
         matrixStack.translate(x,y,z);
 
         Tessellator tessellator = Tessellator.getInstance();
+
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
         Vector3f vector3f = new Vector3f(0,0,0);
         Vector3f vector3f2 = new Vector3f();
@@ -92,28 +96,30 @@ public class ShineMarker {
 
             MatrixStack.Entry positionMatrix = matrixStack.peek();
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0);
-            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0);
-            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha);
-            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0);
-            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
 
             matrixStack.pop();
         }
 
         if(seeThrough)
             RenderSystem.disableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        if(isIrisShaderUsed())
+            RenderSystem.setShaderColor(colorR, colorG, colorB, 0.03f);
+        else
+            RenderSystem.setShaderColor(1, 1, 1, 1.0F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
@@ -121,6 +127,7 @@ public class ShineMarker {
 
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1, 1, 1, 1.0F);
         matrixStack.pop();
     }
 

@@ -3,6 +3,7 @@ package mypals.ml.features.ImageRendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+import mypals.ml.features.ImageRendering.configuration.ImageEntry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static mypals.ml.Lucidity.MOD_ID;
+import static mypals.ml.features.ImageRendering.ImageDataParser.requestIdentifier;
 
 public class ImageRenderer {
     public static PictureShader pictureShader = PictureShader.PosColTexLight;
@@ -51,15 +53,6 @@ public class ImageRenderer {
             this.program = program;
         }
         public final Supplier<ShaderProgram> program;
-    }
-    public static boolean isIrisShaderUsed(){
-        return IrisApi.getInstance()!=null && IrisApi.getInstance().isShaderPackInUse();
-    }
-    public static void renderPictureFromIdentifier(MatrixStack matrixStack, Identifier texturePath,  Vec3d pos, Vec3d rotation, Vector2d scale , float scaleFactor, int light, int overlay, float tickDelta) throws IOException {
-        //renderPicture(matrixStack,texturePath,pos,rotation,scale,scaleFactor,light,overlay,tickDelta);
-    }
-    public static void renderPictureFromPath(MatrixStack matrixStack, String texturePath, String nickName, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
-        renderPictureWorldSpace(matrixStack,Identifier.of(MOD_ID, "textures/generated/"+nickName),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta, disableDepthTest);
     }
     public static void renderPictureWorldSpace(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -77,13 +70,23 @@ public class ImageRenderer {
         renderPicture(matrixStack,textureId,new Vec3d(x,y,z),rotation,scale,pixelsPerBlock,light,overlay,tickDelta, disableDepthTest);
 
     }
+    public static void renderPictureWorldSpace(MatrixStack matrixStack, ImageEntry imageEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
+
+        renderPictureWorldSpace(matrixStack,requestIdentifier(imageEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
+
+    }
+    public static void renderPicture(MatrixStack matrixStack, ImageEntry imageEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
+
+        renderPicture(matrixStack,requestIdentifier(imageEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
+
+    }
 
     public static void renderPicture(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
-
+        ImageDataParser.mergeImages();
 
         MinecraftClient client = MinecraftClient.getInstance();
 
-        float textureWidth = 16; // 默认值，避免崩溃
+        float textureWidth = 16;
         float textureHeight = 16;
 
         ResourceManager resourceManager = client.getResourceManager();
@@ -98,6 +101,24 @@ public class ImageRenderer {
                 textureHeight = image.getHeight() / pixelsPerBlock;
 
                 image.close();
+            }try {
+                Optional<NativeImage> imageOptional = client.getResourceManager()
+                        .getResource(textureId)
+                        .map(resource -> {
+                            try (var inputStream = resource.getInputStream()) {
+                                return NativeImage.read(inputStream);
+                            } catch (IOException e) {
+                                return null;
+                            }
+                        });
+                if (imageOptional.isPresent()) {
+                    NativeImage image = imageOptional.get();
+                    textureWidth = image.getWidth() / pixelsPerBlock;
+                    textureHeight = image.getHeight() / pixelsPerBlock;
+                    image.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         } catch (Exception e) {
@@ -126,6 +147,7 @@ public class ImageRenderer {
         if(disableDepthTest)
             RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         RenderSystem.depthMask(true);
 
         RenderSystem.disableCull();

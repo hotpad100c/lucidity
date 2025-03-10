@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ImageEntry {
     private boolean selected;
-    private final int index;
+    public int index;
     public Identifier textureID;
     //public ImageDataParser.ImageData data;
     public boolean ready;
@@ -62,6 +62,6 @@ public abstract class ImageEntry {
         return textureID;
     }
 
-    protected abstract void onClicked();
+    protected abstract void onClicked(ImageConfigScreen imageConfigScreen);
 
 }

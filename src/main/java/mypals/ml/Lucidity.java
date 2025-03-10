@@ -3,6 +3,7 @@ package mypals.ml;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.config.Keybinds;
 import mypals.ml.config.ScreenGenerator;
+import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.configuration.ImageConfigCommands;
 import mypals.ml.features.advancedAdvancedTooltip.AdvancedAdvancedToolTip;
 import mypals.ml.features.arrowCamera.ArrowCamera;
@@ -264,6 +265,7 @@ public class Lucidity implements ModInitializer {
 		if(renderBlockEvents){
 			ClientsideBlockEventManager.onClientTick();
 		}
+		ImageDataParser.onClientTick();
 		//TreeSearchManager.onClientTick();
 	}
 	public static void UpdateTimers(){

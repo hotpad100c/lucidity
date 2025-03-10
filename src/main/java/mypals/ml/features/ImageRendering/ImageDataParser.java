@@ -1,12 +1,15 @@
 package mypals.ml.features.ImageRendering;
 
 import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.ImageRendering.configuration.ImageConfigScreen;
 import mypals.ml.features.ImageRendering.configuration.ImageEntry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import org.joml.Vector2d;
 import org.joml.Vector2i;
@@ -27,13 +30,17 @@ import static mypals.ml.Lucidity.LOGGER;
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
 import static mypals.ml.features.ImageRendering.MediaTypeDetector.detectMediaType;
+import static mypals.ml.features.ImageRendering.configuration.ImageConfigScreen.mapToZeroOne;
 
 public class ImageDataParser {
 
     public static final String TEMP_TEXTURE_PATH = "textures/temp/";
     private static final String GENERATED_PATH = "assets/" + MOD_ID + "/textures/generated/";
-    private static final Identifier LOST = Identifier.of(MOD_ID, "textures/lost-file.png");
+    public static final Identifier LOST = Identifier.of(MOD_ID, "textures/lost-file.png");
+    public static final Identifier LOADING = Identifier.of(MOD_ID, "textures/loading.png");
 
+
+    public static ArrayList<ImageEntry> readyToMerge = new ArrayList<>();
     public static ConcurrentHashMap<String, ImageEntry> images = new ConcurrentHashMap<>();
 
     public static class ImageData {
@@ -89,6 +96,9 @@ public class ImageDataParser {
         }
     }
 
+    public static void onClientTick(){
+        mergeImages();
+    }
     /**
      * Prepare images for rendering by processing both local and online images.
      */
@@ -103,18 +113,29 @@ public class ImageDataParser {
         // Prepare new images
         for (int i = 0; i < picturesToRender.size(); i++ ) {
             String pic  = picturesToRender.get(i);
-
             resolveRepeatedName(i);
-
-            ImageEntry entry = parse(pic, i);
-            if(entry != null)
-                images.put(entry.name, entry);
+            putToImages(parse(pic, i));
         }
+    }
+    public static void putToImages(ImageEntry imageEntry) {
+        if(imageEntry != null) {
+            images.put(imageEntry.getName(), imageEntry);
+        }
+    }
+    public static void putToReadyToMerge(ImageEntry imageEntry) {
+        if(imageEntry != null) {
+            readyToMerge.add(imageEntry);
+        }
+    }
+    public static void mergeImages() {
+        for (ImageEntry image : readyToMerge) {
+            images.put(image.getName(), image);
+        }
+        readyToMerge.clear();
     }
 
     public static Identifier prepareImage(String path, String name) {
-        Identifier imageCreatedId = createTexture(path, name);
-        return imageCreatedId;
+        return createTexture(path, name);
     }
 
     public static void resolveRepeatedName(int index) {
@@ -152,9 +173,8 @@ public class ImageDataParser {
         MinecraftClient client = MinecraftClient.getInstance();
         TextureManager textureManager = client.getTextureManager();
         Identifier generatedPath = LOST;
-
+        NativeImage image = null;
         try {
-            NativeImage image;
             if (source.startsWith("http://") || source.startsWith("https://")) {
                 // 处理 URL
                 URL imageUrl = new URL(source);
@@ -188,17 +208,22 @@ public class ImageDataParser {
 
             // 注册纹理
             generatedPath = Identifier.of(MOD_ID, TEMP_TEXTURE_PATH + name);
-            textureManager.registerTexture(generatedPath, new NativeImageBackedTexture(image));
+            Identifier finalGeneratedPath = generatedPath;
+            NativeImage finalImage = image;
+
+            MinecraftClient.getInstance().execute(()-> textureManager.registerTexture(finalGeneratedPath, new NativeImageBackedTexture(finalImage)));
+
         } catch (IOException e) {
             LOGGER.error("Failed to create texture from {}: {}", source, e.getMessage());
             e.printStackTrace();
+            Map.entry(null, generatedPath);
         }
 
         return generatedPath;
     }
 
     public static Identifier requestIdentifier(ImageEntry imageEntry) {
-        return imageEntry.isReady()?imageEntry.getTexture():LOST;
+        return imageEntry.isReady()?imageEntry.getTexture():LOADING;
     }
 
     private static NativeImage convertToNativeImage(InputStream inputStream) throws IOException {
@@ -236,66 +261,141 @@ public class ImageDataParser {
      * Parse image data from a string.
      */
     public static ImageEntry parse(String picture, int index) {
-
         String[] parts = picture.split(";");
-        if (parts.length != 5) {
+
+        if (parts.length < 5) {
             return null;
         }
 
         String path = parts[0];
         String name = parts[1];
+
         double[] pos = parseArray(parts[2], 3);
         double[] rotation = parseArray(parts[3], 3);
         double[] scale = parseArray(parts[4], 2);
-        Identifier generatedID = LOST;
-        if(detectMediaType(path).equals(MediaTypeDetector.MediaType.IMAGE))
-            generatedID = prepareImage(path, name);
 
-        return new ImageEntry(true, index, name, path, generatedID, pos, rotation, scale) {
+        ImageEntry initialEntry = new ImageEntry(
+                false, // isReady = false
+                index,
+                name,
+                path,
+                LOADING,
+                pos,
+                rotation,
+                scale
+        ) {
             @Override
-            protected void onClicked() {
+            protected void onClicked(ImageConfigScreen imageConfigScreen) {
+                System.out.println("You clicked " + this.getName());
+                if(imageConfigScreen != null) {
+                    imageConfigScreen.currentImage = this;
+                    this.setSelected(true);
+                    imageConfigScreen.scaleXF.active = true;
+                    imageConfigScreen.scaleYF.active = true;
+                    imageConfigScreen.posXF.active = true;
+                    imageConfigScreen.posYF.active = true;
+                    imageConfigScreen.posZF.active = true;
+                    imageConfigScreen.rotXF.active = true;
+                    imageConfigScreen.rotYF.active = true;
+                    imageConfigScreen.rotZF.active = true;
+                    imageConfigScreen.nameF.active = true;
+                    imageConfigScreen.cancelButton.active = true;
+                    imageConfigScreen.saveButton.active = true;
+                    imageConfigScreen.moveToPlayerButton.active = true;
+                    imageConfigScreen.lookAtPlayerButton.active = true;
 
+                    imageConfigScreen.pathF.setText(this.getPath());
+
+                    imageConfigScreen.rotXF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[0]))));
+                    imageConfigScreen.rotYF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[1]))));
+                    imageConfigScreen.rotZF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[2]))));
+
+                    imageConfigScreen.scaleXF.setText(String.valueOf(this.getScale()[0]));
+                    imageConfigScreen.scaleYF.setText(String.valueOf(this.getScale()[1]));
+
+                    imageConfigScreen.posXF.setText(String.valueOf(this.getPos()[0]));
+                    imageConfigScreen.posYF.setText(String.valueOf(this.getPos()[1]));
+                    imageConfigScreen.posZF.setText(String.valueOf(this.getPos()[2]));
+
+                    imageConfigScreen.nameF.setText(this.name);
+
+                    MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+
+                }
             }
         };
-    }
-    public static String detectImageFormat(InputStream inputStream) throws IOException {
-        // 标记流以便重置
-        if (!inputStream.markSupported()) {
-            inputStream = new BufferedInputStream(inputStream);
-        }
-        inputStream.mark(32); // 标记前 32 字节，足够读取文件头
 
-        byte[] header = new byte[32];
-        int bytesRead = inputStream.read(header);
-        inputStream.reset(); // 重置流以便后续使用
+        // Start a new thread for the actual processing
+        new Thread(() -> {
+            try {
+                // Generate the ID
+                Identifier image = LOST ;
+                if (detectMediaType(path).equals(MediaTypeDetector.MediaType.IMAGE)) {
+                    image = prepareImage(path, name);
+                }
 
-        if (bytesRead < 8) {
-            return "UNKNOWN"; // 文件太小，无法判断
-        }
+                // Create the final ImageEntry with isReady = true
+                ImageEntry finalEntry = new ImageEntry(
+                        true,  // isReady = true
+                        index,
+                        name,
+                        path,
+                        image,
+                        pos,
+                        rotation,
+                        scale
+                ) {
+                    @Override
+                    protected void onClicked(ImageConfigScreen imageConfigScreen) {
+                        System.out.println("You clicked " + this.getName());
+                        if(imageConfigScreen != null) {
+                            imageConfigScreen.currentImage = this;
+                            this.setSelected(true);
+                            imageConfigScreen.scaleXF.active = true;
+                            imageConfigScreen.scaleYF.active = true;
+                            imageConfigScreen.posXF.active = true;
+                            imageConfigScreen.posYF.active = true;
+                            imageConfigScreen.posZF.active = true;
+                            imageConfigScreen.rotXF.active = true;
+                            imageConfigScreen.rotYF.active = true;
+                            imageConfigScreen.rotZF.active = true;
+                            imageConfigScreen.nameF.active = true;
+                            imageConfigScreen.cancelButton.active = true;
+                            imageConfigScreen.saveButton.active = true;
+                            imageConfigScreen.moveToPlayerButton.active = true;
+                            imageConfigScreen.lookAtPlayerButton.active = true;
 
-        // PNG: 89 50 4E 47 0D 0A 1A 0A
-        if (header[0] == (byte) 0x89 && header[1] == (byte) 0x50 && header[2] == (byte) 0x4E && header[3] == (byte) 0x47) {
-            return "PNG";
-        }
+                            imageConfigScreen.pathF.setText(this.getPath());
 
-        // JPEG: FF D8
-        if (header[0] == (byte) 0xFF && header[1] == (byte) 0xD8) {
-            return "JPEG";
-        }
+                            imageConfigScreen.rotXF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[0]))));
+                            imageConfigScreen.rotYF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[1]))));
+                            imageConfigScreen.rotZF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[2]))));
 
-        // WebP: RIFF xxxx WEBP
-        if (header[0] == (byte) 0x52 && header[1] == (byte) 0x49 && header[2] == (byte) 0x46 && header[3] == (byte) 0x46 &&
-                header[8] == (byte) 0x57 && header[9] == (byte) 0x45 && header[10] == (byte) 0x42 && header[11] == (byte) 0x50) {
-            return "WEBP";
-        }
+                            imageConfigScreen.scaleXF.setText(String.valueOf(this.getScale()[0]));
+                            imageConfigScreen.scaleYF.setText(String.valueOf(this.getScale()[1]));
 
-        // SVG: 检查前几个字节是否以 <?xml 或 <svg 开头
-        String headerStr = new String(header, 0, Math.min(bytesRead, 16), "UTF-8").toLowerCase();
-        if (headerStr.startsWith("<?xml") || headerStr.startsWith("<svg")) {
-            return "SVG";
-        }
+                            imageConfigScreen.posXF.setText(String.valueOf(this.getPos()[0]));
+                            imageConfigScreen.posYF.setText(String.valueOf(this.getPos()[1]));
+                            imageConfigScreen.posZF.setText(String.valueOf(this.getPos()[2]));
 
-        return "UNKNOWN";
+                            imageConfigScreen.nameF.setText(this.name);
+
+                            MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+
+                        }
+                    }
+                };
+                // Put the completed entry into the images list
+                images.put(finalEntry.getName(), finalEntry);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Handle any errors that occur during processing
+            }
+        }).start();
+
+        // Return the initial "not ready" entry immediately
+        return initialEntry;
     }
     public static Vector2d toBlockScale(float ppb, Vector2d scale, Vector2i size) {
 

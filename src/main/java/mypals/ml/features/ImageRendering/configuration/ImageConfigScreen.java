@@ -26,10 +26,8 @@ import org.joml.Vector2i;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
@@ -39,31 +37,31 @@ public class ImageConfigScreen extends Screen {
     protected int x = 1;
     protected int y = 1;
 
-    private static float rotX = 0;
-    private static float rotY = 0;
-    private static float rotZ = 0;
+    private float rotX = 0;
+    private float rotY = 0;
+    private float rotZ = 0;
 
-    private static TextFieldWidget pathF;
-    private static TextFieldWidget nameF;
+    public TextFieldWidget pathF;
+    public TextFieldWidget nameF;
 
-    private static TextFieldWidget posXF;
-    private static TextFieldWidget posYF;
-    private static TextFieldWidget posZF;
+    public TextFieldWidget posXF;
+    public TextFieldWidget posYF;
+    public TextFieldWidget posZF;
 
-    private static TextFieldWidget scaleXF;
-    private static TextFieldWidget scaleYF;
+    public TextFieldWidget scaleXF;
+    public TextFieldWidget scaleYF;
 
-    private static SliderWidget rotXF;
-    private static SliderWidget rotYF;
-    private static SliderWidget rotZF;
+    public SliderWidget rotXF;
+    public SliderWidget rotYF;
+    public SliderWidget rotZF;
 
-    private static float scaleX = 1;
-    private static float scaleY = 1;
+    private float scaleX = 1;
+    private float scaleY = 1;
 
-    private static int PREVIEW_SCALE = 5;
+    private int PREVIEW_SCALE = 5;
 
     public ImageEntry currentImage;
-
+    private ImageConfigScreen instance;
     public ScrollableWidget scrollableWidget1;
     public ButtonWidget saveButton;
     public ButtonWidget lookAtPlayerButton;
@@ -74,7 +72,7 @@ public class ImageConfigScreen extends Screen {
         super(title);
     }
 
-    public double mapToZeroOne(double v){
+    public static double mapToZeroOne(double v){
         return v/360;
     }
     public double[] getNormalizedSize(double orgWidth, double orgHeight, double scaleX, double scaleY){
@@ -89,51 +87,10 @@ public class ImageConfigScreen extends Screen {
     }
     @Override
     protected void init() {
-
+        setInstance(this);
         for (int i = 0; i < ImageDataParser.images.entrySet().size(); i++) {
             Map.Entry<String, ImageEntry> entry = ImageDataParser.images.entrySet().stream().toList().get(i);
-            ImageEntry completedEntry = new ImageEntry(entry.getValue().isReady(), entry.getValue().getIndex(),
-                    entry.getKey(), entry.getValue().getPath(), entry.getValue().getTexture(), entry.getValue().getPos(),
-                    entry.getValue().getRotation(), entry.getValue().getScale()) {
-                @Override
-                protected void onClicked() {
-                    System.out.println("You clicked " + this.getName());
-                    currentImage = this;
-                    this.setSelected(true);
-                    scaleXF.active = true;
-                    scaleYF.active = true;
-                    posXF.active = true;
-                    posYF.active = true;
-                    posZF.active = true;
-                    rotXF.active = true;
-                    rotYF.active = true;
-                    rotZF.active = true;
-                    nameF.active = true;
-                    cancelButton.active = true;
-                    saveButton.active = true;
-                    moveToPlayerButton.active = true;
-                    lookAtPlayerButton.active = true;
-
-                    pathF.setText(this.getPath());
-
-                    rotXF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[0]))));
-                    rotYF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[1]))));
-                    rotZF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getRotation()[2]))));
-
-                    scaleXF.setText(String.valueOf(this.getScale()[0]));
-                    scaleYF.setText(String.valueOf(this.getScale()[1]));
-
-                    posXF.setText(String.valueOf(this.getPos()[0]));
-                    posYF.setText(String.valueOf(this.getPos()[1]));
-                    posZF.setText(String.valueOf(this.getPos()[2]));
-
-                    nameF.setText(this.name);
-
-                    MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-
-                }
-            };
-            ImageDataParser.images.put(entry.getKey(), completedEntry);
+            ImageDataParser.images.put(entry.getKey(), entry.getValue());
 
         }
 
@@ -163,7 +120,7 @@ public class ImageConfigScreen extends Screen {
                     int cx = (boxWidth) / 2;
                     int cy = y + 30;
 
-                    int[] pictureSize = getTextureSize(entry.getTexture());
+                    int[] pictureSize = getTextureSize(requestIdentifier(entry));
 
                     double[] normalizedScale = getNormalizedSize(pictureSize[0], pictureSize[1],
                             entry.getScale()[0],entry.getScale()[1]);
@@ -171,7 +128,7 @@ public class ImageConfigScreen extends Screen {
                     float ppb = pictureSize[0] / (float) PREVIEW_SCALE;
 
                     try {
-                        ImageRenderer.renderPicture(context.getMatrices(), entry.getTexture(),
+                        ImageRenderer.renderPicture(context.getMatrices(), requestIdentifier(entry),
                                 new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
                                 new Vec3d(0, 0, 180),
                                 new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
@@ -209,7 +166,7 @@ public class ImageConfigScreen extends Screen {
                     int x = 5;
                     int y = boxHeight / 4 + (boxHeight + spacing) * index;
                     if (mouseX >= x && mouseX <= x + boxWidth && adjustedMouseY >= y && adjustedMouseY <= y + boxHeight) {
-                        entry.onClicked();
+                        entry.onClicked(getInstance());
                         return true;
                     }
                     index++;
@@ -354,17 +311,40 @@ public class ImageConfigScreen extends Screen {
         lookAtPlayerButton.active = false;
 
     }
+    public ImageConfigScreen getIncetanse(){
+        return this;
+    }
     public int[] getTextureSize(Identifier textureId){
         AbstractTexture texture = client.getTextureManager().getTexture(textureId);
         int[] size = new int[2];
+        size[0] = 16;
+        size[1] = 16;
+
         if(texture instanceof NativeImageBackedTexture nativeTexture) {
             NativeImage image = nativeTexture.getImage();
             assert image != null;
             size[0] = image.getWidth();
             size[1] = image.getHeight();
         }else {
-            size[0] = 16;
-            size[1] = 16;
+            try {
+                Optional<NativeImage> imageOptional = client.getResourceManager()
+                        .getResource(textureId)
+                        .map(resource -> {
+                            try (var inputStream = resource.getInputStream()) {
+                                return NativeImage.read(inputStream);
+                            } catch (IOException e) {
+                                return null;
+                            }
+                        });
+                if (imageOptional.isPresent()) {
+                    NativeImage image = imageOptional.get();
+                    size[0] = image.getWidth();
+                    size[1] = image.getHeight();
+                    image.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return size;
     }
@@ -415,7 +395,7 @@ public class ImageConfigScreen extends Screen {
         context.getMatrices().push();
         context.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         if(currentImage != null) {
-            Identifier texturePath = currentImage.getTexture();
+            Identifier texturePath = requestIdentifier(images.get(currentImage.getName()));
 
             double[] normalizedScale = getNormalizedSize(getTextureSize(texturePath)[0], getTextureSize(texturePath)[1],
                     scaleX, scaleY);
@@ -434,27 +414,40 @@ public class ImageConfigScreen extends Screen {
         }
         context.getMatrices().pop();
     }
+    public ImageConfigScreen getInstance(){
+        return this;
+    }
+    public void reParse(){
+        ImageData data = new ImageData(currentImage.getIndex(),
+                pathF.getText(),
+                nameF.getText(),
+                currentImage.getPos(),
+                currentImage.getRotation(),
+                currentImage.getScale()
+        );
+        Identifier newID = LOADING;
+
+        parse(data.toString(),currentImage.getIndex());
+
+        currentImage.textureID = newID;
+
+        images.get(currentImage.name).textureID = newID;
+    }
     public void saveData(){
 
         if(currentImage != null){
             String origName = currentImage.getName();
             if(origName != nameF.getText()){
-                Identifier newID = createTexture(currentImage.getPath(), nameF.getText());
-
-                currentImage.textureID = newID;
-
-                images.get(origName).textureID = newID;
                 images.get(origName).name = nameF.getText();
-                changeMapKey(images, origName, nameF.getText());
                 currentImage.name = nameF.getText();
+                changeMapKey(images, origName, nameF.getText());
+                currentImage.index = images.get(nameF.getText()).getIndex();
+                reParse();
+
             }
             if(currentImage.path != pathF.getText()){
 
-                Identifier newID = createTexture(pathF.getText(), nameF.getText());
-
-                currentImage.textureID = newID;
-
-                images.get(currentImage.name).textureID = newID;
+                reParse();
                 images.get(currentImage.name).path = pathF.getText();
             }
 
@@ -495,5 +488,9 @@ public class ImageConfigScreen extends Screen {
     public void close() {
         saveData();
         super.close();
+    }
+
+    public void setInstance(ImageConfigScreen instance) {
+        this.instance = instance;
     }
 }
