@@ -4,6 +4,7 @@ import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.Text;
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.BlockEvent;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -45,14 +46,17 @@ public class ClientsideBlockEventManager {
         }
     }
     public static void addSyncedBlockEvent(BlockPos pos, Block block, int type, int data) {
-        long time = Util.getMeasuringTimeMs();
-        if(blockEventGroups.containsKey(time)){
-            blockEventGroups.get(time).add(new BlockEvent(pos,block,type,data));
-        }else {
-            List<BlockEvent> l = new ArrayList<>();
-            l.add(new BlockEvent(pos, block, type, data));
-            blockEventGroups.put(time, l);
-        }
+        MinecraftClient.getInstance().execute(()->{
+            long time = Util.getMeasuringTimeMs();
+            if(blockEventGroups.containsKey(time)){
+                blockEventGroups.get(time).add(new BlockEvent(pos,block,type,data));
+            }else {
+                List<BlockEvent> l = new ArrayList<>();
+                l.add(new BlockEvent(pos, block, type, data));
+                blockEventGroups.put(time, l);
+            }
+        });
+
     }
     public static void removeExpired(double expiry) {
         long time = Util.getMeasuringTimeMs();

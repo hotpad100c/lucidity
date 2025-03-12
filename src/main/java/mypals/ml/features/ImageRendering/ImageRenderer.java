@@ -3,35 +3,23 @@ package mypals.ml.features.ImageRendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import mypals.ml.features.ImageRendering.configuration.ImageEntry;
-import net.fabricmc.loader.api.FabricLoader;
-import net.irisshaders.iris.api.v0.IrisApi;
+import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.chunk.BlockBufferAllocatorStorage;
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.chunk.SectionBuilder;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import org.joml.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.Math;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -70,14 +58,9 @@ public class ImageRenderer {
         renderPicture(matrixStack,textureId,new Vec3d(x,y,z),rotation,scale,pixelsPerBlock,light,overlay,tickDelta, disableDepthTest);
 
     }
-    public static void renderPictureWorldSpace(MatrixStack matrixStack, ImageEntry imageEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
+    public static void renderPictureWorldSpace(MatrixStack matrixStack, MediaEntry mediaEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
 
-        renderPictureWorldSpace(matrixStack,requestIdentifier(imageEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
-
-    }
-    public static void renderPicture(MatrixStack matrixStack, ImageEntry imageEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
-
-        renderPicture(matrixStack,requestIdentifier(imageEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
+        renderPictureWorldSpace(matrixStack,requestIdentifier(mediaEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
 
     }
 

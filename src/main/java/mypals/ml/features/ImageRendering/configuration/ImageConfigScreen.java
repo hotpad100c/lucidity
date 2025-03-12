@@ -1,9 +1,10 @@
 package mypals.ml.features.ImageRendering.configuration;
 
-import mypals.ml.Lucidity;
 import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.ImageRendering.ITextureManagerMixin;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.ImageRenderer;
+import mypals.ml.features.ImageRendering.MediaTypeDetector;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,13 +12,11 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.screen.ScreenTexts;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -60,7 +59,7 @@ public class ImageConfigScreen extends Screen {
 
     private int PREVIEW_SCALE = 5;
 
-    public ImageEntry currentImage;
+    public MediaEntry currentImage;
     private ImageConfigScreen instance;
     public ScrollableWidget scrollableWidget1;
     public ButtonWidget saveButton;
@@ -89,7 +88,7 @@ public class ImageConfigScreen extends Screen {
     protected void init() {
         setInstance(this);
         for (int i = 0; i < ImageDataParser.images.entrySet().size(); i++) {
-            Map.Entry<String, ImageEntry> entry = ImageDataParser.images.entrySet().stream().toList().get(i);
+            Map.Entry<String, MediaEntry> entry = ImageDataParser.images.entrySet().stream().toList().get(i);
             ImageDataParser.images.put(entry.getKey(), entry.getValue());
 
         }
@@ -114,7 +113,7 @@ public class ImageConfigScreen extends Screen {
                 // 调整鼠标Y坐标以考虑滚动
                 double adjustedMouseY = mouseY + this.getScrollY();
 
-                for (ImageEntry entry : ImageDataParser.images.values()) {
+                for (MediaEntry entry : ImageDataParser.images.values()) {
                     int x = 5;
                     int y = boxHeight / 4 + (boxHeight + spacing) * index;
                     int cx = (boxWidth) / 2;
@@ -130,7 +129,7 @@ public class ImageConfigScreen extends Screen {
                     try {
                         ImageRenderer.renderPicture(context.getMatrices(), requestIdentifier(entry),
                                 new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
-                                new Vec3d(0, 0, 180),
+                                new Vec3d(0, 180, 180),
                                 new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
                                 ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
                     } catch (IOException e) {
@@ -145,6 +144,8 @@ public class ImageConfigScreen extends Screen {
                     context.drawBorder(x, y, boxWidth, boxHeight, borderColor);
 
                     context.drawText(MinecraftClient.getInstance().textRenderer, entry.getName(), x + 5, y + 5, 0xFFFFFF, false);
+
+                    context.drawText(MinecraftClient.getInstance().textRenderer, entry.getType().getKey(), x + 5, y + 20, 0xFFFFFF, false);
 
                     Vector2d blockScale = toBlockScale(LucidityConfig.pixelsPerBlock, new Vector2d(entry.getScale()[0],entry.getScale()[1]), new Vector2i(pictureSize[0], pictureSize[1]));
 
@@ -161,7 +162,7 @@ public class ImageConfigScreen extends Screen {
 
                 double adjustedMouseY = mouseY + this.getScrollY();
 
-                for (ImageEntry entry : ImageDataParser.images.values()) {
+                for (MediaEntry entry : ImageDataParser.images.values()) {
                     entry.setSelected(false);
                     int x = 5;
                     int y = boxHeight / 4 + (boxHeight + spacing) * index;
@@ -397,6 +398,7 @@ public class ImageConfigScreen extends Screen {
         if(currentImage != null) {
             Identifier texturePath = requestIdentifier(images.get(currentImage.getName()));
 
+
             double[] normalizedScale = getNormalizedSize(getTextureSize(texturePath)[0], getTextureSize(texturePath)[1],
                     scaleX, scaleY);
 
@@ -405,7 +407,7 @@ public class ImageConfigScreen extends Screen {
             try {
                 ImageRenderer.renderPicture(context.getMatrices(), texturePath
                         , new Vec3d(cx + (cx / 1.45), cy - 30, 1000)
-                        , new Vec3d(rotX, rotY, rotZ + 180)
+                        , new Vec3d(rotX, rotY+180, rotZ + 180)
                         , new Vector2d(normalizedScale[0] * 20, normalizedScale[1] * 20),
                         ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
             } catch (IOException e) {
@@ -418,6 +420,8 @@ public class ImageConfigScreen extends Screen {
         return this;
     }
     public void reParse(){
+        TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+
         ImageData data = new ImageData(currentImage.getIndex(),
                 pathF.getText(),
                 nameF.getText(),
@@ -425,13 +429,18 @@ public class ImageConfigScreen extends Screen {
                 currentImage.getRotation(),
                 currentImage.getScale()
         );
+        Identifier[] oldIds = currentImage.textureIDs;
         Identifier newID = LOADING;
 
         parse(data.toString(),currentImage.getIndex());
 
-        currentImage.textureID = newID;
-
-        images.get(currentImage.name).textureID = newID;
+        currentImage.textureIDs = new Identifier[]{newID};
+        currentImage.ready = false;
+        images.get(currentImage.name).textureIDs = new Identifier[]{newID};
+        images.get(currentImage.name).ready = false;
+        for(Identifier id : oldIds){
+            textureManager.destroyTexture(id);
+        }
     }
     public void saveData(){
 
@@ -443,7 +452,6 @@ public class ImageConfigScreen extends Screen {
                 changeMapKey(images, origName, nameF.getText());
                 currentImage.index = images.get(nameF.getText()).getIndex();
                 reParse();
-
             }
             if(currentImage.path != pathF.getText()){
 
@@ -457,16 +465,16 @@ public class ImageConfigScreen extends Screen {
             double rot[] = new double[3];
             double scal[] = new double[2];
 
-            pos[0] = Double.parseDouble(posXF.getText());
-            pos[1] = Double.parseDouble(posYF.getText());
-            pos[2] = Double.parseDouble(posZF.getText());
+            pos[0] = Double.parseDouble(posXF.getText().isEmpty()?currentImage.getPos()[0]+"":posXF.getText());
+            pos[1] = Double.parseDouble(posYF.getText().isEmpty()?currentImage.getPos()[1]+"":posYF.getText());
+            pos[2] = Double.parseDouble(posZF.getText().isEmpty()?currentImage.getPos()[2]+"":posZF.getText());
 
             rot[0] = rotX;
             rot[1] = rotY;
             rot[2] = rotZ;
 
-            scal[0] = Double.parseDouble(scaleXF.getText());
-            scal[1] = Double.parseDouble(scaleYF.getText());
+            scal[0] = Double.parseDouble(scaleXF.getText().isEmpty()?currentImage.getScale()[0]+"":scaleXF.getText());
+            scal[1] = Double.parseDouble(scaleYF.getText().isEmpty()?currentImage.getScale()[0]+"":scaleYF.getText());
 
             ImageDataParser.ImageData newData = new ImageDataParser.ImageData(currentImage.getIndex(),
                     pathF.getText(),

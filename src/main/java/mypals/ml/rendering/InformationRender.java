@@ -2,7 +2,7 @@ package mypals.ml.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.features.ImageRendering.ImageDataParser;
-import mypals.ml.features.ImageRendering.configuration.ImageEntry;
+import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
@@ -11,7 +11,6 @@ import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -107,7 +106,7 @@ public class InformationRender {
                 pictures.add("C:\\Users\\Ryan\\Downloads\\test-transparent.png;p1;[0,0,0];[0,90.3,45];[0.04,0.04]");
                 pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
                 */
-                for(ImageEntry image : ImageDataParser.images.values()){
+                for(MediaEntry image : ImageDataParser.images.values()){
                     renderPictureWorldSpace(matrixStack, image,
                             new Vec3d(image.getPos()[0],image.getPos()[1],image.getPos()[2]),
                             new Vec3d(image.getRotation()[0],image.getRotation()[1],image.getRotation()[2]),

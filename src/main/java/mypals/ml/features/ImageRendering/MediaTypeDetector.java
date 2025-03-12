@@ -11,7 +11,17 @@ import java.nio.file.Files;
 
 public class MediaTypeDetector {
     public enum MediaType {
-        IMAGE, GIF, VIDEO, UNKNOWN
+        IMAGE("IMAGE"),
+        GIF("GIF"),
+        VIDEO("VIDEO"),
+        UNKNOWN("UNKNOWN");
+        private final String key;
+        MediaType(String value) {
+            this.key = value;
+        }
+        public String getKey() {
+            return key;
+        }
     }
 
     /**

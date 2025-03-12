@@ -1,14 +1,18 @@
 package mypals.ml.features.ImageRendering.configuration;
 
-import mypals.ml.features.ImageRendering.ImageDataParser;
-import mypals.ml.features.ImageRendering.ImageRenderer;
+import com.google.common.net.MediaType;
+import mypals.ml.features.ImageRendering.MediaTypeDetector;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class ImageEntry {
+import java.util.List;
+
+public abstract class MediaEntry {
+    public MediaTypeDetector.MediaType type;
     private boolean selected;
+    private List<Integer> delays;
     public int index;
-    public Identifier textureID;
+    public Identifier[] textureIDs;
     //public ImageDataParser.ImageData data;
     public boolean ready;
     public String path;
@@ -17,15 +21,23 @@ public abstract class ImageEntry {
     public double[] rotation;
     public double[] scale;
 
-    public ImageEntry(boolean ready, @Nullable int index, @Nullable String name, @Nullable String orgPath, @Nullable Identifier texturePath, double[] pos, double[] rotation, double[] scale) {
+    public MediaEntry(boolean ready, @Nullable int index, @Nullable String name, @Nullable String orgPath, @Nullable Identifier[] texturePath, double[] pos, double[] rotation, double[] scale, @Nullable MediaTypeDetector.MediaType type) {
         this.ready = ready;
         this.index = index;
         this.name = name;
         this.path = orgPath;
-        this.textureID = texturePath;
+        this.textureIDs = texturePath;
         this.pos = pos;
         this.rotation = rotation;
         this.scale = scale;
+        this.type = type;
+    }
+
+    public List<Integer> getDelays() {
+        return delays;
+    }
+    public void setDelays(List<Integer> delays) {
+        this.delays = delays;
     }
     public void setSelected(boolean selected){
         this.selected = selected;
@@ -33,7 +45,9 @@ public abstract class ImageEntry {
     public String getName() {
         return name;
     }
-
+    public MediaTypeDetector.MediaType getType() {
+        return type;
+    }
     public boolean isSelected() {
         return selected;
     }
@@ -58,8 +72,8 @@ public abstract class ImageEntry {
     public String getPath() {
         return path;
     }
-    public Identifier getTexture() {
-        return textureID;
+    public Identifier[] getTexture() {
+        return textureIDs;
     }
 
     protected abstract void onClicked(ImageConfigScreen imageConfigScreen);

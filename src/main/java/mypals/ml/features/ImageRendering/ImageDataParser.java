@@ -2,8 +2,7 @@ package mypals.ml.features.ImageRendering;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.features.ImageRendering.configuration.ImageConfigScreen;
-import mypals.ml.features.ImageRendering.configuration.ImageEntry;
-import net.fabricmc.loader.api.FabricLoader;
+import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.NativeImage;
@@ -20,15 +19,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyStore;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static mypals.ml.Lucidity.LOGGER;
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
+import static mypals.ml.features.ImageRendering.GIFHandler.createGifTextures;
 import static mypals.ml.features.ImageRendering.MediaTypeDetector.detectMediaType;
 import static mypals.ml.features.ImageRendering.configuration.ImageConfigScreen.mapToZeroOne;
 
@@ -40,8 +37,8 @@ public class ImageDataParser {
     public static final Identifier LOADING = Identifier.of(MOD_ID, "textures/loading.png");
 
 
-    public static ArrayList<ImageEntry> readyToMerge = new ArrayList<>();
-    public static ConcurrentHashMap<String, ImageEntry> images = new ConcurrentHashMap<>();
+    public static ArrayList<MediaEntry> readyToMerge = new ArrayList<>();
+    public static ConcurrentHashMap<String, MediaEntry> images = new ConcurrentHashMap<>();
 
     public static class ImageData {
         public int index;
@@ -117,25 +114,24 @@ public class ImageDataParser {
             putToImages(parse(pic, i));
         }
     }
-    public static void putToImages(ImageEntry imageEntry) {
-        if(imageEntry != null) {
-            images.put(imageEntry.getName(), imageEntry);
-        }
-    }
-    public static void putToReadyToMerge(ImageEntry imageEntry) {
-        if(imageEntry != null) {
-            readyToMerge.add(imageEntry);
+    public static void putToImages(MediaEntry mediaEntry) {
+        if(mediaEntry != null) {
+            images.put(mediaEntry.getName(), mediaEntry);
         }
     }
     public static void mergeImages() {
-        for (ImageEntry image : readyToMerge) {
+        for (MediaEntry image : readyToMerge) {
             images.put(image.getName(), image);
         }
         readyToMerge.clear();
     }
 
-    public static Identifier prepareImage(String path, String name) {
+    public static Identifier prepareImageMedia(String path, String name) {
         return createTexture(path, name);
+    }
+    public static Map.Entry<Identifier[],List<Integer>> prepareGIFMedia(String path, String name) {
+        GIFHandler.GifFrameData data = createGifTextures(path, name);
+        return Map.entry(data.identifiers.toArray(Identifier[]::new),data.delays);
     }
 
     public static void resolveRepeatedName(int index) {
@@ -222,8 +218,46 @@ public class ImageDataParser {
         return generatedPath;
     }
 
-    public static Identifier requestIdentifier(ImageEntry imageEntry) {
-        return imageEntry.isReady()?imageEntry.getTexture():LOADING;
+    public static Identifier requestIdentifier(MediaEntry mediaEntry) {
+        if(mediaEntry.getType().equals(MediaTypeDetector.MediaType.IMAGE)) {
+            return mediaEntry.isReady() ? mediaEntry.getTexture()[0] : LOADING;
+        }
+        if (mediaEntry.getType().equals(MediaTypeDetector.MediaType.GIF)) {
+            if (!mediaEntry.isReady()) {
+                return LOADING;
+            }
+            // 假设 mediaEntry.getTexture() 返回 GifFrameData
+
+            List<Identifier> textures = List.of(mediaEntry.getTexture());
+            List<Integer> delays = mediaEntry.getDelays();
+            if (delays == null || textures.isEmpty()) {
+                return LOADING;
+            }
+            // 计算总动画时长
+            int totalDuration = delays.stream().mapToInt(Integer::intValue).sum();
+            if (totalDuration == 0) {
+                return textures.get(0); // 防止除零
+            }
+
+            // 根据当前时间计算当前帧
+            long currentTime = System.currentTimeMillis();
+            long timeInCycle = currentTime % totalDuration; // 当前时间在循环中的位置
+
+            int elapsed = 0;
+            try {
+                for (int i = 0; i < delays.size(); i++) {
+                    elapsed += delays.get(i);
+                    if (timeInCycle < elapsed) {
+                        return textures.get(i); // 返回当前帧
+                    }
+                }
+            }catch (Exception e){
+                LOGGER.error("Error while calculating GIF frame: {}", e.getMessage());
+                e.printStackTrace();
+            }
+            return textures.get(0); // 默认返回第一帧
+        }
+        return mediaEntry.isReady() ? mediaEntry.getTexture()[0] : LOADING;
     }
 
     private static NativeImage convertToNativeImage(InputStream inputStream) throws IOException {
@@ -260,7 +294,7 @@ public class ImageDataParser {
     /**
      * Parse image data from a string.
      */
-    public static ImageEntry parse(String picture, int index) {
+    public static MediaEntry parse(String picture, int index) {
         String[] parts = picture.split(";");
 
         if (parts.length < 5) {
@@ -274,15 +308,16 @@ public class ImageDataParser {
         double[] rotation = parseArray(parts[3], 3);
         double[] scale = parseArray(parts[4], 2);
 
-        ImageEntry initialEntry = new ImageEntry(
-                false, // isReady = false
+        MediaEntry initialEntry = new MediaEntry(
+                false,
                 index,
                 name,
                 path,
-                LOADING,
+                new Identifier[]{LOADING},
                 pos,
                 rotation,
-                scale
+                scale,
+                null
         ) {
             @Override
             protected void onClicked(ImageConfigScreen imageConfigScreen) {
@@ -329,13 +364,20 @@ public class ImageDataParser {
         new Thread(() -> {
             try {
                 // Generate the ID
-                Identifier image = LOST ;
-                if (detectMediaType(path).equals(MediaTypeDetector.MediaType.IMAGE)) {
-                    image = prepareImage(path, name);
+                Identifier[] image = new Identifier[]{LOST};
+                List<Integer> delays = new ArrayList<>();
+                MediaTypeDetector.MediaType type = detectMediaType(path);
+                if (type.equals(MediaTypeDetector.MediaType.IMAGE)) {
+                    image = new Identifier[]{prepareImageMedia(path, name)};
+                }
+                if(type.equals(MediaTypeDetector.MediaType.GIF)){
+                    Map.Entry<Identifier[],List<Integer>> gifEntry = prepareGIFMedia(path, name);
+                    image = gifEntry.getKey();
+                    delays = gifEntry.getValue();
                 }
 
                 // Create the final ImageEntry with isReady = true
-                ImageEntry finalEntry = new ImageEntry(
+                MediaEntry finalEntry = new MediaEntry(
                         true,  // isReady = true
                         index,
                         name,
@@ -343,7 +385,8 @@ public class ImageDataParser {
                         image,
                         pos,
                         rotation,
-                        scale
+                        scale,
+                        type
                 ) {
                     @Override
                     protected void onClicked(ImageConfigScreen imageConfigScreen) {
@@ -385,6 +428,9 @@ public class ImageDataParser {
                         }
                     }
                 };
+                if(delays.size() > 0){
+                    finalEntry.setDelays(delays);
+                }
                 // Put the completed entry into the images list
                 images.put(finalEntry.getName(), finalEntry);
 
