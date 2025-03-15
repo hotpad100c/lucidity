@@ -176,8 +176,7 @@ public class ImageDataParser {
                 URL imageUrl = new URL(source);
                 HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
                 connection.setRequestProperty("User-Agent", "Mozilla/5.0"); // 模拟浏览器
-                connection.setConnectTimeout(5000); // 设置超时
-
+                connection.setConnectTimeout(5000);
                 String contentType = connection.getContentType();
                 if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
                     LOGGER.warn("URL {} does not point to an image (Content-Type: {})", source, contentType);
@@ -191,7 +190,6 @@ public class ImageDataParser {
                     connection.disconnect();
                 }
             } else {
-                // 处理本地文件
                 File file = new File(source);
                 if (!file.exists() || !file.isFile()) {
                     LOGGER.warn("File {} does not exist or is not a file", source);
@@ -226,20 +224,18 @@ public class ImageDataParser {
             if (!mediaEntry.isReady()) {
                 return LOADING;
             }
-            // 假设 mediaEntry.getTexture() 返回 GifFrameData
-
             List<Identifier> textures = List.of(mediaEntry.getTexture());
             List<Integer> delays = mediaEntry.getDelays();
             if (delays == null || textures.isEmpty()) {
                 return LOADING;
             }
-            // 计算总动画时长
+
+            // 计算总时长
             int totalDuration = delays.stream().mapToInt(Integer::intValue).sum();
             if (totalDuration == 0) {
-                return textures.get(0); // 防止除零
+                return textures.get(0);
             }
 
-            // 根据当前时间计算当前帧
             long currentTime = System.currentTimeMillis();
             long timeInCycle = currentTime % totalDuration; // 当前时间在循环中的位置
 
@@ -248,39 +244,34 @@ public class ImageDataParser {
                 for (int i = 0; i < delays.size(); i++) {
                     elapsed += delays.get(i);
                     if (timeInCycle < elapsed) {
-                        return textures.get(i); // 返回当前帧
+                        return textures.get(i);
                     }
                 }
             }catch (Exception e){
                 LOGGER.error("Error while calculating GIF frame: {}", e.getMessage());
                 e.printStackTrace();
             }
-            return textures.get(0); // 默认返回第一帧
+            return textures.get(0);
         }
         return mediaEntry.isReady() ? mediaEntry.getTexture()[0] : LOADING;
     }
 
     private static NativeImage convertToNativeImage(InputStream inputStream) throws IOException {
-        // 读取图片为 BufferedImage
+
         BufferedImage bufferedImage = ImageIO.read(inputStream);
         if (bufferedImage == null) {
             throw new IOException("Unable to decode image");
         }
 
-        // 转换为 PNG 格式的字节流
         ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, "png", pngOutputStream);
         byte[] pngBytes = pngOutputStream.toByteArray();
 
-        // 将 PNG 字节流转换为 NativeImage
         try (ByteArrayInputStream pngInputStream = new ByteArrayInputStream(pngBytes)) {
             return NativeImage.read(pngInputStream);
         }
     }
 
-    /**
-     * Parse a string into an array of doubles.
-     */
     private static double[] parseArray(String arrayString, int expectCount) {
         String[] elements = arrayString.replaceAll("[\\[\\]]", "").split(",");
         return Arrays.copyOf(
@@ -291,9 +282,6 @@ public class ImageDataParser {
         );
     }
 
-    /**
-     * Parse image data from a string.
-     */
     public static MediaEntry parse(String picture, int index) {
         String[] parts = picture.split(";");
 

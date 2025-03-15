@@ -1,5 +1,6 @@
 plugins {
 	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'maven-publish'
 }
 
@@ -9,6 +10,7 @@ group = project.maven_group
 base {
 	archivesName = project.archives_base_name
 }
+
 loom {
 	accessWidenerPath = file("src/main/resources/lucidity.accesswidener")
 }
@@ -36,25 +38,26 @@ repositories {
 			includeGroup "maven.modrinth"
 		}
 	}
+	mavenCentral()
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
-    modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
+	modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
 	modCompileOnly("maven.modrinth:sodium:mc1.21.1-0.6.5-fabric")
 	modCompileOnly "maven.modrinth:iris:${project.iris_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	implementation 'org.bytedeco:javacv:1.5.7'
+	implementation 'org.bytedeco:ffmpeg-platform:5.0-1.5.7'
 }
 
 processResources {
 	inputs.property "version", project.version
-
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
@@ -65,22 +68,30 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
-
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename { "${it}_${project.base.archivesName.get()}" }
 	}
 }
 
-// configure the maven publication
+shadowJar {
+	archiveClassifier.set('shadow')
+	relocate 'org.bytedeco', "${project.group}.shaded.org.bytedeco" // 避免类冲突
+	zip64 true
+}
+
+tasks {
+	remapJar {
+		dependsOn shadowJar
+		inputFile.set(shadowJar.archiveFile) // 使用 Shadow JAR 作为输入
+	}
+}
+
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
@@ -88,12 +99,7 @@ publishing {
 			from components.java
 		}
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+
 	}
 }

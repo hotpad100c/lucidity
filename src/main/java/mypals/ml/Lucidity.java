@@ -8,6 +8,7 @@ import mypals.ml.features.ImageRendering.configuration.ImageConfigCommands;
 import mypals.ml.features.advancedAdvancedTooltip.AdvancedAdvancedToolTip;
 import mypals.ml.features.arrowCamera.ArrowCamera;
 import mypals.ml.features.betterBarrier.BetterBarrier;
+import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.commandHelper.ChatCommandScreenObserver;
 import mypals.ml.features.damageIndicator.DamageHandler;
 import mypals.ml.features.damageIndicator.IndicatorRenderer;
@@ -48,6 +49,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -140,13 +142,13 @@ public class Lucidity implements ModInitializer {
 		new ArrowCamera();
 		ArrowCamera.onInitialize();
 		AdvancedAdvancedToolTip.onInitialize();
-		/*OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
+		OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(-5,0,0));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,-5));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,0,5));
 		OutlineManager.targetedBlocks.add(new BlockPos(0,-5,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));*/
+		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));
 
 		SelectiveRenderingManager.resolveSelectiveBlockRenderingMode(renderModeBlock);
 		SelectiveRenderingManager.resolveSelectiveEntityRenderingMode(renderModeEntity);
@@ -158,11 +160,16 @@ public class Lucidity implements ModInitializer {
 			WandTooltipRenderer.renderWandTooltip(context);
 			IndicatorRenderer.renderIndicators(context);
 		});
-		WorldRenderEvents.LAST.register((context) ->{
+		WorldRenderEvents.AFTER_ENTITIES.register((context) ->{
 			//OutlineManager.init();
+			OutlineManager.resolveBlocks();
+			OutlineManager.init();
+			OutlineManager.onRenderWorldLast(context);
+
 		});
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			updateConfig();
+			//OutlineManager.init();
 		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {
@@ -226,7 +233,6 @@ public class Lucidity implements ModInitializer {
 		if(renderMobChaseRange || renderMobEyeLineConnection){
 			MobFollowRangeScanner.onClientTick(scanRadius);
 		}
-		
 	}
 	private static void resolveEnviroment(MinecraftClient client){
 		ClientWorld world = client.world;

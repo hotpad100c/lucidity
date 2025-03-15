@@ -3,9 +3,12 @@ package mypals.ml.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
+import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
+import net.caffeinemc.mods.sodium.client.render.frapi.SodiumRenderer;
+import net.caffeinemc.mods.sodium.fabric.SodiumFabricMod;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
@@ -57,6 +60,12 @@ public class InformationRender {
     public static boolean isIrisShaderUsed(){
         if( FabricLoader.getInstance().isModLoaded("iris")) {
             return IrisApi.getInstance() != null && IrisApi.getInstance().isShaderPackInUse();
+        }
+        return false;
+    }
+    public static boolean isSodiumUsed(){
+        if( FabricLoader.getInstance().isModLoaded("sodium")) {
+            return true;
         }
         return false;
     }
@@ -154,6 +163,8 @@ public class InformationRender {
                 shineMarkers.remove(marker.pos);
             }
         });
+
+
     }
     private static void drawSelectedAreas(MatrixStack matrixStack){
         if (MinecraftClient.getInstance().player != null && (MinecraftClient.getInstance().player.getMainHandStack().getItem() == wand || (MinecraftClient.getInstance().player.isSpectator() && selectInSpectator))) {
@@ -173,7 +184,22 @@ public class InformationRender {
                 }
             }
             for (AreaBox selectedArea : selectedAreas) {
-                selectedArea.draw(matrixStack, false);
+                int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+                int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+                int minZ = Math.min(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
+                int maxX = Math.max(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+                int maxY = Math.max(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+                int maxZ = Math.max(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
+
+                // 遍历所有方块
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            OutlineManager.targetedBlocks.add(new BlockPos(x, y, z));
+                        }
+                    }
+                }
+                //selectedArea.draw(matrixStack, false);
             }
         }
 

@@ -3,16 +3,11 @@
         "swap",
         "final"
     ],
-    "passes": [{
-        "name": "block_outline",
+    "passes": [
+        {
+        "name": "entity_outline",
         "intarget": "final",
-        "outtarget": "swap",
-        "uniforms": [
-            {
-                "name": "ColorModulator",
-                "values": [0.0, 0.0, 1.0, 1.0]
-            }
-        ]
+        "outtarget": "swap"
     }, {
         "name": "box_blur",
         "intarget": "swap",
@@ -34,7 +29,8 @@
         }, {
             "name": "Radius",
             "values": [2.0]
-        }]
+        }
+        ]
     }, {
         "name": "blit",
         "intarget": "swap",
