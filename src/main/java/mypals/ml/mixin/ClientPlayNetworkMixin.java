@@ -5,6 +5,7 @@ import mypals.ml.features.pastBlockEvents.ClientsideBlockEventManager;
 import mypals.ml.features.OreFinder.MineralFinder;
 import mypals.ml.features.OreFinder.OreResolver;
 import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.command.CommandSource;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.awt.*;
 
 import static mypals.ml.config.LucidityConfig.enableWorldEaterHelper;
+import static mypals.ml.config.LucidityConfig.renderBlockEvents;
 import static mypals.ml.features.OreFinder.MineralFinder.isExposedMineral;
 import static mypals.ml.features.OreFinder.OreResolver.tryAddToRecordedOreListOrRemove;
 
@@ -34,60 +36,67 @@ public abstract class ClientPlayNetworkMixin {
 
     @Inject(method = "onBlockEvent", at = @At("HEAD"), cancellable = true)
     public void onBlockEvent(BlockEventS2CPacket packet, CallbackInfo ci) {
-        ClientsideBlockEventManager.addSyncedBlockEvent(packet.getPos(),packet.getBlock(),packet.getType(),packet.getData());
+        if(renderBlockEvents) {
+            ClientsideBlockEventManager.addSyncedBlockEvent(packet.getPos(), packet.getBlock(), packet.getType(), packet.getData());
+        }
     }
     @Inject(method = "onChunkData", at = @At("RETURN"))
     private void onChunkData(ChunkDataS2CPacket packet, CallbackInfo ci)
     {
-        if(enableWorldEaterHelper) {
-            int cx = packet.getChunkX();
-            int cz = packet.getChunkZ();
-            WorldChunk worldChunk = this.world.getChunkManager().getWorldChunk(cx, cz);
+        MinecraftClient.getInstance().execute(()->{
+            if(enableWorldEaterHelper) {
+                int cx = packet.getChunkX();
+                int cz = packet.getChunkZ();
+                WorldChunk worldChunk = this.world.getChunkManager().getWorldChunk(cx, cz);
 
-            if (worldChunk != null)
-            {
-                BlockPos.Mutable pos = new BlockPos.Mutable();
-                ChunkSection[] sections = worldChunk.getSectionArray();
-                for (int i = 0; i < sections.length; i++)
+                if (worldChunk != null)
                 {
-                    ChunkSection section = sections[i];
-                    if (section != null && !section.isEmpty())
+                    BlockPos.Mutable pos = new BlockPos.Mutable();
+                    ChunkSection[] sections = worldChunk.getSectionArray();
+                    for (int i = 0; i < sections.length; i++)
                     {
-                        for (int x = 0; x < 16; x++)
+                        ChunkSection section = sections[i];
+                        if (section != null && !section.isEmpty())
                         {
-                            for (int y = 0; y < 16; y++)
+                            for (int x = 0; x < 16; x++)
                             {
-                                for (int z = 0; z < 16; z++)
+                                for (int y = 0; y < 16; y++)
                                 {
-                                    pos.set(x + worldChunk.getPos().getStartX(), y + (this.world.sectionIndexToCoord(i) << 4), z + worldChunk.getPos().getStartZ());
+                                    for (int z = 0; z < 16; z++)
+                                    {
+                                        pos.set(x + worldChunk.getPos().getStartX(), y + (this.world.sectionIndexToCoord(i) << 4), z + worldChunk.getPos().getStartZ());
 
-                                    if(isExposedMineral(this.world, pos)) {
-                                        Block block = world.getBlockState(pos).getBlock();
-                                        boolean haveOreNearBy = false;
-                                        Color color = MineralFinder.MINERAL_BLOCKS.get(block);
-                                        for (Direction direction : Direction.values()) {
-                                            if (OreResolver.recordedOres.containsKey(pos.offset(direction)) && OreResolver.recordedOres.get(pos.offset(direction)).equals(color)) {
-                                                haveOreNearBy = true;
+                                        if(isExposedMineral(this.world, pos)) {
+                                            Block block = world.getBlockState(pos).getBlock();
+                                            boolean haveOreNearBy = false;
+                                            Color color = MineralFinder.MINERAL_BLOCKS.get(block);
+                                            for (Direction direction : Direction.values()) {
+                                                if (OreResolver.recordedOres.containsKey(pos.offset(direction)) && OreResolver.recordedOres.get(pos.offset(direction)).equals(color)) {
+                                                    haveOreNearBy = true;
+                                                }
+                                            }
+                                            if(!haveOreNearBy) {
+                                                OreResolver.recordedOres.put(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), color);
                                             }
                                         }
-                                        if(!haveOreNearBy) {
-                                            OreResolver.recordedOres.put(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), color);
-                                        }
-                                    }
 
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
+        });
+
     }
     @Inject(method = "onBlockUpdate", at = @At("HEAD"))
     public void onBlockUpdate(BlockUpdateS2CPacket packet, CallbackInfo ci) {
         if(enableWorldEaterHelper) {
-            BlockPos pos = packet.getPos();
-            tryAddToRecordedOreListOrRemove(pos);
+            MinecraftClient.getInstance().execute(()-> {
+                BlockPos pos = packet.getPos();
+                tryAddToRecordedOreListOrRemove(pos);
+            });
         }
     }
     @Inject(method = "onGameJoin", at = @At("HEAD"))

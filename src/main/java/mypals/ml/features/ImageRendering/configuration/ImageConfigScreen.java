@@ -1,9 +1,10 @@
 package mypals.ml.features.ImageRendering.configuration;
 
-import mypals.ml.Lucidity;
 import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.ImageRendering.ITextureManagerMixin;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.ImageRenderer;
+import mypals.ml.features.ImageRendering.MediaTypeDetector;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,65 +12,55 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.screen.ScreenTexts;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2d;
+import org.joml.Vector2i;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.picturesToRender;
-import static mypals.ml.features.ImageRendering.ImageDataParser.TEMP_TEXTURE_PATH;
-import static mypals.ml.features.ImageRendering.ImageDataParser.prepareImages;
+import static mypals.ml.features.ImageRendering.ImageDataParser.*;
 
 public class ImageConfigScreen extends Screen {
-    protected int backgroundWidth = 500;
-    protected int backgroundHeight = 133;
     protected int x = 1;
     protected int y = 1;
 
-    private static float posX = 0;
-    private static float posY = 0;
-    private static float posZ = 0;
+    private float rotX = 0;
+    private float rotY = 0;
+    private float rotZ = 0;
 
-    private static float rotX = 0;
-    private static float rotY = 0;
-    private static float rotZ = 0;
+    public TextFieldWidget pathF;
+    public TextFieldWidget nameF;
 
-    private static TextFieldWidget pathF;
-    private static TextFieldWidget nameF;
+    public TextFieldWidget posXF;
+    public TextFieldWidget posYF;
+    public TextFieldWidget posZF;
 
-    private static TextFieldWidget posXF;
-    private static TextFieldWidget posYF;
-    private static TextFieldWidget posZF;
+    public TextFieldWidget scaleXF;
+    public TextFieldWidget scaleYF;
 
-    private static TextFieldWidget scaleXF;
-    private static TextFieldWidget scaleYF;
+    public SliderWidget rotXF;
+    public SliderWidget rotYF;
+    public SliderWidget rotZF;
 
-    private static SliderWidget rotXF;
-    private static SliderWidget rotYF;
-    private static SliderWidget rotZF;
+    private float scaleX = 1;
+    private float scaleY = 1;
 
-    private static float scaleX = 1;
-    private static float scaleY = 1;
+    private int PREVIEW_SCALE = 5;
 
-    private static int PREVIEW_SCALE = 5;
-
-    public ImageEntry currentImage;
-
+    public MediaEntry currentImage;
+    private ImageConfigScreen instance;
     public ScrollableWidget scrollableWidget1;
     public ButtonWidget saveButton;
     public ButtonWidget lookAtPlayerButton;
@@ -79,76 +70,27 @@ public class ImageConfigScreen extends Screen {
     public ImageConfigScreen(Text title) {
         super(title);
     }
-    private final List<ImageEntry> imageEntries = new ArrayList<>();
 
-    public double mapToZeroOne(double v){
+    public static double mapToZeroOne(double v){
         return v/360;
     }
     public double[] getNormalizedSize(double orgWidth, double orgHeight, double scaleX, double scaleY){
-        /*double maxDimension = Math.max(orgWidth, orgHeight);
-        double normalizedWidth = orgWidth / maxDimension;
-        double normalizedHeight = orgHeight / maxDimension;*/
-
         double maxTargetDimension = Math.max(scaleX, scaleY);
         double normalizedTargetWidth = scaleX / maxTargetDimension;
         double normalizedTargetHeight = scaleY / maxTargetDimension;
 
         double[] output = new double[2];
-        /*if (normalizedTargetWidth > normalizedWidth) {
-            // 目标宽度比例较大，以高度为基准
-            output[0] = scaleX;
-            output[1] = (normalizedWidth / normalizedHeight) * output[1];
-        } else {
-            // 目标高度比例较大，以宽度为基准
-            output[0] = scaleY;
-            output[1] = (normalizedHeight / normalizedWidth) * output[0];
-        }*/
         output[0] = normalizedTargetWidth;
         output[1] = normalizedTargetHeight;
         return output;
     }
     @Override
     protected void init() {
+        setInstance(this);
+        for (int i = 0; i < ImageDataParser.images.entrySet().size(); i++) {
+            Map.Entry<String, MediaEntry> entry = ImageDataParser.images.entrySet().stream().toList().get(i);
+            ImageDataParser.images.put(entry.getKey(), entry.getValue());
 
-        for (Map.Entry<String, Map.Entry<Identifier, ImageDataParser.ImageData>> entry : ImageDataParser.images.entrySet()) {
-            imageEntries.add(new ImageEntry(entry.getValue().getValue().index, entry.getKey(),entry.getValue().getKey(),entry.getValue().getValue()){
-                @Override
-                protected void onClicked() {
-                    System.out.println("You clicked " + this.getName());
-                    currentImage = this;
-                    this.setSelected(true);
-                    scaleXF.active = true;
-                    scaleYF.active = true;
-                    posXF.active = true;
-                    posYF.active = true;
-                    posZF.active = true;
-                    rotXF.active = true;
-                    rotYF.active = true;
-                    rotZF.active = true;
-                    nameF.active = true;
-                    cancelButton.active = true;
-                    saveButton.active = true;
-                    moveToPlayerButton.active = true;
-                    lookAtPlayerButton.active = true;
-
-                    pathF.setText(this.getData().getPath());
-
-                    rotXF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getData().getRotation()[0]))));
-                    rotYF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getData().getRotation()[1]))));
-                    rotZF.setValue(mapToZeroOne(Double.parseDouble(String.valueOf(this.getData().getRotation()[2]))));
-
-                    scaleXF.setText(String.valueOf(this.getData().getScale()[0]));
-                    scaleYF.setText(String.valueOf(this.getData().getScale()[1]));
-
-                    posXF.setText(String.valueOf(this.getData().getPos()[0]));
-                    posYF.setText(String.valueOf(this.getData().getPos()[1]));
-                    posZF.setText(String.valueOf(this.getData().getPos()[2]));
-
-                    nameF.setText(this.getData().name);
-
-                    MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                }
-            });
         }
 
         this.addDrawableChild(scrollableWidget1 = new ScrollableWidget(0, 5, this.width - (this.width/2),this.height-10,ScreenTexts.EMPTY) {
@@ -171,21 +113,23 @@ public class ImageConfigScreen extends Screen {
                 // 调整鼠标Y坐标以考虑滚动
                 double adjustedMouseY = mouseY + this.getScrollY();
 
-                for (ImageEntry entry : imageEntries) {
+                for (MediaEntry entry : ImageDataParser.images.values()) {
                     int x = 5;
                     int y = boxHeight / 4 + (boxHeight + spacing) * index;
                     int cx = (boxWidth) / 2;
                     int cy = y + 30;
 
-                    double[] normalizedScale = getNormalizedSize(getTextureSize(entry.getTexture())[0], getTextureSize(entry.getTexture())[1],
-                            entry.getData().getScale()[0],entry.getData().getScale()[1]);
+                    int[] pictureSize = getTextureSize(requestIdentifier(entry));
 
-                    float ppb = getTextureSize(entry.getTexture())[0] / (float) PREVIEW_SCALE;
+                    double[] normalizedScale = getNormalizedSize(pictureSize[0], pictureSize[1],
+                            entry.getScale()[0],entry.getScale()[1]);
+
+                    float ppb = pictureSize[0] / (float) PREVIEW_SCALE;
 
                     try {
-                        ImageRenderer.renderPicture(context.getMatrices(), entry.getTexture(),
+                        ImageRenderer.renderPicture(context.getMatrices(), requestIdentifier(entry),
                                 new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
-                                new Vec3d(0, 0, 180),
+                                new Vec3d(0, 180, 180),
                                 new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
                                 ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
                     } catch (IOException e) {
@@ -199,9 +143,14 @@ public class ImageConfigScreen extends Screen {
                     int borderColor = isMouseOver ? Color.WHITE.getRGB() : Color.GRAY.getRGB(); // 鼠标悬停时变黄
                     context.drawBorder(x, y, boxWidth, boxHeight, borderColor);
 
-
-
                     context.drawText(MinecraftClient.getInstance().textRenderer, entry.getName(), x + 5, y + 5, 0xFFFFFF, false);
+
+                    context.drawText(MinecraftClient.getInstance().textRenderer, entry.getType().getKey(), x + 5, y + 20, 0xFFFFFF, false);
+
+                    Vector2d blockScale = toBlockScale(LucidityConfig.pixelsPerBlock, new Vector2d(entry.getScale()[0],entry.getScale()[1]), new Vector2i(pictureSize[0], pictureSize[1]));
+
+                    context.drawText(MinecraftClient.getInstance().textRenderer, "[ " + String.format("%.2f", blockScale.x) + ", " + String.format("%.2f", blockScale.y) + " ] Block(s)", x + 5, y+40, 0xFFFFFF, false);
+
 
                     index++;
                 }
@@ -213,12 +162,12 @@ public class ImageConfigScreen extends Screen {
 
                 double adjustedMouseY = mouseY + this.getScrollY();
 
-                for (ImageEntry entry : imageEntries) {
+                for (MediaEntry entry : ImageDataParser.images.values()) {
                     entry.setSelected(false);
                     int x = 5;
                     int y = boxHeight / 4 + (boxHeight + spacing) * index;
                     if (mouseX >= x && mouseX <= x + boxWidth && adjustedMouseY >= y && adjustedMouseY <= y + boxHeight) {
-                        entry.onClicked();
+                        entry.onClicked(getInstance());
                         return true;
                     }
                     index++;
@@ -363,17 +312,40 @@ public class ImageConfigScreen extends Screen {
         lookAtPlayerButton.active = false;
 
     }
+    public ImageConfigScreen getIncetanse(){
+        return this;
+    }
     public int[] getTextureSize(Identifier textureId){
         AbstractTexture texture = client.getTextureManager().getTexture(textureId);
         int[] size = new int[2];
+        size[0] = 16;
+        size[1] = 16;
+
         if(texture instanceof NativeImageBackedTexture nativeTexture) {
             NativeImage image = nativeTexture.getImage();
             assert image != null;
             size[0] = image.getWidth();
             size[1] = image.getHeight();
         }else {
-            size[0] = 16;
-            size[1] = 16;
+            try {
+                Optional<NativeImage> imageOptional = client.getResourceManager()
+                        .getResource(textureId)
+                        .map(resource -> {
+                            try (var inputStream = resource.getInputStream()) {
+                                return NativeImage.read(inputStream);
+                            } catch (IOException e) {
+                                return null;
+                            }
+                        });
+                if (imageOptional.isPresent()) {
+                    NativeImage image = imageOptional.get();
+                    size[0] = image.getWidth();
+                    size[1] = image.getHeight();
+                    image.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return size;
     }
@@ -424,7 +396,8 @@ public class ImageConfigScreen extends Screen {
         context.getMatrices().push();
         context.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         if(currentImage != null) {
-            Identifier texturePath = currentImage.getTexture();
+            Identifier texturePath = requestIdentifier(images.get(currentImage.getName()));
+
 
             double[] normalizedScale = getNormalizedSize(getTextureSize(texturePath)[0], getTextureSize(texturePath)[1],
                     scaleX, scaleY);
@@ -434,7 +407,7 @@ public class ImageConfigScreen extends Screen {
             try {
                 ImageRenderer.renderPicture(context.getMatrices(), texturePath
                         , new Vec3d(cx + (cx / 1.45), cy - 30, 1000)
-                        , new Vec3d(rotX, rotY, rotZ + 180)
+                        , new Vec3d(rotX, rotY+180, rotZ + 180)
                         , new Vector2d(normalizedScale[0] * 20, normalizedScale[1] * 20),
                         ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
             } catch (IOException e) {
@@ -443,41 +416,67 @@ public class ImageConfigScreen extends Screen {
         }
         context.getMatrices().pop();
     }
+    public ImageConfigScreen getInstance(){
+        return this;
+    }
+    public void reParse(){
+        TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
+
+        ImageData data = new ImageData(currentImage.getIndex(),
+                pathF.getText(),
+                nameF.getText(),
+                currentImage.getPos(),
+                currentImage.getRotation(),
+                currentImage.getScale()
+        );
+        Identifier[] oldIds = currentImage.textureIDs;
+        Identifier newID = LOADING;
+
+        parse(data.toString(),currentImage.getIndex());
+
+        currentImage.textureIDs = new Identifier[]{newID};
+        currentImage.ready = false;
+        images.get(currentImage.name).textureIDs = new Identifier[]{newID};
+        images.get(currentImage.name).ready = false;
+        for(Identifier id : oldIds){
+            textureManager.destroyTexture(id);
+        }
+    }
     public void saveData(){
+
         if(currentImage != null){
-
-            if(currentImage.getData().name != nameF.getText()){
-                Identifier textureId = currentImage.getTexture();
-                currentImage.getData().name = nameF.getText();
-                TextureManager textureManager = client.getTextureManager();
-                Identifier newID = Identifier.of(MOD_ID, TEMP_TEXTURE_PATH+nameF.getText());
-                textureManager.registerTexture(newID,
-                        client.getTextureManager().getTexture(textureId));
-                currentImage.texturePath = newID;
-                imageEntries.get(imageEntries.indexOf(currentImage)).texturePath = newID;
-                imageEntries.get(imageEntries.indexOf(currentImage)).name = nameF.getText();
-                imageEntries.get(imageEntries.indexOf(currentImage)).data.name = nameF.getText();
+            String origName = currentImage.getName();
+            if(origName != nameF.getText()){
+                images.get(origName).name = nameF.getText();
+                currentImage.name = nameF.getText();
+                changeMapKey(images, origName, nameF.getText());
+                currentImage.index = images.get(nameF.getText()).getIndex();
+                reParse();
             }
-            imageEntries.get(imageEntries.indexOf(currentImage)).data.path = pathF.getText();
+            if(currentImage.path != pathF.getText()){
 
-            currentImage.getData().path = pathF.getText();
+                reParse();
+                images.get(currentImage.name).path = pathF.getText();
+            }
+
+            currentImage.path = pathF.getText();
 
             double pos[] = new double[3];
             double rot[] = new double[3];
-            double scal[] = new double[3];
+            double scal[] = new double[2];
 
-            pos[0] = Double.parseDouble(posXF.getText());
-            pos[1] = Double.parseDouble(posYF.getText());
-            pos[2] = Double.parseDouble(posZF.getText());
+            pos[0] = Double.parseDouble(posXF.getText().isEmpty()?currentImage.getPos()[0]+"":posXF.getText());
+            pos[1] = Double.parseDouble(posYF.getText().isEmpty()?currentImage.getPos()[1]+"":posYF.getText());
+            pos[2] = Double.parseDouble(posZF.getText().isEmpty()?currentImage.getPos()[2]+"":posZF.getText());
 
             rot[0] = rotX;
             rot[1] = rotY;
             rot[2] = rotZ;
 
-            scal[0] = Double.parseDouble(scaleXF.getText());
-            scal[1] = Double.parseDouble(scaleYF.getText());
+            scal[0] = Double.parseDouble(scaleXF.getText().isEmpty()?currentImage.getScale()[0]+"":scaleXF.getText());
+            scal[1] = Double.parseDouble(scaleYF.getText().isEmpty()?currentImage.getScale()[0]+"":scaleYF.getText());
 
-            ImageDataParser.ImageData newData = new ImageDataParser.ImageData(currentImage.getData().getIndex(),
+            ImageDataParser.ImageData newData = new ImageDataParser.ImageData(currentImage.getIndex(),
                     pathF.getText(),
                     nameF.getText(),
                     pos,
@@ -485,16 +484,21 @@ public class ImageConfigScreen extends Screen {
                     scal
             );
 
-            picturesToRender.set(currentImage.getData().getIndex(),newData.toString());
-            LucidityConfig.CONFIG_HANDLER.save();
-            prepareImages();
+            images.get(nameF.getText()).pos = pos;
+            images.get(nameF.getText()).rotation = rot;
+            images.get(nameF.getText()).scale = scal;
 
-            Lucidity.updateConfig();
+            picturesToRender.set(currentImage.getIndex(),newData.toString());
+            LucidityConfig.CONFIG_HANDLER.save();
         }
     }
     @Override
     public void close() {
         saveData();
         super.close();
+    }
+
+    public void setInstance(ImageConfigScreen instance) {
+        this.instance = instance;
     }
 }

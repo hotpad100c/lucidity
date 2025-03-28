@@ -3,28 +3,27 @@ package mypals.ml.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.rendering.InformationRender;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.PostEffectProcessor;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.entity.ProjectileEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.ChunkSection;
-import net.minecraft.world.chunk.WorldChunk;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.Debug;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
 
 @Mixin(WorldRenderer.class)
 public class WorldRenderMixin {
-	@Shadow private @Nullable ClientWorld world;
 
 	@Inject(method = "render", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/render/WorldRenderer;renderChunkDebugInfo(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/Camera;)V", ordinal = 0))
 	private void render(CallbackInfo ci,
@@ -43,6 +42,16 @@ public class WorldRenderMixin {
 	) {
 		OutlineManager.init();
 	}
-
-
+	@SuppressWarnings({"InvalidInjectorMethodSignature", "MixinAnnotationTarget"})
+	@ModifyVariable(
+			method = "render",
+			at = @At(
+					value = "LOAD",
+					ordinal = 0
+			),
+			ordinal = 3
+	)
+	private boolean forceOutline(boolean bl3) {
+		return bl3 || !OutlineManager.targetedBlocks.isEmpty() || !selectedAreas.isEmpty();
+	}
 }

@@ -6,9 +6,11 @@ import mypals.ml.Lucidity;
 import mypals.ml.features.explosionVisualizer.simulate.ExplosionSimulator;
 import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -215,7 +217,16 @@ public class ScreenGenerator {
                                                 list -> instance.instance().picturesToRender = list
                                         )
                                         .controller(StringControllerBuilder::create)
-                                        .initial(String.format("path;name;[x,y,z];[0,0,0];[1,1]"))
+                                        .initial(()->{
+
+                                            if(MinecraftClient.getInstance().player != null) {
+                                                Vec3d pos = MinecraftClient.getInstance().player.getPos();
+                                                return String.format("path;name;[" + pos.x + ","+ pos.y + "," + pos.z +"];[0,0,0];[1,1];true");
+                                            }else{
+                                                return String.format("path;name;[x,y,z];[0,0,0];[1,1];true");
+                                            }
+
+                                        })
                                         .build()
                                 ).group(OptionGroup.createBuilder()
                                         .name(Text.translatable("config.lucidity.category.pictureRenderings"))

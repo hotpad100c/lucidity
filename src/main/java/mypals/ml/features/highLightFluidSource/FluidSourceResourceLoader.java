@@ -141,7 +141,7 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
             }
             @Override
             public int getFluidColor(@Nullable BlockRenderView view, @Nullable BlockPos pos, FluidState state) {
-                return BiomeColors.getWaterColor(view, pos);
+                return BiomeColors.getWaterColor(view == null?MinecraftClient.getInstance().world : view, pos == null?new BlockPos(0,0,0):pos);
             }
         };
         FluidRenderHandlerRegistry.INSTANCE.register(Fluids.WATER, waterSourceRenderHandler);

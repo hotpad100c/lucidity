@@ -48,3 +48,4 @@ accessible field net/minecraft/block/AbstractBlock$Settings offsetter Lnet/minec
 accessible method net/minecraft/block/AbstractBlock$AbstractBlockState shouldBeSolid ()Z
 accessible method net/minecraft/client/gui/widget/SliderWidget setValue (D)V
 accessible field net/minecraft/client/render/Tessellator allocator Lnet/minecraft/client/util/BufferAllocator;
+accessible field net/minecraft/client/render/WorldRenderer bufferBuilders Lnet/minecraft/client/render/BufferBuilderStorage;

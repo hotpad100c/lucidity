@@ -1,26 +1,31 @@
 package mypals.ml.features.blockOutline;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import mypals.ml.rendering.ShapeRender;
-import mypals.ml.rendering.shapes.CubeShape;
+import mypals.ml.features.selectiveRendering.AreaBox;
+import net.caffeinemc.mods.sodium.client.SodiumClientMod;
+import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
+import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderCache;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.*;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
-import net.minecraft.client.util.BufferAllocator;
-import net.minecraft.client.util.Window;
+import net.minecraft.client.texture.atlas.AtlasSprite;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.World;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
 import java.io.IOException;
@@ -30,120 +35,111 @@ import java.util.Map;
 import java.util.Objects;
 
 import static mypals.ml.Lucidity.LOGGER;
-import static mypals.ml.Lucidity.MOD_ID;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
+import static mypals.ml.rendering.InformationRender.isSodiumUsed;
 
 public class OutlineManager {
-    private static PostEffectProcessor shaderEffect;
-    private static int framebufferWidth = -1;
-    private static int framebufferHeight = -1;
-    private static final Tessellator tessellator = new Tessellator(256);
-    //private static final Identifier SHADER_RESOURCE = Identifier.ofVanilla( "shaders/post/entity_outline.json");
-    //private static final Identifier SHADER_RESOURCE = Identifier.of(MOD_ID, "shaders/post/outline.json");
-    private static final Identifier SHADER_RESOURCE = Identifier.of(MOD_ID,"shaders/post/outline.json");
-    private static Map<BlockPos, BlockState> blockToRenderer = new HashMap<>();
+    public static Map<BlockPos, BlockState> blockToRenderer = new HashMap<>();
     public static ArrayList<BlockPos> targetedBlocks = new ArrayList<>();
 
     public static void init() {
-        if (shaderEffect != null) {
-            shaderEffect.close();
-        }
 
-        framebufferWidth = framebufferHeight = -1;
-
-        try {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            Framebuffer framebuffer = mc.getFramebuffer();
-            TextureManager textureManager = mc.getTextureManager();
-            ResourceManager resourceManager = mc.getResourceManager();
-
-            shaderEffect = new PostEffectProcessor(textureManager, resourceManager, framebuffer, SHADER_RESOURCE);
-        } catch (IOException e) {
-            LOGGER.warn("Failed to load shader: {}", SHADER_RESOURCE, e);
-            shaderEffect = null;
-        }
     }
-    public static void onRenderWorldLast(MatrixStack matrixStack){
-        if(shaderEffect == null)return;
-        if (blockToRenderer.isEmpty()) return;
-
+    public static void onRenderWorldLast(WorldRenderContext context) {
         MinecraftClient mc = MinecraftClient.getInstance();
+        BlockRenderManager dispatcher = mc.getBlockRenderManager();
+        BlockEntityRenderDispatcher blockEntityRenderer = mc.getBlockEntityRenderDispatcher();
 
-        Window mainWindow = mc.getWindow();
-        int width = mainWindow.getFramebufferWidth();
-        int height = mainWindow.getFramebufferHeight();
-        if (width != framebufferWidth || height != framebufferHeight) {
-            framebufferWidth = width;
-            framebufferHeight = height;
-            shaderEffect.setupDimensions(width, height);
+        Camera camera = context.camera();
+        OutlineVertexConsumerProvider outlineVertexConsumerProvider = mc.worldRenderer.bufferBuilders.getOutlineVertexConsumers();
+        MatrixStack matrixStack = context.matrixStack();
+
+        if (matrixStack == null) {
+            System.err.println("MatrixStack is null, skipping render.");
+            return;
         }
 
+        outlineVertexConsumerProvider.setColor(255, 0, 255, 255);
+
+        float delta = context.tickCounter().getTickDelta(false);
 
 
-        BlockRenderManager dispatcher = mc.getBlockRenderManager();
-        Camera view = mc.gameRenderer.getCamera();
-        BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
+        for (var entry : blockToRenderer.entrySet()) {
+            onRenderOutline(entry, delta, camera, matrixStack, Color.orange);
+        }
+        for (AreaBox selectedArea : selectedAreas) {
+            int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+            int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+            int minZ = Math.min(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
+            int maxX = Math.max(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+            int maxY = Math.max(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+            int maxZ = Math.max(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
 
-        RenderSystem.disableBlend();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        /*RenderSystem.setShaderColor(0.0F, 1.0F, 0.0F, 1.0F);
-
-        for (PostEffectPass pass : shaderEffect.passes) {
-            if (pass.getName().equals("block_outline")) {
-                JsonEffectShaderProgram program = pass.getProgram();
-                Uniform colorUniform = program.getUniformByName("ColorModulator");
-
-                if (colorUniform != null) {
-                    colorUniform.set(1.0F, 0.0F, 0.0F, 1.0F);
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        BlockPos blockPos = new BlockPos(x, y, z);
+                        onRenderOutline(new HashMap.SimpleEntry<>(blockPos, context.world().getBlockState(blockPos)), delta, camera, matrixStack, Color.white);
+                    }
                 }
             }
-        }*/
-
-
-
-        Framebuffer framebuffer = shaderEffect.getSecondaryTarget("final");
-        framebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
-        //framebuffer.setClearColor(1,1,1,1);
-        framebuffer.beginWrite(false);
-
-        // render to framebuffer
-        for (var entry : blockToRenderer.entrySet()) {
-            var blockPos = entry.getKey();
-            var blockState = entry.getValue();
-            var model = dispatcher.getModel(blockState);
-
-            /*matrixStack.push();
-            matrixStack.translate(-view.getPos().x, -view.getPos().y, -view.getPos().z);
-            matrixStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-
-
-
-           dispatcher.getModelRenderer().render(
-                    matrixStack.peek(), bufferBuilder, blockState, model,
-                    1.0F, 1.0F,1.0F, LightmapTextureManager.MAX_LIGHT_COORDINATE,
-                    OverlayTexture.DEFAULT_UV);
-
-            matrixStack.pop();*/
-            CubeShape.draw(matrixStack,blockPos,0f,0, Color.RED,1,true);
         }
-        //BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        //BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        shaderEffect.render(0);
+    }
+    public static void onRenderOutline(Map.Entry<BlockPos, BlockState> entry, float delta, Camera camera, MatrixStack matrixStack, Color color) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        BlockRenderManager dispatcher = mc.getBlockRenderManager();
+        BlockEntityRenderDispatcher blockEntityRenderer = mc.getBlockEntityRenderDispatcher();
+        double x, y, z;
+        double lastTickPosX,lastTickPosY,lastTickPosZ;
 
-        mc.getFramebuffer().beginWrite(false);
+        BlockPos blockPos = entry.getKey();
+        BlockState blockState = entry.getValue();
 
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(
-                GlStateManager.SrcFactor.SRC_ALPHA,
-                GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA,
-                GlStateManager.SrcFactor.ZERO, GlStateManager.DstFactor.ONE);
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderSystem.setShaderColor(1,1,1,1);
-        framebuffer.draw(width, height, false);
-        //clean up
-        RenderSystem.disableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
+        lastTickPosX = camera.getPos().getX();
+        lastTickPosY = camera.getPos().getY();
+        lastTickPosZ = camera.getPos().getZ();
+
+        x = (blockPos.getX() - MathHelper.lerp(delta, lastTickPosX, camera.getPos().getX()));
+        y = (blockPos.getY() - MathHelper.lerp(delta, lastTickPosY, camera.getPos().getY()));
+        z = (blockPos.getZ() - MathHelper.lerp(delta, lastTickPosZ, camera.getPos().getZ()));
+
+        OutlineVertexConsumerProvider outlineVertexConsumerProvider = mc.worldRenderer.bufferBuilders.getOutlineVertexConsumers();
+        matrixStack.push();
+        matrixStack.translate(x, y, z);
+        matrixStack.scale(1.001f, 1.001f, 1.001f);
+
+
+        outlineVertexConsumerProvider.setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()); // 设置轮廓颜色（紫色）
+
+
+
+        if (!blockState.getFluidState().isEmpty()) {
+            //System.out.println("Rendering fluid at " + blockPos + " with state " + blockState.getFluidState());
+            CustomFluidOutlineRenderer.renderFluidOutline(mc.world,blockPos,
+                    outlineVertexConsumerProvider.getBuffer(RenderLayer.getOutline(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)),
+                    blockState, blockState.getFluidState(), matrixStack);
+        }
+
+
+
+
+        // 渲染方块
+        if (blockState.getRenderType() == BlockRenderType.MODEL) {
+            dispatcher.renderBlock(blockState, blockPos, (BlockRenderView) mc.world, matrixStack,
+                    outlineVertexConsumerProvider.getBuffer(RenderLayer.getOutline(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)),
+                    false, mc.getCameraEntity().getRandom());
+        }
+
+        // 渲染方块实体
+
+        if (blockState.getBlock() instanceof BlockWithEntity) {
+            BlockEntity blockEntity = mc.world.getBlockEntity(blockPos);
+            if (blockEntity != null) {
+                blockEntityRenderer.render(blockEntity, delta, matrixStack, outlineVertexConsumerProvider);
+            }
+        }
+
+        matrixStack.pop();
 
     }
     public static void resolveBlocks(){
@@ -152,6 +148,7 @@ public class OutlineManager {
         for(BlockPos pos : targetedBlocks){
             blockToRenderer.put(pos,world.getBlockState(pos));
         }
+        OutlineManager.targetedBlocks.clear();
     }
 
 }
