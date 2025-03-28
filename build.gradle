@@ -1,6 +1,6 @@
 plugins {
 	id 'fabric-loom' version '1.8-SNAPSHOT'
-	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	//id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'maven-publish'
 }
 
@@ -52,8 +52,8 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	implementation 'org.bytedeco:javacv:1.5.7'
-	implementation 'org.bytedeco:ffmpeg-platform:5.0-1.5.7'
+	//implementation 'org.bytedeco:javacv:1.5.7'
+	//implementation 'org.bytedeco:ffmpeg-platform:5.0-1.5.7'
 }
 
 processResources {
@@ -79,7 +79,7 @@ jar {
 	}
 }
 
-shadowJar {
+/*shadowJar {
 	archiveClassifier.set('shadow')
 	relocate 'org.bytedeco', "${project.group}.shaded.org.bytedeco" // 避免类冲突
 	zip64 true
@@ -90,8 +90,7 @@ tasks {
 		dependsOn shadowJar
 		inputFile.set(shadowJar.archiveFile) // 使用 Shadow JAR 作为输入
 	}
-}
-
+*/
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {

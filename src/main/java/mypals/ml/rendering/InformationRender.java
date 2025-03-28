@@ -179,27 +179,15 @@ public class InformationRender {
             }
 
             if (deleteMode) {
-                for (AreaBox selectedArea : getAreasToDelete(lookingAt, false)) {
+                List<AreaBox> areasToDelete = getAreasToDelete(lookingAt, false);
+                for (AreaBox selectedArea : areasToDelete) {
                     selectedArea.draw(matrixStack, Color.red, 0.4f, true);
                 }
-            }
-            for (AreaBox selectedArea : selectedAreas) {
-                int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
-                int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
-                int minZ = Math.min(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
-                int maxX = Math.max(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
-                int maxY = Math.max(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
-                int maxZ = Math.max(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
-
-                // 遍历所有方块
-                for (int x = minX; x <= maxX; x++) {
-                    for (int y = minY; y <= maxY; y++) {
-                        for (int z = minZ; z <= maxZ; z++) {
-                            OutlineManager.targetedBlocks.add(new BlockPos(x, y, z));
-                        }
+                for (AreaBox selectedArea : selectedAreas) {
+                    if(!areasToDelete.contains(selectedArea)){
+                        selectedArea.draw(matrixStack, Color.white, 0.01f, true);
                     }
                 }
-                //selectedArea.draw(matrixStack, false);
             }
         }
 
