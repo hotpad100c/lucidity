@@ -2,7 +2,7 @@ package mypals.ml.features.pastBlockEvents;
 
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.rendering.InformationRender;
-import mypals.ml.rendering.shapes.Text;
+import mypals.ml.rendering.shapes.TextShape;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.world.BlockEvent;
@@ -26,7 +26,7 @@ public class ClientsideBlockEventManager {
                 InformationRender.addAreaBox(new AreaBox(blockEvent.pos(),blockEvent.pos(), renderBlockEventsColor,
                         renderBlockEventsColor.getAlpha()/255.0f, false));
                 int finalI = i;
-                InformationRender.addText(new Text(
+                InformationRender.addText(new TextShape(
                         new ArrayList<String>() {{
                             add("Order:" + finalI);
                             add(net.minecraft.text.Text.translatable(blockEvent.block().getTranslationKey()).getString());

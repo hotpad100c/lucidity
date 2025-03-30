@@ -12,7 +12,9 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static mypals.ml.rendering.InformationRender.isIrisShaderUsed;
 import static mypals.ml.rendering.ShapeRender.*;
@@ -27,7 +29,8 @@ public class ShineMarker {
     public float speed;
     public int lifeTime;
     public boolean seeThrough;
-    public ShineMarker(Vec3d pos, Color color, float size, float speed, int lights,long seed,boolean autoAlpha,boolean seeThrough) {
+
+    public ShineMarker(Vec3d pos, Color color, float size, float speed, int lights, long seed, boolean autoAlpha, boolean seeThrough) {
         this.pos = pos;
         this.color = color;
         this.size = size;
@@ -37,108 +40,150 @@ public class ShineMarker {
         this.autoAlpha = autoAlpha;
         this.seeThrough = seeThrough;
     }
-    public void draw(MatrixStack matrixStack,float time,int alpha,boolean seeThrough) {
-        draw(matrixStack, this.pos, this.size, 0, time, this.lights, this.speed,2,
-                this.color.getRed(), this.color.getGreen(), this.color.getBlue(), this.autoAlpha?alpha:255, this.seed,seeThrough);
-    }
-    private static final float HALF_SQRT_3 = (float) (Math.sqrt(3.0D) / 2.0D);
-    public static void draw(MatrixStack matrixStack, Vec3d pos, float size, float tickDelta, float time, int lights, float rotSpeed, float rotOffset,
-                                        int colorR, int colorG, int colorB, int alpha, long seed,boolean seeThrough) {
-        Random random = new Random(seed);
-        float time1 = time * rotSpeed * 0.05F;
 
-        Camera cam = MinecraftClient.getInstance().gameRenderer.getCamera();
-        float scale = Math.min(size, calculateScale(MinecraftClient.getInstance().getCameraEntity().getPos(),pos))*
-                (0.9F + random.nextFloat() * 0.2F);
-        lastTickPosX = cam.getPos().getX();
-        lastTickPosY = cam.getPos().getY();
-        lastTickPosZ = cam.getPos().getZ();
-        float x = (float) (pos.getX() - MathHelper.lerp(tickDelta, lastTickPosX, cam.getPos().getX()));
-        float y = (float) (pos.getY() - MathHelper.lerp(tickDelta, lastTickPosY, cam.getPos().getY()));
-        float z = (float) (pos.getZ() - MathHelper.lerp(tickDelta, lastTickPosZ, cam.getPos().getZ()));
+    public void draw(MatrixStack matrixStack, float time, int alpha, Color color) {
+        drawSingle(matrixStack, this, time,color);
+    }
+
+    // 单独绘制一个 ShineMarker
+    private static void drawSingle(MatrixStack matrixStack, ShineMarker marker, float time, Color color) {
+        drawMultiple(matrixStack, Collections.singletonList(marker), time, color);
+    }
+
+    // 批量绘制多个 ShineMarker
+    public static void drawMultiple(MatrixStack matrixStack, java.util.List<ShineMarker> markers, float time, Color color) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        Camera cam = client.gameRenderer.getCamera();
+        if (!cam.isReady() || client.player == null || markers.isEmpty()) {
+            return;
+        }
 
         matrixStack.push();
-        matrixStack.translate(x,y,z);
+        Vec3d cameraPos = cam.getPos();
+        float lastTickPosX = (float) cameraPos.getX();
+        float lastTickPosY = (float) cameraPos.getY();
+        float lastTickPosZ = (float) cameraPos.getZ();
 
-        Tessellator tessellator = Tessellator.getInstance();
-
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+        // 设置通用渲染状态
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
 
-        Vector3f vector3f = new Vector3f(0,0,0);
+        // 分批处理：不穿透和穿透
+        java.util.List<ShineMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
+        java.util.List<ShineMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
+
+        // 绘制不穿透的标记
+        if (!opaqueMarkers.isEmpty()) {
+            BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            drawMarkers(matrixStack, opaqueMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
+            RenderSystem.enableDepthTest();
+            setShaderColor(client, false, color);
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
+        }
+
+        if (!seeThroughMarkers.isEmpty()) {
+            BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            drawMarkers(matrixStack, seeThroughMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
+            RenderSystem.disableDepthTest();
+            setShaderColor(client, true, color);
+            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            RenderSystem.enableDepthTest();
+        }
+
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        matrixStack.pop();
+    }
+
+    private static void drawMarkers(MatrixStack matrixStack, java.util.List<ShineMarker> markers, float time,
+                                    Vec3d cameraPos, float lastTickPosX, float lastTickPosY, float lastTickPosZ, BufferBuilder buffer) {
+        Random random = new Random();
+        Vector3f vector3f = new Vector3f(0, 0, 0);
         Vector3f vector3f2 = new Vector3f();
         Vector3f vector3f3 = new Vector3f();
         Vector3f vector3f4 = new Vector3f();
         Quaternionf quaternionf = new Quaternionf();
 
+        for (ShineMarker marker : markers) {
+            random.setSeed(marker.seed);
+            float time1 = time * marker.speed * 0.05f;
+            float scale = Math.min(marker.size, calculateScale(MinecraftClient.getInstance().getCameraEntity().getPos(), marker.pos)) *
+                    (0.9f + random.nextFloat() * 0.2f);
+            int alpha = marker.autoAlpha ? (int)(calculateAlpha(MinecraftClient.getInstance().cameraEntity.getPos(),
+                    marker.pos, marker.lifeTime)*255) : 255;
 
+            float x = (float) (marker.pos.getX() - MathHelper.lerp(0, lastTickPosX, cameraPos.getX()));
+            float y = (float) (marker.pos.getY() - MathHelper.lerp(0, lastTickPosY, cameraPos.getY()));
+            float z = (float) (marker.pos.getZ() - MathHelper.lerp(0, lastTickPosZ, cameraPos.getZ()));
 
-        for (int i = 0; i < lights; i++) {
             matrixStack.push();
-            quaternionf.rotationXYZ(
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.1),
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.1),
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.2)
-            ).rotateXYZ(
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.15),
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.15),
-                    (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.2)
-            );
-            float length = random.nextFloat(0.6f,1f) * 2.0F;
-            float width = random.nextFloat(0.6f,1f) * 6.0F;
+            matrixStack.translate(x, y, z);
 
-            vector3f2.set(-HALF_SQRT_3 * length, width, -0.5F * length);
-            vector3f3.set(HALF_SQRT_3 * length, width, -0.5F * length);
-            vector3f4.set(0.0F, width, 0.5F* length);
+            for (int i = 0; i < marker.lights; i++) {
+                matrixStack.push();
+                quaternionf.rotationXYZ(
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.1),
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.1),
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.2)
+                ).rotateXYZ(
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.15),
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.sin(time1 * 0.15),
+                        (random.nextFloat() * (float) (Math.PI * 2)) + (float) Math.cos(time1 * 0.2)
+                );
 
-            matrixStack.multiply(quaternionf);
-            matrixStack.scale(scale,scale,scale);
+                float length = random.nextFloat(0.6f, 1f) * 2.0f;
+                float width = random.nextFloat(0.6f, 1f) * 6.0f;
 
-            MatrixStack.Entry positionMatrix = matrixStack.peek();
+                vector3f2.set(-HALF_SQRT_3 * length, width, -0.5f * length);
+                vector3f3.set(HALF_SQRT_3 * length, width, -0.5f * length);
+                vector3f4.set(0.0f, width, 0.5f * length);
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                matrixStack.multiply(quaternionf);
+                matrixStack.scale(scale, scale, scale);
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f3).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                MatrixStack.Entry positionMatrix = matrixStack.peek();
 
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f4).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
-            buffer.vertex(positionMatrix, vector3f2).color(colorR, colorG, colorB, 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f2).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f3).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f3).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f4).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f).color(255, 255, 255, alpha).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f4).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                buffer.vertex(positionMatrix, vector3f2).color(marker.color.getRed(), marker.color.getGreen(), marker.color.getBlue(), 0).light(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE);
+                matrixStack.pop();
+            }
 
             matrixStack.pop();
         }
+    }
 
-        if(seeThrough)
-            RenderSystem.disableDepthTest();
-        if(isIrisShaderUsed())
-            RenderSystem.setShaderColor(colorR, colorG, colorB, 0.03f);
-        else
-            RenderSystem.setShaderColor(1, 1, 1, 1.0F);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+    private static final float HALF_SQRT_3 = (float) (Math.sqrt(3.0D) / 2.0D);
 
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
-        RenderSystem.setShaderColor(1, 1, 1, 1.0F);
-        matrixStack.pop();
+    private static void setShaderColor(MinecraftClient client, boolean seeThrough, Color color) {
+        if (isIrisShaderUsed()) {
+            RenderSystem.setShaderColor((float) color.getRed() /255, (float) color.getGreen() /255, (float) color.getBlue() /255, 1);
+        } else {
+            RenderSystem.setShaderColor(1, 1, 1, 1.0f);
+        }
     }
 
 
-    public static float calculateScale(Vec3d viewPos,Vec3d pos) {
+    public static float calculateScale(Vec3d viewPos, Vec3d pos) {
         double maxDist = 500;
         double dist = Math.min(viewPos.distanceTo(pos), maxDist);
-        float f = (float) Math.pow(Math.sin(dist / maxDist * Math.PI), 0.5F);
-        return f * 3F;
+        float f = (float) Math.pow(Math.sin(dist / maxDist * Math.PI), 0.5f);
+        return f * 3f;
     }
-    public static float calculateAlpha(Vec3d viewPos,Vec3d pos,double lifeTime){
+
+    public static float calculateAlpha(Vec3d viewPos, Vec3d pos, double lifeTime) {
         double a;
         double maxDist = 5.0;
         double dist = Math.min(viewPos.distanceTo(pos), maxDist);
@@ -147,12 +192,12 @@ public class ShineMarker {
         } else {
             a = dist / maxDist;
         }
-        return (float)a;
+        return (float) a;
     }
+
     public static double mapAlpha(double x, float min, float max) {
         if (x < min) x = min;
         if (x > max) x = max;
-
         return (x - min) / (max - min);
     }
 }

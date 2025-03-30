@@ -2,7 +2,7 @@ package mypals.ml.features.trajectory;
 
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.rendering.InformationRender;
-import mypals.ml.rendering.shapes.MultiPointLine;
+import mypals.ml.rendering.shapes.LineStrip;
 import mypals.ml.rendering.shapes.ShineMarker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -328,17 +328,17 @@ public class TrajectoryManager {
         for (Entity projectile : projectilesSimple) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.nearTrajectoryColor, projectile, world, 0.03f, 0.99f);
 
-            InformationRender.addLine(new MultiPointLine(points, Color.YELLOW,0.9f,false));
+            InformationRender.addLine(new LineStrip(points, Color.YELLOW,0.9f,false));
         }
         for (Entity projectile : projectilesComplex) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.farTrajectoryColor, projectile, world,0.05f, 0.99f);
 
-            InformationRender.addLine(new MultiPointLine(points, Color.RED,0.9f,false));
+            InformationRender.addLine(new LineStrip(points, Color.RED,0.9f,false));
         }
         for (Entity projectile : projectilesStrate) {
             ArrayList<Vec3d> points = calculateTrajectoryForEntity(LucidityConfig.linerTrajectoryColor, projectile, world,0f, 0.99f);
 
-            InformationRender.addLine(new MultiPointLine(points, Color.CYAN,0.9f,false));
+            InformationRender.addLine(new LineStrip(points, Color.CYAN,0.9f,false));
         }
     }
 
@@ -350,6 +350,6 @@ public class TrajectoryManager {
             else
                 points = applyRightOffset(owner, points, -1f);
         }
-        InformationRender.addLine(new MultiPointLine(points, colorTrace,1f,false));
+        InformationRender.addLine(new LineStrip(points, colorTrace,1f,false));
     }
 }

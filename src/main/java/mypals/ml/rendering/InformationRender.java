@@ -3,12 +3,9 @@ package mypals.ml.rendering;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
-import mypals.ml.features.blockOutline.OutlineManager;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
-import net.caffeinemc.mods.sodium.client.render.frapi.SodiumRenderer;
-import net.caffeinemc.mods.sodium.fabric.SodiumFabricMod;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
@@ -23,6 +20,7 @@ import org.joml.Vector2d;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -40,9 +38,9 @@ public class InformationRender {
     public static List<BoxShape> boxes = new CopyOnWriteArrayList<>();
     public static ConcurrentHashMap<BlockPos, CubeShape> cubes = new ConcurrentHashMap<>();
     public static List<LineShape> lines = new CopyOnWriteArrayList<>();
-    public static List<MultiPointLine> multiPointLines = new CopyOnWriteArrayList<>();
-    public static ConcurrentHashMap<Vec3d, ShineMarker> shineMarkers = new ConcurrentHashMap<>();
-    public static ConcurrentHashMap<Vec3d, Text> texts = new ConcurrentHashMap<>();
+    public static List<LineStrip> multiPointLines = new CopyOnWriteArrayList<>();
+    public static Map<Color, ConcurrentHashMap<Vec3d, ShineMarker>> shineMarkers = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<Vec3d, TextShape> texts = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<Map.Entry<BlockPos,BlockPos>, AreaBox> areaBoxes = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<BlockPos,OnGroundMarker> onGroundMarkers = new ConcurrentHashMap<>();
     public static final RenderPhase.DepthTest NO_DEPTH_TEST = new RenderPhase.DepthTest("none", 0) {
@@ -74,7 +72,7 @@ public class InformationRender {
             boxes.add(box);
         }
     }
-    public static void addText(Text text) {
+    public static void addText(TextShape text) {
         texts.put(text.pos, text);
     }
     public static void addCube(CubeShape cube) {
@@ -83,18 +81,28 @@ public class InformationRender {
     public static void addLine(LineShape line) {
         lines.add(line);
     }
-    public static void addLine(MultiPointLine line) {
+    public static void addLine(LineStrip line) {
         multiPointLines.add(line);
     }
 
-    public static void addShineMarker(ShineMarker shineMarker,int time){
-        if(shineMarkers.containsKey(shineMarker.pos)){
-            shineMarkers.get(shineMarker.pos).lifeTime = time;
-            shineMarkers.get(shineMarker.pos).color = shineMarker.color;
-        }else{
-            shineMarker.lifeTime = time;
-            shineMarkers.put(shineMarker.pos, shineMarker);
-        }
+    public static void addShineMarker(ShineMarker shineMarker, int time) {
+
+        ConcurrentHashMap<Vec3d, ShineMarker> markers = shineMarkers.computeIfAbsent(
+                shineMarker.color,
+                k -> new ConcurrentHashMap<>()
+        );
+
+        // 更新或添加 ShineMarker
+        markers.compute(shineMarker.pos, (pos, existingMarker) -> {
+            if (existingMarker != null) {
+                existingMarker.lifeTime = time;
+                existingMarker.color = shineMarker.color; // 更新颜色（如果需要）
+                return existingMarker;
+            } else {
+                shineMarker.lifeTime = time;
+                return shineMarker;
+            }
+        });
     }
     public static void addAreaBox(AreaBox areaBox){
         areaBoxes.put(Map.entry(areaBox.minPos,areaBox.maxPos), areaBox);
@@ -103,18 +111,8 @@ public class InformationRender {
         onGroundMarkers.put(onGroundMarker.pos, onGroundMarker);
     }
     public static void render(MatrixStack matrixStack, RenderTickCounter counter){
-        Tessellator tessellator = Tessellator.getInstance();
-
         if(MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().gameRenderer.getCamera().isReady()) {
             try {
-
-                //renderPictureFromIdentifier(matrixStack, Identifier.of(MOD_ID,"textures/examples/ray.png"),new Vec3d(0,0,0),new Vec3d(45,90,16),new Vec2f(0.05f,0.05f),0.05f,15728880, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
-                //renderPictureFromPath(matrixStack, "C:/Users/Ryan/Downloads/lost-file.png/",new Vec3d(9,0,0),new Vec3d(45,0,90),new Vec2f(0.09f,0.09f),0.1f,15720000, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true));
-
-                /*List<String> pictures = new ArrayList<>();
-                pictures.add("C:\\Users\\Ryan\\Downloads\\test-transparent.png;p1;[0,0,0];[0,90.3,45];[0.04,0.04]");
-                pictures.add("C:\\Users\\Ryan\\Downloads\\BE2DC86B6FF92FF374D26B22DCC27195.png;pic2;[10,0,10];[180,45,90];[0.05,0.08]");
-                */
                 for(MediaEntry image : ImageDataParser.images.values()){
                     renderPictureWorldSpace(matrixStack, image,
                             new Vec3d(image.getPos()[0],image.getPos()[1],image.getPos()[2]),
@@ -126,20 +124,13 @@ public class InformationRender {
                 for (BoxShape box : boxes) {
                     box.draw(matrixStack);
                 }
-                for(CubeShape cube : cubes.values()){
-                    cube.draw(matrixStack, 0.01f, counter.getTickDelta(true));
-                }
+                CubeShape.drawCubes(matrixStack,cubes,0.01f,counter.getTickDelta(true));
                 drawLines(matrixStack);
-                for(ShineMarker marker : shineMarkers.values()){
-                    marker.draw(matrixStack, MinecraftClient.getInstance().cameraEntity.age, Math.round(calculateAlpha(MinecraftClient.getInstance().cameraEntity.getPos(),
-                            marker.pos, marker.lifeTime) * 255),marker.seeThrough);
+                for (Map.Entry<Color,ConcurrentHashMap<Vec3d, ShineMarker>> markers : shineMarkers.entrySet()){
+                    ShineMarker.drawMultiple(matrixStack,markers.getValue().values().stream().toList(),MinecraftClient.getInstance().cameraEntity.age, markers.getKey());
                 }
-                for(OnGroundMarker marker : onGroundMarkers.values()){
-                    marker.draw(matrixStack);
-                }
-                for(Text text : texts.values()){
-                    text.draw(matrixStack, counter.getTickDelta(true));
-                }
+                OnGroundMarker.drawMultiple(matrixStack,onGroundMarkers.values().stream().toList());
+                TextShape.drawMultiple(matrixStack, texts.values().stream().toList(),counter.getTickDelta(true));
                 for (AreaBox areaBox: areaBoxes.values()) {
                     areaBox.draw(matrixStack, false);
                 }
@@ -157,11 +148,13 @@ public class InformationRender {
         multiPointLines.clear();
         areaBoxes.clear();
         onGroundMarkers.clear();
-        shineMarkers.forEachValue(1,marker->{
-            marker.lifeTime--;
-            if(marker.lifeTime <= 0){
-                shineMarkers.remove(marker.pos);
-            }
+        shineMarkers.entrySet().removeIf(entry -> {
+            Map<Vec3d,ShineMarker> markerSet = entry.getValue();
+            markerSet.entrySet().removeIf(marker -> {
+                marker.getValue().lifeTime--;
+                return marker.getValue().lifeTime <= 0;
+            });
+            return markerSet.isEmpty();
         });
 
 
@@ -172,7 +165,7 @@ public class InformationRender {
             BlockHitResult result = getPlayerLookedBlock(MinecraftClient.getInstance().player, MinecraftClient.getInstance().world);
             BlockPos lookingAt = result.getType() == HitResult.Type.BLOCK ? result.getBlockPos() : BlockPos.ofFloored(result.getPos());
             if(renderSelectionMarker) {
-                CubeShape.draw(matrixStack, lookingAt, 0.01f, 0, deleteMode ? Color.red : Color.white, 0.2f, false);
+                CubeShape.drawSingle(matrixStack, lookingAt, 0.01f, 0, deleteMode ? Color.red : Color.white, 0.2f, false);
             }
             if (WandActionsManager.pos1 != null) {
                 renderSelectionBox(matrixStack, MinecraftClient.getInstance().gameRenderer.getCamera(), 0);
@@ -193,11 +186,7 @@ public class InformationRender {
 
     }
     private static void drawLines(MatrixStack matrixStack){
-        for (LineShape line : lines) {
-            line.draw(matrixStack, line.start, line.end, line.color, line.alpha,line.seeThrough);
-        }
-        for (MultiPointLine line : multiPointLines) {
-            line.draw(matrixStack, line.points, line.color, line.alpha,line.seeThrough);
-        }
+        LineShape.drawLines(matrixStack, lines);
+        LineStrip.drawLineStrips(matrixStack, multiPointLines);
     }
 }

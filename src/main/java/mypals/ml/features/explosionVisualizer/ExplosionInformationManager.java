@@ -9,7 +9,7 @@ import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.Explosi
 import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.CubeShape;
 import mypals.ml.rendering.shapes.LineShape;
-import mypals.ml.rendering.shapes.Text;
+import mypals.ml.rendering.shapes.TextShape;
 import net.minecraft.block.AirBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.LivingEntity;
@@ -38,7 +38,7 @@ public class ExplosionInformationManager {
             if(showBlockDestroyInfo) {
                 for (BlockPos p : blocksToDestroy) {
                     // Render each affected block
-                    InformationRender.addText(new Text(
+                    InformationRender.addText(new TextShape(
                             new ArrayList<>(Arrays.asList(LucidityConfig.BlockDestroyIcon)),
                             p.toCenterPos(),
                             LucidityConfig.BlockDestroyIconSize,
@@ -49,7 +49,7 @@ public class ExplosionInformationManager {
                     InformationRender.addCube(new CubeShape(p,0.2f,LucidityConfig.BlockDestroyIconColor,LucidityConfig.BlockDestroyIconSeeThrow));
                 }
                 for (BlockPos p: blocksCantDestroy){
-                    InformationRender.addText(new Text(
+                    InformationRender.addText(new TextShape(
                             new ArrayList<>(Arrays.asList(LucidityConfig.BlockDestroyIcon)),
                             p.toCenterPos(),
                             LucidityConfig.BlockDestroyIconSize,
@@ -79,7 +79,7 @@ public class ExplosionInformationManager {
                         int green = (int) (255 * damageFactor);
                         int color = (red << 16) | (green << 8);
 
-                        InformationRender.addText(new Text(
+                        InformationRender.addText(new TextShape(
                                 new ArrayList<>(Arrays.asList(s)),
                                 e.getEntity().getPos().add(0, height + 0.5, 0),
                                 0.015F,
@@ -87,7 +87,7 @@ public class ExplosionInformationManager {
                                 1,
                                 false
                         ));
-                        InformationRender.addText(new Text(
+                        InformationRender.addText(new TextShape(
                                 new ArrayList<>(Arrays.asList(s2)),
                                 e.getEntity().getPos().add(0, height, 0),
                                 0.015F,
@@ -106,7 +106,7 @@ public class ExplosionInformationManager {
                     if(LucidityConfig.EnableAlpha)
                         color = mapAlpha(color, l.getOrgBlastStrength(), p.getStrength());
                     if(p.getStrength() > 0 && !(MinecraftClient.getInstance().world.getBlockState(BlockPos.ofFloored(p.getPosition())).getBlock() instanceof AirBlock))
-                        InformationRender.addText(new Text(
+                        InformationRender.addText(new TextShape(
                                 new ArrayList<>(Arrays.asList(LucidityConfig.BlockDetectionRayIcon)),
                                 p.getPosition(),
                                 LucidityConfig.BlockDetectionRayIconSize,
@@ -121,7 +121,7 @@ public class ExplosionInformationManager {
             for (Vec3d p : explotionCenters) {
                 int orangeColor = 16753920;
                 String s = "\uD83D\uDCA5";
-                InformationRender.addText(new Text(
+                InformationRender.addText(new TextShape(
                         new ArrayList<>(Arrays.asList(s)),
                         p,
                         0.045F,
@@ -138,7 +138,7 @@ public class ExplosionInformationManager {
                             Vec3d collitionPoint = r.point_hit;
                             boolean hit_target = r.hit_target;
                             if (hit_target) {
-                                InformationRender.addText(new Text(
+                                InformationRender.addText(new TextShape(
                                         new ArrayList<>(Arrays.asList(EntitySamplePoion_Safe_Icon)),
                                         org,
                                         LucidityConfig.EntitySamplePoionIconSize,
@@ -151,7 +151,7 @@ public class ExplosionInformationManager {
                             }
                             else {
 
-                                InformationRender.addText(new Text(
+                                InformationRender.addText(new TextShape(
                                         new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Danger_Icon)),
                                         org,
                                         LucidityConfig.EntitySamplePoionIconSize,
@@ -159,7 +159,7 @@ public class ExplosionInformationManager {
                                         1,
                                         LucidityConfig.EntitySamplePointSeeThrow
                                 ));
-                                InformationRender.addText(new Text(
+                                InformationRender.addText(new TextShape(
                                         new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Blocked_Icon)),
                                         collitionPoint,
                                         LucidityConfig.EntitySamplePoionIconSize-0.005F,

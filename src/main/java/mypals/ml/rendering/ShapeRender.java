@@ -35,10 +35,10 @@ public class ShapeRender {
         HitResult result = client.cameraEntity.raycast(player.getAbilities().creativeMode ? 5.0F : 4.5F, 0, false);
         BlockPos pos = WandActionsManager.pos2 != null ? WandActionsManager.pos2 : (result.getType() == HitResult.Type.BLOCK ? ((BlockHitResult) result).getBlockPos() : BlockPos.ofFloored(result.getPos()));
         if(pos != null){
-            CubeShape.draw(matrices, pos, 0.01f, tickDelta, Color.blue, 0.2f,true);
+            CubeShape.drawSingle(matrices, pos, 0.01f, tickDelta, Color.blue, 0.2f,true);
         }
         if(origin != null){
-            CubeShape.draw(matrices, origin, 0.01f, tickDelta, Color.red, 0.2f,true);
+            CubeShape.drawSingle(matrices, origin, 0.01f, tickDelta, Color.red, 0.2f,true);
         }
         pos = pos.subtract(origin);
 
