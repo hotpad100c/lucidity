@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import static mypals.ml.Lucidity.LOGGER;
+import static mypals.ml.config.LucidityConfig.selectInSpectator;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
 import static mypals.ml.rendering.InformationRender.isSodiumUsed;
 
 public class OutlineManager {
@@ -67,23 +69,26 @@ public class OutlineManager {
         for (var entry : blockToRenderer.entrySet()) {
             onRenderOutline(entry, delta, camera, matrixStack, Color.orange);
         }
-        for (AreaBox selectedArea : selectedAreas) {
-            int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
-            int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
-            int minZ = Math.min(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
-            int maxX = Math.max(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
-            int maxY = Math.max(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
-            int maxZ = Math.max(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
+        if((MinecraftClient.getInstance().player.getMainHandStack().getItem() == wand || (MinecraftClient.getInstance().player.isSpectator() && selectInSpectator))){
+            for (AreaBox selectedArea : selectedAreas) {
+                int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+                int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+                int minZ = Math.min(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
+                int maxX = Math.max(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
+                int maxY = Math.max(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
+                int maxZ = Math.max(selectedArea.minPos.getZ(), selectedArea.maxPos.getZ());
 
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
-                        BlockPos blockPos = new BlockPos(x, y, z);
-                        onRenderOutline(new HashMap.SimpleEntry<>(blockPos, context.world().getBlockState(blockPos)), delta, camera, matrixStack, Color.white);
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            BlockPos blockPos = new BlockPos(x, y, z);
+                            onRenderOutline(new HashMap.SimpleEntry<>(blockPos, context.world().getBlockState(blockPos)), delta, camera, matrixStack, Color.white);
+                        }
                     }
                 }
             }
         }
+
     }
     public static void onRenderOutline(Map.Entry<BlockPos, BlockState> entry, float delta, Camera camera, MatrixStack matrixStack, Color color) {
         MinecraftClient mc = MinecraftClient.getInstance();

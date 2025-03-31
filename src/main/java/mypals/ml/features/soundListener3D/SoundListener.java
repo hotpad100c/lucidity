@@ -4,12 +4,9 @@ import com.google.common.collect.Lists;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.rendering.InformationRender;
-import mypals.ml.rendering.shapes.CubeShape;
+import mypals.ml.rendering.shapes.TextShape;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.hud.SubtitlesHud;
 import net.minecraft.client.sound.*;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
@@ -19,11 +16,9 @@ import net.minecraft.util.math.Vec3d;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import static mypals.ml.config.LucidityConfig.*;
-import static mypals.ml.config.LucidityConfig.renderBlockEventsColor;
 
 public class SoundListener implements SoundInstanceListener {
     List<SoundEventEntry> soundEntries = Lists.<SoundEventEntry>newArrayList();
@@ -57,7 +52,7 @@ public class SoundListener implements SoundInstanceListener {
                     InformationRender.addAreaBox(new AreaBox(blockPos,blockPos, renderSoundEventsColor,
                             renderSoundEventsColor.getAlpha()/255.0f, false));
 
-                    InformationRender.addText(new mypals.ml.rendering.shapes.Text(
+                    InformationRender.addText(new TextShape(
                             new ArrayList<String>() {{
                         add(soundEventEntry.getText().getString());
                         add(soundEntry.location.toString());

@@ -3,8 +3,7 @@ package mypals.ml.features.renderMobSpawn;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.CubeShape;
-import mypals.ml.rendering.shapes.Text;
-import net.minecraft.block.BlockState;
+import mypals.ml.rendering.shapes.TextShape;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
@@ -31,7 +30,7 @@ public class SpaceScanner {
                     ArrayList<String> mobs = PossibleSpawnChecker.getPossibleSpawnsAt((ClientWorld) world, pos);
                     if(!mobs.isEmpty()) {
                         InformationRender.addCube(new CubeShape(pos,0.05f,Color.yellow,true));
-                        InformationRender.addText(new Text(mobs, pos.toCenterPos(), LucidityConfig.renderMobSpawnSize, assignRainbowColors(mobs), 1, true));
+                        InformationRender.addText(new TextShape(mobs, pos.toCenterPos(), LucidityConfig.renderMobSpawnSize, assignRainbowColors(mobs), 1, true));
                     }
                     /*if (!state.isAir() && (!above.isSolidBlock(world,pos.up()) || above.isAir() )) {
                         List<String> mobs = PossibleSpawnChecker.getPossibleSpawnsAt((ClientWorld) world, pos.up());

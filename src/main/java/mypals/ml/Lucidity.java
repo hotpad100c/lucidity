@@ -54,6 +54,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,6 @@ public class Lucidity implements ModInitializer {
 	public static Identifier id(String path) {
 		return Identifier.of(MOD_ID, path);
 	}
-
     public static void onConfigUpdated() {
 		MinecraftClient client = MinecraftClient.getInstance();
 		updateChunks(client);
@@ -142,13 +142,6 @@ public class Lucidity implements ModInitializer {
 		new ArrowCamera();
 		ArrowCamera.onInitialize();
 		AdvancedAdvancedToolTip.onInitialize();
-		OutlineManager.targetedBlocks.add(new BlockPos(0,0,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(5,0,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(-5,0,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,0,-5));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,0,5));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,-5,0));
-		OutlineManager.targetedBlocks.add(new BlockPos(0,5,0));
 
 		SelectiveRenderingManager.resolveSelectiveBlockRenderingMode(renderModeBlock);
 		SelectiveRenderingManager.resolveSelectiveEntityRenderingMode(renderModeEntity);
