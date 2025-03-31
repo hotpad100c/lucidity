@@ -214,7 +214,7 @@ public class ExplosionSimulator {
                     blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
                 }
                 else if(thisEntity instanceof WindChargeEntity || thisEntity instanceof BreezeWindChargeEntity){
-                    WindChargeExplosionBehaviorManager EManager = new WindChargeExplosionBehaviorManager(true, Registries.BLOCK.getEntryList(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity()));
+                    WindChargeExplosionBehaviorManager EManager = new WindChargeExplosionBehaviorManager(true);
                     blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
                 }
                 else{

@@ -27,6 +27,7 @@
     "MouseMixin",
     "TextureManagerMixin",
     "WorldRenderMixin",
+    "vanilla.BlockModelRendererMixin",
     "vanilla.EntityRenderDispatcherMixin",
     "vanilla.ParticleManagerMixin",
     "vanilla.SectionBuilderMixin"

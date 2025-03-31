@@ -28,7 +28,6 @@ public class AdvancedAdvancedToolTip {
             "slipperiness",
             "velocityMultiplier",
             "jumpVelocityMultiplier",
-            "lootTableKey",
             "opaque",
             "burnable",
             "forceSolid",
@@ -57,11 +56,11 @@ public class AdvancedAdvancedToolTip {
     }
     public static List<String> getSounds(BlockSoundGroup soundGroup){
         List<String> properties = new ArrayList<>();
-        properties.add("-  "+soundGroup.getBreakSound().getId());
-        properties.add("-  "+soundGroup.getFallSound().getId());
-        properties.add("-  "+soundGroup.getHitSound().getId());
-        properties.add("-  "+soundGroup.getPlaceSound().getId());
-        properties.add("-  "+soundGroup.getStepSound().getId());
+        properties.add("-  "+soundGroup.getBreakSound().id());
+        properties.add("-  "+soundGroup.getFallSound().id());
+        properties.add("-  "+soundGroup.getHitSound().id());
+        properties.add("-  "+soundGroup.getPlaceSound().id());
+        properties.add("-  "+soundGroup.getStepSound().id());
         return properties;
     }
     public static String getPistonBehaviorTranslation(PistonBehavior behavior) {
@@ -143,9 +142,6 @@ break;
             case "jumpVelocityMultiplier":
                 properties.add( Text.translatable("block.jumpVelocityMultiplier").getString() + ": " +
                         settings.jumpVelocityMultiplier);
-break;
-            case "lootTableKey":
-                properties.add( Text.translatable("block.lootTableKey").getString() + ": " + settings.lootTableKey);
 break;
             case "opaque":
                 properties.add( Text.translatable("block.opaque").getString() + ": " + settings.opaque);

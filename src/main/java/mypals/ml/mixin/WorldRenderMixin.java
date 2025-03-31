@@ -25,12 +25,28 @@ import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.se
 @Mixin(WorldRenderer.class)
 public class WorldRenderMixin {
 
-	@Inject(method = "render", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/render/WorldRenderer;renderChunkDebugInfo(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/render/Camera;)V", ordinal = 0))
-	private void render(CallbackInfo ci,
-						@Local MatrixStack matrixStack,
-						@Local(argsOnly = true) RenderTickCounter tickCounter
+	@Inject(
+			method = "method_62212",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/debug/DebugRenderer;renderLate(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;DDD)V")
+	)private void render(CallbackInfo ci,
+						 @Local MatrixStack stack
 	) {
-		InformationRender.render(matrixStack,tickCounter);
+		InformationRender.render(new MatrixStack(), new RenderTickCounter() {
+			@Override
+			public float getLastFrameDuration() {
+				return 0;
+			}
+
+			@Override
+			public float getTickDelta(boolean ignoreFreeze) {
+				return 0;
+			}
+
+			@Override
+			public float getLastDuration() {
+				return 0;
+			}
+		});
 	}
 	@Inject(method = "reload(Lnet/minecraft/resource/ResourceManager;)V", at = @At("HEAD"))
 	private void reload(CallbackInfo ci

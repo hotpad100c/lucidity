@@ -2,6 +2,7 @@ package mypals.ml.rendering.shapes;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -42,7 +43,7 @@ public class LineStrip {
         Vec3d cameraPos = camera.getPos();
         matrixStack.push();
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
@@ -53,10 +54,11 @@ public class LineStrip {
         java.util.List<LineStrip> seeThroughStrips = lineStrips.stream().filter(strip ->  strip.seeThrough && strip.points.size() > 1).collect(Collectors.toList());
 
         if (!opaqueStrips.isEmpty()) {
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
 
             for (LineStrip strip : opaqueStrips) {
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
                 float red = ((strip.color.getRGB() >> 16) & 0xFF) / 255.0f;
                 float green = ((strip.color.getRGB() >> 8) & 0xFF) / 255.0f;
                 float blue = (strip.color.getRGB() & 0xFF) / 255.0f;
@@ -71,21 +73,22 @@ public class LineStrip {
                     buffer.vertex(matrixStack.peek().getPositionMatrix(), (float) x, (float) y, (float) z)
                             .color(red, green, blue, strip.alpha);
                 }
+                RenderSystem.enableDepthTest();
+                BufferRenderer.drawWithGlobalProgram(buffer.end());
             }
 
-            RenderSystem.enableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+
         }
 
 
         if (!seeThroughStrips.isEmpty()) {
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
 
             for (LineStrip strip : seeThroughStrips) {
                 float red = ((strip.color.getRGB() >> 16) & 0xFF) / 255.0f;
                 float green = ((strip.color.getRGB() >> 8) & 0xFF) / 255.0f;
                 float blue = (strip.color.getRGB() & 0xFF) / 255.0f;
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
 
                 for (Vec3d point : strip.points) {
                     lastTickPosX = camera.getPos().getX();
@@ -97,11 +100,12 @@ public class LineStrip {
                     buffer.vertex(matrixStack.peek().getPositionMatrix(), (float) x, (float) y, (float) z)
                             .color(red, green, blue, strip.alpha);
                 }
+                RenderSystem.disableDepthTest();
+                BufferRenderer.drawWithGlobalProgram(buffer.end());
+                RenderSystem.enableDepthTest();
             }
 
-            RenderSystem.disableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest();
+
         }
 
         RenderSystem.disableBlend();

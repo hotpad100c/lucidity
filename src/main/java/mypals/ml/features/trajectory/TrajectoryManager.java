@@ -212,10 +212,10 @@ public class TrajectoryManager {
             Vec3d Velocity = new Vec3d(speedVecC.x, speedVecC.y, speedVecC.z);
             Vec3d entityPos = new Vec3d(0, 0 + 1.5, 0);
 
-            SnowballEntity modleEntity = new SnowballEntity(world, player);
+            SnowballEntity tempEntity = new SnowballEntity(EntityType.SNOWBALL,world);
 
             for (int i = 0; i < 100; i++) {
-                HitResult hitResult = world.raycast(new RaycastContext(new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z), new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z).add(Velocity), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, modleEntity));
+                HitResult hitResult = world.raycast(new RaycastContext(new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z), new Vec3d(posX + entityPos.x, posY + entityPos.y, posZ + entityPos.z).add(Velocity), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, tempEntity));
                 if (hitResult.getType() != HitResult.Type.MISS) {
                     hitPoint = new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z);
                     InformationRender.addShineMarker(new ShineMarker(new Vec3d(hitResult.getPos().x, hitResult.getPos().y, hitResult.getPos().z),colorHit,0.1f,2,30,114514,false,false),1);

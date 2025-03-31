@@ -19,19 +19,19 @@ import static net.caffeinemc.mods.sodium.client.render.chunk.ExtendedBlockEntity
 
 @Mixin(FluidRenderer.class)
 public class FluidRenderMixin {
-    @Inject(at = @At("RETURN"),method = "shouldRenderSide(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/fluid/FluidState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/fluid/FluidState;)Z"
+    @Inject(at = @At("RETURN"),method = "shouldRenderSide(Lnet/minecraft/fluid/FluidState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;Lnet/minecraft/fluid/FluidState;)Z"
             ,cancellable = true)
-    private static void shouldRenderSide(BlockRenderView world, BlockPos pos, FluidState fluidState, BlockState blockState, Direction direction, FluidState neighborFluidState, CallbackInfoReturnable<Boolean> cir) {
+    private static void shouldRenderSide(FluidState fluidState, BlockState blockState, Direction direction, FluidState fluidState2, CallbackInfoReturnable<Boolean> cir) {
         if(!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
-            if(!shouldRenderBlock(world.getBlockState(pos.offset(direction)),pos.offset(direction)))
+            if(!shouldRenderBlock(blockState,new BlockPos(0,0,0)))
                 cir.setReturnValue(false);
         }
     }
-    @Inject(at = @At("RETURN"),method = "isSideCovered(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/Direction;FLnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"
+    @Inject(at = @At("RETURN"),method = "isSideCovered(Lnet/minecraft/util/math/Direction;FLnet/minecraft/block/BlockState;)Z"
             ,cancellable = true)
-    private static void isSideCovered(BlockView world, Direction direction, float height, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+    private static void isSideCovered(Direction direction, float f, BlockState blockState, CallbackInfoReturnable<Boolean> cir) {
         if(!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
-            if(!shouldRenderBlock(world.getBlockState(pos.offset(direction)),pos.offset(direction)))
+            if(!shouldRenderBlock(blockState,new BlockPos(0,0,0)))
                 cir.setReturnValue(false);
         }
     }

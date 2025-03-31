@@ -6,7 +6,7 @@ import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
@@ -28,7 +28,7 @@ public class CustomFluidOutlineRenderer {
         matrixStack.translate(-pos.getX(), -pos.getY(), -pos.getZ());
 
         boolean isLava = fluidState.isIn(FluidTags.LAVA);
-        Sprite[] sprites = new Sprite[]{ModelLoader.LAVA_FLOW.getSprite()};
+        Sprite[] sprites = new Sprite[]{ModelBaker.LAVA_FLOW.getSprite()};
         int color = isLava ? 0xFFFFFF : BiomeColors.getWaterColor(world, pos);
         float r = (float) (color >> 16 & 0xFF) / 255.0F;
         float g = (float) (color >> 8 & 0xFF) / 255.0F;

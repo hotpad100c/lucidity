@@ -2,59 +2,83 @@ package mypals.ml.mixin.vanilla;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import mypals.ml.config.LucidityConfig;
+import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.BlockModelRenderer;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.BakedQuad;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.BitSet;
 import java.util.List;
+import java.util.Random;
 
+import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.blockRenderMode;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
 import static net.minecraft.world.RedstoneView.DIRECTIONS;
 
 @Mixin(BlockModelRenderer.class)
 public class BlockModelRendererMixin {
     @Shadow @Final private BlockColors colors;
+    @WrapOperation(at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z"),
+            method = {
+                    "renderSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V",
+                    "renderFlat(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;ZLnet/minecraft/util/math/random/Random;JI)V"})
+    private boolean onRenderSmoothOrFlat(BlockState state, BlockState otherState,
+                                         Direction side, Operation<Boolean> original, @Local(argsOnly = true) BlockRenderView world, @Local(argsOnly = true) BlockPos pos)
+    {
+        LucidityConfig.CONFIG_HANDLER.instance();
+        if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
+            boolean shouldRender = shouldRenderBlock(state,pos);
+            boolean shouldRenderNeighbor = shouldRenderBlock(world.getBlockState(pos.offset(side)),pos.offset(side));
 
-    @WrapMethod(method = "renderQuadsSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Ljava/util/List;[FLjava/util/BitSet;Lnet/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator;I)V")
+            if (shouldRender && !shouldRenderNeighbor) {
+                return true;
+            }
+            else if (!shouldRender && shouldRenderNeighbor) {
+                return false;
+            }
+        }
+        return Block.shouldDrawSide(state, world.getBlockState(pos.offset(side)), side);
+    }
+    /*@WrapMethod(method = "renderQuadsSmooth(Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Ljava/util/List;[FLjava/util/BitSet;Lnet/minecraft/client/render/block/BlockModelRenderer$AmbientOcclusionCalculator;I)V")
     public void renderQuadsSmooth(
             BlockRenderView world, BlockState state, BlockPos pos, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> quads, float[] box, BitSet flags, BlockModelRenderer.AmbientOcclusionCalculator ambientOcclusionCalculator, int overlay, Operation<Void> original
     ) {
         for (BakedQuad bakedQuad : quads) {
-            // 获取 Quad 的朝向
             Direction quadDirection = bakedQuad.getFace();
 
-            // 计算当前 Quad 紧邻的方块位置
             BlockPos neighborPos = pos.offset(quadDirection);
-            // 获取紧邻方块的 BlockState
             BlockState neighborState = world.getBlockState(neighborPos);
 
-            // 获取当前 Quad 的光照计算信息
             getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), quadDirection, box, flags);
             ambientOcclusionCalculator.apply(world, state, pos, quadDirection, box, flags, bakedQuad.hasShade());
 
-            // 默认使用计算的光照值
             int[] light = ambientOcclusionCalculator.light;
 
-            // 如果 shouldRenderBlock 返回 true，则强制最大光照
             if (!shouldRenderBlock(neighborState, neighborPos)) {
                 light = new int[]{0xF000F0, 0xF000F0, 0xF000F0, 0xF000F0};
             }
 
-            // 渲染当前的 Quad
             renderQuad(
                     world,
                     state,
@@ -78,7 +102,6 @@ public class BlockModelRendererMixin {
     public void renderQuadsFlat(
             BlockRenderView world, BlockState state, BlockPos pos, int light, int overlay, boolean useWorldLight, MatrixStack matrices, VertexConsumer vertexConsumer, List<BakedQuad> quads, BitSet flags, Operation<Void> original     // 提供渲染所需的世界视图
     ) {
-        // 遍历所有传入的四边形（BakedQuads）
         for (BakedQuad bakedQuad : quads) {
             if (useWorldLight) {
                 getQuadDimensions(world, state, pos, bakedQuad.getVertexData(), bakedQuad.getFace(), null, flags);
@@ -92,9 +115,7 @@ public class BlockModelRendererMixin {
                     light = 0xF000F0;
                 }
             }
-
             float f = world.getBrightness(bakedQuad.getFace(), bakedQuad.hasShade());
-
             renderQuad(
                     world, state, pos, vertexConsumer, matrices.peek(), bakedQuad,
                     f, f, f, f,
@@ -102,7 +123,7 @@ public class BlockModelRendererMixin {
                     overlay
             );
         }
-    }
+    }*/
     @Unique
     private void renderQuad(
             BlockRenderView world,
@@ -124,8 +145,8 @@ public class BlockModelRendererMixin {
         float f;
         float g;
         float h;
-        if (quad.hasColor()) {
-            int i = colors.getColor(state, world, pos, quad.getColorIndex());
+        if (quad.hasTint()) {
+            int i = colors.getColor(state, world, pos, quad.getTintIndex());
             f = (float)(i >> 16 & 0xFF) / 255.0F;
             g = (float)(i >> 8 & 0xFF) / 255.0F;
             h = (float)(i & 0xFF) / 255.0F;
@@ -175,9 +196,6 @@ public class BlockModelRendererMixin {
             box[Direction.NORTH.getId() + l] = 1.0F - h;
             box[Direction.SOUTH.getId() + l] = 1.0F - k;
         }
-
-        float p = 1.0E-4F;
-        float m = 0.9999F;
         switch (face) {
             case DOWN:
                 flags.set(1, f >= 1.0E-4F || h >= 1.0E-4F || i <= 0.9999F || k <= 0.9999F);

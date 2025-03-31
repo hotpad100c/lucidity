@@ -55,20 +55,18 @@ public class ParticleCommandParser {
             double dy = delta[1] * speed;
             double dz = delta[2] * speed;
 
-            world.addParticle(particle, forceMode, position[0], position[1], position[2], dx, dy, dz);
+            world.addParticle(particle,forceMode,false, position[0], position[1], position[2], dx, dy, dz);
         } else {
             for (int i = 0; i < count; i++) {
-                // 生成符合正态分布的随机偏移
                 double offsetX = gaussianOffset(position[0], delta[0]);
                 double offsetY = gaussianOffset(position[1], delta[1]);
                 double offsetZ = gaussianOffset(position[2], delta[2]);
 
-                // 额外参数也服从正态分布，均值 0，标准差为 speed
                 double dx = gaussianOffset(0, speed);
                 double dy = gaussianOffset(0, speed);
                 double dz = gaussianOffset(0, speed);
 
-                world.addParticle(particle, forceMode, offsetX, offsetY, offsetZ, dx, dy, dz);
+                world.addParticle(particle, forceMode,false, offsetX, offsetY, offsetZ, dx, dy, dz);
             }
         }
     }
@@ -82,7 +80,7 @@ public class ParticleCommandParser {
         Registry<ParticleType<?>> particleRegistry = MinecraftClient.getInstance()
                 .getNetworkHandler()
                 .getRegistryManager()
-                .get(RegistryKeys.PARTICLE_TYPE);
+                .getOrThrow(RegistryKeys.PARTICLE_TYPE);
 
         Identifier id = Identifier.of(name);
         ParticleType<?> type = particleRegistry.get(id);

@@ -4,15 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.entity.*;
-import net.minecraft.entity.mob.GhastEntity;
-import net.minecraft.entity.mob.HoglinEntity;
-import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.mob.PatrolEntity;
-import net.minecraft.entity.mob.PiglinEntity;
-import net.minecraft.entity.mob.SkeletonHorseEntity;
-import net.minecraft.entity.mob.SlimeEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
+import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.ArmadilloEntity;
 import net.minecraft.entity.passive.BatEntity;
@@ -120,6 +112,8 @@ public class LocalFakeSpawnRestriction {
         register(EntityType.VINDICATOR, SpawnLocationTypes.UNRESTRICTED, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntitySpawnChacker::canSpawnInDark);
         register(EntityType.WANDERING_TRADER, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntitySpawnChacker::canMobSpawn);
         register(EntityType.WARDEN, SpawnLocationTypes.UNRESTRICTED, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntitySpawnChacker::canMobSpawn);
+        register(EntityType.CREAKING, SpawnLocationTypes.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntitySpawnChacker::canMobSpawn);
+
     }
 
     static record Entry(Heightmap.Type heightmapType, SpawnLocation location, LocalFakeSpawnRestriction.SpawnPredicate<?> predicate) {

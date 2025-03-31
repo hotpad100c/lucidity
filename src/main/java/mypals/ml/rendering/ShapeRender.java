@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.debug.DebugRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -57,7 +58,7 @@ public class ShapeRender {
         VertexConsumer consumer = client.getBufferBuilders().getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
         matrices.translate(x, y, z);
 
-        WorldRenderer.drawBox(matrices, consumer, 0, 0, 0, pos.getX(), pos.getY(), pos.getZ(), 1, 1, 1, 1, 0, 0, 0);
+        VertexRendering.drawBox(matrices, consumer, 0, 0, 0, pos.getX(), pos.getY(), pos.getZ(), 1, 1, 1, 1, 0, 0, 0);
 
         matrices.pop();
     }

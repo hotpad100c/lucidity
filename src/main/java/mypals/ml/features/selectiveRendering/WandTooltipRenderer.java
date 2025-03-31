@@ -126,7 +126,7 @@ public class WandTooltipRenderer {
         for (ToolTipItem item : hudItems) {
             if (item.icon != null) {
                 RenderSystem.enableBlend();
-                context.drawTexture(item.icon, x, y, 0, 0, 16, 16, 16, 16);
+                context.drawTexture(RenderLayer::getGuiTextured, item.icon, x, y, 0, 0, 16, 16, 16, 16);
                 RenderSystem.disableBlend();
             }
 
@@ -159,7 +159,7 @@ public class WandTooltipRenderer {
         int x = 0;
         int y = centerY - 60/* + iconYOffset*/;
         RenderSystem.enableBlend();
-        context.drawTexture(Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        context.drawTexture(RenderLayer::getGuiTextured, Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
         RenderSystem.disableBlend();
         context.drawText(client.textRenderer, Text.translatable(wandApplyToMode.getTranslationKey()), x+iconWidth+2, y+(iconWidth/2), 0xFFFFFFE0, true);
 
@@ -179,7 +179,7 @@ public class WandTooltipRenderer {
             }
         };
         RenderSystem.enableBlend();
-        context.drawTexture(secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        context.drawTexture(RenderLayer::getGuiTextured, secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
         RenderSystem.disableBlend();
         context.drawText(client.textRenderer, Text.translatable(translationKey), x+iconWidth, y + iconWidth, 0xFFFFFFE0, true);
 

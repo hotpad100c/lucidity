@@ -7,7 +7,6 @@ import mypals.ml.features.selectiveRendering.AreaBox;
 import mypals.ml.features.selectiveRendering.WandActionsManager;
 import mypals.ml.rendering.shapes.*;
 import net.fabricmc.loader.api.FabricLoader;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -56,9 +55,9 @@ public class InformationRender {
     };
 
     public static boolean isIrisShaderUsed(){
-        if( FabricLoader.getInstance().isModLoaded("iris")) {
+        /*if( FabricLoader.getInstance().isModLoaded("iris")) {
             return IrisApi.getInstance() != null && IrisApi.getInstance().isShaderPackInUse();
-        }
+        }*/
         return false;
     }
     public static boolean isSodiumUsed(){

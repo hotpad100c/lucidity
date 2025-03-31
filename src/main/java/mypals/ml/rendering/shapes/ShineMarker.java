@@ -2,8 +2,8 @@ package mypals.ml.rendering.shapes;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -65,7 +65,7 @@ public class ShineMarker {
         float lastTickPosZ = (float) cameraPos.getZ();
 
         // 设置通用渲染状态
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 

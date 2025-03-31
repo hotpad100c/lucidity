@@ -24,7 +24,7 @@ public class SolarWizard {
         float yaw = player.getYaw();
         long timeOfDay = (long) ((yaw / 360.0) * 24000) % 24000; // 计算新的时间
 
-        world.setTimeOfDay(timeOfDay);
+        world.setTime(timeOfDay,timeOfDay,false);
     }
 
     public static long calculateOffset(PlayerEntity player, long baseTime) {

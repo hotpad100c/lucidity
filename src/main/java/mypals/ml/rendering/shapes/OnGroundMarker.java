@@ -1,7 +1,9 @@
 package mypals.ml.rendering.shapes;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.caffeinemc.mods.sodium.client.gl.shader.ShaderConstants;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -50,18 +52,15 @@ public class OnGroundMarker {
         matrixStack.push();
         Vec3d cameraPos = camera.getPos();
 
-        // 设置通用渲染状态
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
         RenderSystem.defaultBlendFunc();
 
-        // 分批处理：不穿透和穿透
         java.util.List<OnGroundMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
         java.util.List<OnGroundMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
 
-        // 绘制不穿透的标记
         if (!opaqueMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, cameraPos, buffer);
@@ -69,7 +68,6 @@ public class OnGroundMarker {
             BufferRenderer.drawWithGlobalProgram(buffer.end());
         }
 
-        // 绘制穿透的标记
         if (!seeThroughMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, seeThroughMarkers, cameraPos, buffer);

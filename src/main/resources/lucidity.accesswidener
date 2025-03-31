@@ -28,7 +28,6 @@ accessible field net/minecraft/block/AbstractBlock$Settings slipperiness F
 accessible field net/minecraft/block/AbstractBlock$Settings velocityMultiplier F
 accessible field net/minecraft/block/AbstractBlock$Settings jumpVelocityMultiplier F
 accessible field net/minecraft/block/AbstractBlock$Settings opaque Z
-accessible field net/minecraft/block/AbstractBlock$Settings lootTableKey Lnet/minecraft/registry/RegistryKey;
 accessible field net/minecraft/block/AbstractBlock$Settings isAir Z
 accessible field net/minecraft/block/AbstractBlock$Settings burnable Z
 accessible field net/minecraft/block/AbstractBlock$Settings forceSolid Z
@@ -48,4 +47,6 @@ accessible field net/minecraft/block/AbstractBlock$Settings offsetter Lnet/minec
 accessible method net/minecraft/block/AbstractBlock$AbstractBlockState shouldBeSolid ()Z
 accessible method net/minecraft/client/gui/widget/SliderWidget setValue (D)V
 accessible field net/minecraft/client/render/Tessellator allocator Lnet/minecraft/client/util/BufferAllocator;
+accessible method net/minecraft/entity/Entity isAlwaysInvulnerableTo (Lnet/minecraft/entity/damage/DamageSource;)Z
 accessible field net/minecraft/client/render/WorldRenderer bufferBuilders Lnet/minecraft/client/render/BufferBuilderStorage;
+accessible method net/minecraft/client/texture/NativeImage setColor (III)V

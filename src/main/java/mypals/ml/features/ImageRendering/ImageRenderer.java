@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
@@ -28,20 +29,7 @@ import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.features.ImageRendering.ImageDataParser.requestIdentifier;
 
 public class ImageRenderer {
-    public static PictureShader pictureShader = PictureShader.PosColTexLight;
-    static Map<RenderLayer, BufferBuilder> BufferBuilderMap = new Reference2ObjectArrayMap<>(RenderLayer.getBlockLayers().size());
 
-    public enum PictureShader {
-        PosColTexLight(GameRenderer::getPositionColorTexLightmapProgram),
-        RenderTypeCutout(GameRenderer::getRenderTypeCutoutProgram),
-        PosTex(GameRenderer::getPositionTexProgram),
-        PosTexCol(GameRenderer::getPositionTexColorProgram);
-
-        PictureShader(Supplier<ShaderProgram> program) {
-            this.program = program;
-        }
-        public final Supplier<ShaderProgram> program;
-    }
     public static void renderPictureWorldSpace(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
@@ -123,7 +111,7 @@ public class ImageRenderer {
         if (!(camera.isReady() && client.player != null)) return;
 
         //RenderSystem.setShader(isIrisShaderUsed()?ImageRenderer.pictureShader.program : GameRenderer::getPositionColorTexLightmapProgram);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 
         RenderSystem.setShaderTexture(0, textureId);
         RenderSystem.setShaderColor(1,1,1,1);

@@ -119,8 +119,8 @@ public class MobFollowRangeScanner {
                 mob));
     }
     private static double getFollowRangeEstimate(MobEntity mob) {
-        double followRange = mob.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
-        if (followRange <= 0) { // 如果获取不到，使用硬编码默认值
+        double followRange = mob.getAttributeValue(EntityAttributes.FOLLOW_RANGE);
+        if (followRange <= 0) {
             if (mob.getType().toString().contains("zombie")) return 35.0;
             if (mob.getType().toString().contains("skeleton")) return 16.0;
             if (mob.getType().toString().contains("creeper")) return 16.0;
