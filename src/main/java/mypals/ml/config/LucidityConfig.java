@@ -249,4 +249,6 @@ public class LucidityConfig {
     public static List<String> picturesToRender = new ArrayList<>();
     @SerialEntry
     public static float pixelsPerBlock = 377.95f;
+    @SerialEntry
+    public static float fluidTransparency = 1.1f;
 }
