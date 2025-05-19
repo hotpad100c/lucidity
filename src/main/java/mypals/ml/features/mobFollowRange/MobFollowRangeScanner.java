@@ -121,7 +121,7 @@ public class MobFollowRangeScanner {
     private static double getFollowRangeEstimate(MobEntity mob) {
         double followRange = mob.getAttributeValue(EntityAttributes.GENERIC_FOLLOW_RANGE);
         if (followRange <= 0) { // 如果获取不到，使用硬编码默认值
-            if (mob.getType().toString().contains("zombie")) return 35.0;
+            if (mob.getType().toString().contains("zombie")) return 8;
             if (mob.getType().toString().contains("skeleton")) return 16.0;
             if (mob.getType().toString().contains("creeper")) return 16.0;
             if (mob.getType().toString().contains("spider")) return 16.0;
@@ -147,15 +147,12 @@ public class MobFollowRangeScanner {
         return blocks;
     }
 
-    /**
-     * 找到 `blockPos` 处 **向上** 最近的空气方块
-     */
+
     private static BlockPos findClosestSurface(World world, BlockPos mobPos) {
         int startY = mobPos.getY();
         int maxY = Math.min(world.getHeight(), startY + 30); // 限制搜索范围
         int minY = Math.max(world.getBottomY(), startY - 30);
 
-        // 优先向上查找
         for (int y = startY; y <= maxY; y++) {
             BlockPos checkPos = new BlockPos(mobPos.getX(), y, mobPos.getZ());
             BlockPos belowPos = checkPos.down();
@@ -171,11 +168,11 @@ public class MobFollowRangeScanner {
             BlockPos belowPos = checkPos.down();
 
             if (world.getBlockState(checkPos).isAir() && !world.getBlockState(belowPos).isAir()) {
-                return belowPos; // 找到最近的表面
+                return belowPos; 
             }
         }
 
-        return null; // 找不到合适的方块
+        return null; 
     }
 }
 
