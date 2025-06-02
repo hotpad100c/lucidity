@@ -63,7 +63,7 @@ public class IndicatorRenderer {
         }
         int x = MinecraftClient.getInstance().getWindow().getScaledWidth() - 110;
         int y = MinecraftClient.getInstance().getWindow().getScaledHeight()/2;
-        context.setShaderColor(r, g, b, 256);
+        context.setShaderColor(r, g, b, 255);
         if(realDamage != 0){
             context.drawText(MinecraftClient.getInstance().textRenderer, Text.translatable("info.lucidity.clientsideDamageCalculation.damageToEnemy").getString() + realDamage, x, y, 0xFFFFFF, true);
         }
