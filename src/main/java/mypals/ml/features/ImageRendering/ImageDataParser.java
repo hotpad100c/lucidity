@@ -305,7 +305,7 @@ public class ImageDataParser {
                 pos,
                 rotation,
                 scale,
-                null
+                MediaTypeDetector.MediaType.UNKNOWN
         ) {
             @Override
             protected void onClicked(ImageConfigScreen imageConfigScreen) {
