@@ -309,7 +309,7 @@ public class ImageDataParser {
         ) {
             @Override
             protected void onClicked(ImageConfigScreen imageConfigScreen) {
-                System.out.println("You clicked " + this.getName());
+                //System.out.println("You clicked " + this.getName());
                 if(imageConfigScreen != null) {
                     imageConfigScreen.currentImage = this;
                     this.setSelected(true);
