@@ -305,11 +305,11 @@ public class ImageDataParser {
                 pos,
                 rotation,
                 scale,
-                null
+                MediaTypeDetector.MediaType.UNKNOWN
         ) {
             @Override
             protected void onClicked(ImageConfigScreen imageConfigScreen) {
-                System.out.println("You clicked " + this.getName());
+                //System.out.println("You clicked " + this.getName());
                 if(imageConfigScreen != null) {
                     imageConfigScreen.currentImage = this;
                     this.setSelected(true);

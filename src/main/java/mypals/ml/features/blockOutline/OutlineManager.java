@@ -69,7 +69,7 @@ public class OutlineManager {
         for (var entry : blockToRenderer.entrySet()) {
             onRenderOutline(entry, delta, camera, matrixStack, Color.orange);
         }
-        if((MinecraftClient.getInstance().player.getMainHandStack().getItem() == wand || (MinecraftClient.getInstance().player.isSpectator() && selectInSpectator))){
+        /*if((MinecraftClient.getInstance().player.getMainHandStack().getItem() == wand || (MinecraftClient.getInstance().player.isSpectator() && selectInSpectator))){
             for (AreaBox selectedArea : selectedAreas) {
                 int minX = Math.min(selectedArea.minPos.getX(), selectedArea.maxPos.getX());
                 int minY = Math.min(selectedArea.minPos.getY(), selectedArea.maxPos.getY());
@@ -87,7 +87,7 @@ public class OutlineManager {
                     }
                 }
             }
-        }
+        }*/
 
     }
     public static void onRenderOutline(Map.Entry<BlockPos, BlockState> entry, float delta, Camera camera, MatrixStack matrixStack, Color color) {
