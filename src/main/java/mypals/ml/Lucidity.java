@@ -26,6 +26,7 @@ import mypals.ml.features.OreFinder.OreResolver;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -37,12 +38,14 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.WardenEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
 import net.minecraft.util.ActionResult;
@@ -76,7 +79,7 @@ import static mypals.ml.features.OreFinder.MineralFinder.iterateBlocksWithinDist
 import static mypals.ml.features.OreFinder.MineralFinder.parseSelectedBlocks;
 
 public class Lucidity implements ModInitializer {
-	private static SoundListener soundListener  = new SoundListener();
+	private static final SoundListener soundListener  = new SoundListener();
 	public static final String MOD_ID = "lucidity";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static final SimpleOption<Double> GAMMA_BYPASS = new SimpleOption<>("options.gamma", SimpleOption.emptyTooltip(), (optionText, value) -> Text.empty(), SimpleOption.DoubleSliderCallbacks.INSTANCE.withModifier(
@@ -128,6 +131,9 @@ public class Lucidity implements ModInitializer {
     @Override
 	public void onInitialize() {
 		BetterBarrier.init();
+		Registries.FLUID.forEach(fluid -> {
+			BlockRenderLayerMap.INSTANCE.putFluid(fluid, RenderLayer.getTranslucent());
+		});
 		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> {
 			ResourceManagerHelper.registerBuiltinResourcePack(
 					Identifier.of(MOD_ID, "lavahighlight"),
@@ -155,7 +161,6 @@ public class Lucidity implements ModInitializer {
 		});
 		WorldRenderEvents.AFTER_ENTITIES.register((context) ->{
 			//OutlineManager.init();
-			OutlineManager.resolveBlocks();
 			OutlineManager.init();
 			OutlineManager.onRenderWorldLast(context);
 
@@ -264,6 +269,7 @@ public class Lucidity implements ModInitializer {
 		if(renderBlockEvents){
 			ClientsideBlockEventManager.onClientTick();
 		}
+		OutlineManager.resolveBlocks();
 		ImageDataParser.onClientTick();
 		//TreeSearchManager.onClientTick();
 	}

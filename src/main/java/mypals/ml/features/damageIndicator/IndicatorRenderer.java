@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.data.client.BlockStateVariantMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -50,8 +51,7 @@ public class IndicatorRenderer {
         float realDamage = 0;
         if(MinecraftClient.getInstance().crosshairTarget.getType() == HitResult.Type.ENTITY ) {
             EntityHitResult entityHitResult = (EntityHitResult) MinecraftClient.getInstance().crosshairTarget;
-            if(entityHitResult.getEntity() instanceof LivingEntity) {
-                LivingEntity playerLookingAtEntity = (LivingEntity) entityHitResult.getEntity();
+            if(entityHitResult.getEntity() instanceof LivingEntity playerLookingAtEntity) {
                 if (playerLookingAtEntity != null) {
                     playerDellDamage = DamageHandler.calculatePlayerDamage(client.player, playerLookingAtEntity);
                     realDamage = DamageHandler.calculateTargetDamage(damageSource, playerDellDamage, playerLookingAtEntity);
@@ -85,7 +85,7 @@ public class IndicatorRenderer {
                 float radians2 = (float) Math.toRadians(finalAngle - 90.0D);
 
                 int textureWidth = 100;
-                int distanceFromCenter = (int) LucidityConfig.indicatorOffset;
+                int distanceFromCenter = LucidityConfig.indicatorOffset;
 
                 int x = client.getWindow().getScaledWidth() / 2;
                 int y = client.getWindow().getScaledHeight() / 2;
@@ -94,8 +94,8 @@ public class IndicatorRenderer {
 
                 float a = calculateAlpha(client.world.getTime(),indicator.lifeTime,LucidityConfig.damageIndicatorLifeTime) / 255f;
 
-
-                context.setShaderColor(r, g, b, a);
+                
+                context.setShaderColor(r, g, b, Math.min(1,Math.max(0,a)));
 
                 context.getMatrices().push();
                 context.getMatrices().translate(indicatorX, indicatorY, 0.0F);

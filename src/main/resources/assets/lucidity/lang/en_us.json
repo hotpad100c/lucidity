@@ -272,6 +272,10 @@
   "config.lucidity.betterLightBlock": "Better Light Block",
   "config.lucidity.description.betterLightBlock": "Light block will be rendered in a better look.",
 
+  "config.lucidity.fluidTransparency":"Fluid Transparency Override",
+  "config.lucidity.description.fluidTransparency":"Override transparency of fluids(0~1; 1.01 = off)",
+
+
   "config.lucidity.forceTechnicalBlocksToRender": "Force Technical Blocks Render",
   "config.lucidity.description.forceTechnicalBlocksToRender": "Force technical blocks(barrier,structure void,light...) to render.",
 

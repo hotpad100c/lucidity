@@ -71,10 +71,6 @@ public class PossibleSpawnChecker {
                 pos.getY(),
                 pos.getZ() + 0.5
         );
-        if (!world.isSpaceEmpty(type.getSpawnBox(spawnCenter.x, spawnCenter.y, spawnCenter.z))) {
-            return false;
-        }
-
-        return true;
+        return world.isSpaceEmpty(type.getSpawnBox(spawnCenter.x, spawnCenter.y, spawnCenter.z));
     }
 }

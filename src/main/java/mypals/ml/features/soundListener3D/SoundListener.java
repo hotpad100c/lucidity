@@ -21,7 +21,7 @@ import java.util.List;
 import static mypals.ml.config.LucidityConfig.*;
 
 public class SoundListener implements SoundInstanceListener {
-    List<SoundEventEntry> soundEntries = Lists.<SoundEventEntry>newArrayList();
+    List<SoundEventEntry> soundEntries = Lists.newArrayList();
     private boolean enabled;
     @Override
     public void onSoundPlayed(SoundInstance sound, WeightedSoundSet soundSet, float range) {
@@ -66,7 +66,7 @@ public class SoundListener implements SoundInstanceListener {
 
         }
     }
-    static record SoundEntry(Vec3d location, long time) {
+    record SoundEntry(Vec3d location, long time) {
     }
     static class SoundEventEntry {
         private final Text text;
@@ -105,7 +105,7 @@ public class SoundListener implements SoundInstanceListener {
                 return false;
             } else {
                 SoundEntry soundEntry = this.getNearestSound(pos);
-                return soundEntry == null ? false : pos.isInRange(soundEntry.location, this.range);
+                return soundEntry != null && pos.isInRange(soundEntry.location, this.range);
             }
         }
 

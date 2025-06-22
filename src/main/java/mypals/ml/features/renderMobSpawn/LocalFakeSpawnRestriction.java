@@ -42,14 +42,14 @@ public class LocalFakeSpawnRestriction {
             Heightmap.Type heightmapType,
             SpawnPredicate<T> predicate
     ) {
-        Entry old = RESTRICTIONS.put(type, new Entry(heightmapType, location, (SpawnPredicate<?>)predicate));
+        Entry old = RESTRICTIONS.put(type, new Entry(heightmapType, location, predicate));
         if (old != null) {
             throw new IllegalStateException("Duplicate registration for type " + Registries.ENTITY_TYPE.getId(type));
         }
     }
 
     public static SpawnLocation getLocation(EntityType<?> type) {
-        LocalFakeSpawnRestriction.Entry entry = (LocalFakeSpawnRestriction.Entry)RESTRICTIONS.get(type);
+        LocalFakeSpawnRestriction.Entry entry = RESTRICTIONS.get(type);
         return entry == null ? SpawnLocationTypes.UNRESTRICTED : entry.location;
     }
 
@@ -122,7 +122,7 @@ public class LocalFakeSpawnRestriction {
         register(EntityType.WARDEN, SpawnLocationTypes.UNRESTRICTED, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, EntitySpawnChacker::canMobSpawn);
     }
 
-    static record Entry(Heightmap.Type heightmapType, SpawnLocation location, LocalFakeSpawnRestriction.SpawnPredicate<?> predicate) {
+    record Entry(Heightmap.Type heightmapType, SpawnLocation location, LocalFakeSpawnRestriction.SpawnPredicate<?> predicate) {
     }
 
     @FunctionalInterface

@@ -28,13 +28,13 @@ public class FillCommandParser {
         try {
             ArrayList<BlockPos> points = new ArrayList<>();
             points.add(new BlockPos(
-                    (int)parseCoordinateInt(tokens[1],playerEntity,0),
-                    (int)parseCoordinateInt(tokens[2],playerEntity,1),
-                    (int)parseCoordinateInt(tokens[3],playerEntity,2)));
+                    parseCoordinateInt(tokens[1],playerEntity,0),
+                    parseCoordinateInt(tokens[2],playerEntity,1),
+                    parseCoordinateInt(tokens[3],playerEntity,2)));
             points.add(new BlockPos(
-                    (int)parseCoordinateInt(tokens[4],playerEntity,0),
-                    (int)parseCoordinateInt(tokens[5],playerEntity,1),
-                    (int)parseCoordinateInt(tokens[6],playerEntity,2)));
+                    parseCoordinateInt(tokens[4],playerEntity,0),
+                    parseCoordinateInt(tokens[5],playerEntity,1),
+                    parseCoordinateInt(tokens[6],playerEntity,2)));
             return points;
         }catch (Exception e) {
             return null;

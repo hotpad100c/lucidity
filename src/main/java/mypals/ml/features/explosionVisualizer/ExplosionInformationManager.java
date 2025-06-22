@@ -18,6 +18,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static mypals.ml.config.LucidityConfig.*;
 
@@ -39,10 +40,10 @@ public class ExplosionInformationManager {
                 for (BlockPos p : blocksToDestroy) {
                     // Render each affected block
                     InformationRender.addText(new TextShape(
-                            new ArrayList<>(Arrays.asList(LucidityConfig.BlockDestroyIcon)),
+                            new ArrayList<>(Collections.singletonList(BlockDestroyIcon)),
                             p.toCenterPos(),
                             LucidityConfig.BlockDestroyIconSize,
-                            new ArrayList<>(Arrays.asList(LucidityConfig.BlockDestroyIconColor)),
+                            new ArrayList<>(Collections.singletonList(BlockDestroyIconColor)),
                             1,
                             LucidityConfig.BlockDestroyIconSeeThrow
                     ));
@@ -50,10 +51,10 @@ public class ExplosionInformationManager {
                 }
                 for (BlockPos p: blocksCantDestroy){
                     InformationRender.addText(new TextShape(
-                            new ArrayList<>(Arrays.asList(LucidityConfig.BlockDestroyIcon)),
+                            new ArrayList<>(Collections.singletonList(BlockDestroyIcon)),
                             p.toCenterPos(),
                             LucidityConfig.BlockDestroyIconSize,
-                            new ArrayList<>(Arrays.asList(invertColor(LucidityConfig.BlockDestroyIconColor))),
+                            new ArrayList<>(List.of(invertColor(BlockDestroyIconColor))),
                             1,
                             LucidityConfig.BlockDestroyIconSeeThrow
                     ));
@@ -80,18 +81,18 @@ public class ExplosionInformationManager {
                         int color = (red << 16) | (green << 8);
 
                         InformationRender.addText(new TextShape(
-                                new ArrayList<>(Arrays.asList(s)),
+                                new ArrayList<>(List.of(s)),
                                 e.getEntity().getPos().add(0, height + 0.5, 0),
                                 0.015F,
-                                new ArrayList<>(Arrays.asList(new Color(color))),
+                                new ArrayList<>(List.of(new Color(color))),
                                 1,
                                 false
                         ));
                         InformationRender.addText(new TextShape(
-                                new ArrayList<>(Arrays.asList(s2)),
+                                new ArrayList<>(List.of(s2)),
                                 e.getEntity().getPos().add(0, height, 0),
                                 0.015F,
-                                new ArrayList<>(Arrays.asList(new Color(color))),
+                                new ArrayList<>(List.of(new Color(color))),
                                 1,
                                 false
                         ));
@@ -107,10 +108,10 @@ public class ExplosionInformationManager {
                         color = mapAlpha(color, l.getOrgBlastStrength(), p.getStrength());
                     if(p.getStrength() > 0 && !(MinecraftClient.getInstance().world.getBlockState(BlockPos.ofFloored(p.getPosition())).getBlock() instanceof AirBlock))
                         InformationRender.addText(new TextShape(
-                                new ArrayList<>(Arrays.asList(LucidityConfig.BlockDetectionRayIcon)),
+                                new ArrayList<>(Collections.singletonList(BlockDetectionRayIcon)),
                                 p.getPosition(),
                                 LucidityConfig.BlockDetectionRayIconSize,
-                                new ArrayList<>(Arrays.asList(new Color(color))),
+                                new ArrayList<>(List.of(new Color(color))),
                                 1,
                                 LucidityConfig.BlockDetectionRaySeeThrow
                         ));
@@ -122,10 +123,10 @@ public class ExplosionInformationManager {
                 int orangeColor = 16753920;
                 String s = "\uD83D\uDCA5";
                 InformationRender.addText(new TextShape(
-                        new ArrayList<>(Arrays.asList(s)),
+                        new ArrayList<>(List.of(s)),
                         p,
                         0.045F,
-                        new ArrayList<>(Arrays.asList(new Color(orangeColor))),
+                        new ArrayList<>(List.of(new Color(orangeColor))),
                         1,
                         true
                 ));
@@ -139,10 +140,10 @@ public class ExplosionInformationManager {
                             boolean hit_target = r.hit_target;
                             if (hit_target) {
                                 InformationRender.addText(new TextShape(
-                                        new ArrayList<>(Arrays.asList(EntitySamplePoion_Safe_Icon)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Safe_Icon)),
                                         org,
                                         LucidityConfig.EntitySamplePoionIconSize,
-                                        new ArrayList<>(Arrays.asList(EntitySamplePoion_Safe_IconColor)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Safe_IconColor)),
                                         1,
                                                 LucidityConfig.EntitySamplePointSeeThrow
                                 ));
@@ -152,18 +153,18 @@ public class ExplosionInformationManager {
                             else {
 
                                 InformationRender.addText(new TextShape(
-                                        new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Danger_Icon)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Danger_Icon)),
                                         org,
                                         LucidityConfig.EntitySamplePoionIconSize,
-                                        new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Danger_IconColor)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Danger_IconColor)),
                                         1,
                                         LucidityConfig.EntitySamplePointSeeThrow
                                 ));
                                 InformationRender.addText(new TextShape(
-                                        new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Blocked_Icon)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Blocked_Icon)),
                                         collitionPoint,
                                         LucidityConfig.EntitySamplePoionIconSize-0.005F,
-                                        new ArrayList<>(Arrays.asList(LucidityConfig.EntitySamplePoion_Blocked_IconColor)),
+                                        new ArrayList<>(Collections.singletonList(EntitySamplePoion_Blocked_IconColor)),
                                         1,
                                         LucidityConfig.EntitySamplePointSeeThrow
                                 ));

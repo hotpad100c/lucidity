@@ -57,7 +57,7 @@ public class ImageConfigScreen extends Screen {
     private float scaleX = 1;
     private float scaleY = 1;
 
-    private int PREVIEW_SCALE = 5;
+    private final int PREVIEW_SCALE = 5;
 
     public MediaEntry currentImage;
     private ImageConfigScreen instance;
@@ -87,16 +87,16 @@ public class ImageConfigScreen extends Screen {
     @Override
     protected void init() {
         setInstance(this);
-        for (int i = 0; i < ImageDataParser.images.entrySet().size(); i++) {
+        for (int i = 0; i < ImageDataParser.images.size(); i++) {
             Map.Entry<String, MediaEntry> entry = ImageDataParser.images.entrySet().stream().toList().get(i);
             ImageDataParser.images.put(entry.getKey(), entry.getValue());
 
         }
 
         this.addDrawableChild(scrollableWidget1 = new ScrollableWidget(0, 5, this.width - (this.width/2),this.height-10,ScreenTexts.EMPTY) {
-            int boxWidth = this.width - 10;
-            int boxHeight = 50;
-            int spacing = 5;
+            final int boxWidth = this.width - 10;
+            final int boxHeight = 50;
+            final int spacing = 5;
             @Override
             protected int getContentsHeight() {
                 return (boxHeight + spacing) * ImageDataParser.images.size() - spacing;
@@ -461,9 +461,9 @@ public class ImageConfigScreen extends Screen {
 
             currentImage.path = pathF.getText();
 
-            double pos[] = new double[3];
-            double rot[] = new double[3];
-            double scal[] = new double[2];
+            double[] pos = new double[3];
+            double[] rot = new double[3];
+            double[] scal = new double[2];
 
             pos[0] = Double.parseDouble(posXF.getText().isEmpty()?currentImage.getPos()[0]+"":posXF.getText());
             pos[1] = Double.parseDouble(posYF.getText().isEmpty()?currentImage.getPos()[1]+"":posYF.getText());

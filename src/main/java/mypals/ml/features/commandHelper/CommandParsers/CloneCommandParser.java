@@ -34,17 +34,17 @@ public class CloneCommandParser {
         PlayerEntity playerEntity = MinecraftClient.getInstance().player;
         // 提取所有整数
         try {
-            numbers.add((int)parseCoordinateInt(tokens[1],playerEntity,0));
-            numbers.add((int)parseCoordinateInt(tokens[2],playerEntity,1));
-            numbers.add((int)parseCoordinateInt(tokens[3],playerEntity,2));
+            numbers.add(parseCoordinateInt(tokens[1],playerEntity,0));
+            numbers.add(parseCoordinateInt(tokens[2],playerEntity,1));
+            numbers.add(parseCoordinateInt(tokens[3],playerEntity,2));
 
-            numbers.add((int)parseCoordinateInt(tokens[4],playerEntity,0));
-            numbers.add((int)parseCoordinateInt(tokens[5],playerEntity,1));
-            numbers.add((int)parseCoordinateInt(tokens[6],playerEntity,2));
+            numbers.add(parseCoordinateInt(tokens[4],playerEntity,0));
+            numbers.add(parseCoordinateInt(tokens[5],playerEntity,1));
+            numbers.add(parseCoordinateInt(tokens[6],playerEntity,2));
 
-            numbers.add((int)parseCoordinateInt(tokens[7],playerEntity,0));
-            numbers.add((int)parseCoordinateInt(tokens[8],playerEntity,1));
-            numbers.add((int)parseCoordinateInt(tokens[9],playerEntity,2));
+            numbers.add(parseCoordinateInt(tokens[7],playerEntity,0));
+            numbers.add(parseCoordinateInt(tokens[8],playerEntity,1));
+            numbers.add(parseCoordinateInt(tokens[9],playerEntity,2));
         }catch (NumberFormatException ignored) {}
 
         if (numbers.size() >= 9) {

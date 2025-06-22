@@ -24,7 +24,7 @@ public class EntityExplosionBehaviorManager extends ExplosionBehaviorManager {
     public float getEffectiveExplosionResistance(World world, BlockPos pos, BlockState blockState, float max)
     {
         return max;
-    };
+    }
 
     public boolean canExplosionDestroyBlock(World world, BlockPos pos, BlockState state) {
         return true;

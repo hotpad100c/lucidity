@@ -17,7 +17,7 @@ import static mypals.ml.config.LucidityConfig.*;
 
 
 public class ClientsideBlockEventManager {
-    private static ConcurrentHashMap<Long, List<BlockEvent>> blockEventGroups = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, List<BlockEvent>> blockEventGroups = new ConcurrentHashMap<>();
     public static void onClientTick(){
         removeExpired(renderBlockEventsExpiredTime);
         for(List<BlockEvent> blockEvents : blockEventGroups.values()) {

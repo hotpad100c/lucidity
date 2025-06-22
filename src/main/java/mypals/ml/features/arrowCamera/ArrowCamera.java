@@ -134,10 +134,10 @@ public class ArrowCamera {
 
 			options.hudHidden = hideGUI;
 			options.getFov().setValue(fovSetting);
-			if(ArrowCamera.instance.thirdPersonView==0){
+			if(thirdPersonView==0){
 				options.setPerspective(Perspective.FIRST_PERSON);
 			}else{
-				options.setPerspective(ArrowCamera.instance.thirdPersonView == 1 ? Perspective.THIRD_PERSON_BACK : Perspective.THIRD_PERSON_FRONT);
+				options.setPerspective(thirdPersonView == 1 ? Perspective.THIRD_PERSON_BACK : Perspective.THIRD_PERSON_FRONT);
 			}
 			mc.setCameraEntity(mc.player);
 			if (camera != null && !camera.isRemoved()) {

@@ -76,8 +76,7 @@ public class ImageRenderer {
         Optional<Resource> resourceOptional;
         try {
             AbstractTexture texture = client.getTextureManager().getTexture(textureId);
-            if (texture instanceof NativeImageBackedTexture) {
-                NativeImageBackedTexture nativeTexture = (NativeImageBackedTexture) texture;
+            if (texture instanceof NativeImageBackedTexture nativeTexture) {
                 NativeImage image = nativeTexture.getImage();
 
                 textureWidth = image.getWidth() / pixelsPerBlock;
@@ -116,8 +115,8 @@ public class ImageRenderer {
         float scaledWidth = (float) (textureWidth * scale.x);
         float scaledHeight = (float) (textureHeight * scale.y);
 
-        float centerX = (float) (scaledWidth/2);
-        float centerY = (float) (scaledHeight/2);
+        float centerX = scaledWidth/2;
+        float centerY = scaledHeight/2;
 
         Camera camera = client.gameRenderer.getCamera();
         if (!(camera.isReady() && client.player != null)) return;
@@ -186,7 +185,7 @@ public class ImageRenderer {
     static VertexSorter getBlockBufferAllocatorStorage(Vec3d pos) {
         Vec3d vec3d = MinecraftClient.getInstance().player.getCameraPosVec(0);
         return VertexSorter.byDistance(
-                (float)(vec3d.x - (float)pos.getX()), (float)(vec3d.y - (double)pos.getY()), (float)(vec3d.z - (double)pos.getZ())
+                (float)(vec3d.x - (float)pos.getX()), (float)(vec3d.y - pos.getY()), (float)(vec3d.z - pos.getZ())
         );
     }
 

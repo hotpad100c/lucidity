@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static mypals.ml.Lucidity.*;
+import static mypals.ml.config.Keybinds.deleteArea;
 import static mypals.ml.config.LucidityConfig.*;
 import static mypals.ml.features.ImageRendering.ImageRenderer.*;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
@@ -62,10 +63,7 @@ public class InformationRender {
         return false;
     }
     public static boolean isSodiumUsed(){
-        if( FabricLoader.getInstance().isModLoaded("sodium")) {
-            return true;
-        }
-        return false;
+        return FabricLoader.getInstance().isModLoaded("sodium");
     }
     public static void addBox(BoxShape box) {
         if(!boxes.contains(box)){
@@ -170,15 +168,14 @@ public class InformationRender {
             if (WandActionsManager.pos1 != null) {
                 renderSelectionBox(matrixStack, MinecraftClient.getInstance().gameRenderer.getCamera(), 0);
             }
+            List<AreaBox> areasToDelete = getAreasToDelete(lookingAt, false);
 
-            if (deleteMode) {
-                List<AreaBox> areasToDelete = getAreasToDelete(lookingAt, false);
-                for (AreaBox selectedArea : areasToDelete) {
-                    selectedArea.draw(matrixStack, Color.red, 0.4f, true);
-                }
+            if(deleteArea.isPressed()) {
                 for (AreaBox selectedArea : selectedAreas) {
-                    if(!areasToDelete.contains(selectedArea)){
+                    if (!areasToDelete.contains(selectedArea)) {
                         selectedArea.draw(matrixStack, Color.white, 0.01f, true);
+                    } else {
+                        selectedArea.draw(matrixStack, Color.white, 0.1f, true);
                     }
                 }
             }

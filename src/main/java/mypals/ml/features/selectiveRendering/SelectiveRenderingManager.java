@@ -392,11 +392,8 @@ public class SelectiveRenderingManager {
         return false;
     }
     public static boolean isInsideArea(Vec3d pos, AreaBox areaBox){
-        if (areaBox.minPos.getX() <= pos.getX() && pos.getX() <= areaBox.maxPos.getX() &&
+        return areaBox.minPos.getX() <= pos.getX() && pos.getX() <= areaBox.maxPos.getX() &&
                 areaBox.minPos.getY() <= pos.getY() && pos.getY() <= areaBox.maxPos.getY() &&
-                areaBox.minPos.getZ() <= pos.getZ() && pos.getZ() <= areaBox.maxPos.getZ()) {
-            return true;
-        }
-        return false;
+                areaBox.minPos.getZ() <= pos.getZ() && pos.getZ() <= areaBox.maxPos.getZ();
     }
 }

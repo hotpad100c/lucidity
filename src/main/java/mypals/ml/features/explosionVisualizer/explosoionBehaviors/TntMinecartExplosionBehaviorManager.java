@@ -15,8 +15,6 @@ public class TntMinecartExplosionBehaviorManager extends EntityExplosionBehavior
 
     @Override
     public boolean canExplosionDestroyBlock(World world, BlockPos pos, BlockState state) {
-        return !state.isIn(BlockTags.RAILS) && !world.getBlockState(pos.up()).isIn(BlockTags.RAILS)
-                ? super.canExplosionDestroyBlock(world, pos, state)
-                : false;
+        return !state.isIn(BlockTags.RAILS) && !world.getBlockState(pos.up()).isIn(BlockTags.RAILS) && super.canExplosionDestroyBlock(world, pos, state);
     }
 }

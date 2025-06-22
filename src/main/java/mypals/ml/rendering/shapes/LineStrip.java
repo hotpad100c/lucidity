@@ -53,10 +53,11 @@ public class LineStrip {
         java.util.List<LineStrip> seeThroughStrips = lineStrips.stream().filter(strip ->  strip.seeThrough && strip.points.size() > 1).collect(Collectors.toList());
 
         if (!opaqueStrips.isEmpty()) {
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
 
             for (LineStrip strip : opaqueStrips) {
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+
                 float red = ((strip.color.getRGB() >> 16) & 0xFF) / 255.0f;
                 float green = ((strip.color.getRGB() >> 8) & 0xFF) / 255.0f;
                 float blue = (strip.color.getRGB() & 0xFF) / 255.0f;
@@ -68,13 +69,14 @@ public class LineStrip {
                     float x = (float) (point.getX() - MathHelper.lerp(0, lastTickPosX, camera.getPos().getX()));
                     float y = (float) (point.getY() - MathHelper.lerp(0, lastTickPosY, camera.getPos().getY()));
                     float z = (float) (point.getZ() - MathHelper.lerp(0, lastTickPosZ, camera.getPos().getZ()));
-                    buffer.vertex(matrixStack.peek().getPositionMatrix(), (float) x, (float) y, (float) z)
+                    buffer.vertex(matrixStack.peek().getPositionMatrix(), x, y, z)
                             .color(red, green, blue, strip.alpha);
                 }
+                RenderSystem.enableDepthTest();
+                BufferRenderer.drawWithGlobalProgram(buffer.end());
             }
 
-            RenderSystem.enableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+
         }
 
 
@@ -94,7 +96,7 @@ public class LineStrip {
                     float x = (float) (point.getX() - MathHelper.lerp(0, lastTickPosX, camera.getPos().getX()));
                     float y = (float) (point.getY() - MathHelper.lerp(0, lastTickPosY, camera.getPos().getY()));
                     float z = (float) (point.getZ() - MathHelper.lerp(0, lastTickPosZ, camera.getPos().getZ()));
-                    buffer.vertex(matrixStack.peek().getPositionMatrix(), (float) x, (float) y, (float) z)
+                    buffer.vertex(matrixStack.peek().getPositionMatrix(), x, y, z)
                             .color(red, green, blue, strip.alpha);
                 }
             }

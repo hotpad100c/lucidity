@@ -40,12 +40,12 @@ public class ScreenGenerator {
                                         .binding(
                                                 new ArrayList<>(),
                                                 () -> {
-                                                    if (instance.instance().selectedBlockTypes == null) {
+                                                    if (LucidityConfig.selectedBlockTypes == null) {
                                                         LucidityConfig.selectedBlockTypes = new ArrayList<>();
                                                     }
-                                                    return instance.instance().selectedBlockTypes;
+                                                    return LucidityConfig.selectedBlockTypes;
                                                 },
-                                                list -> instance.instance().selectedBlockTypes = list
+                                                list -> LucidityConfig.selectedBlockTypes = list
                                         )
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
@@ -62,12 +62,12 @@ public class ScreenGenerator {
                                                 new ArrayList<>(),
                                                 () -> {
                                                     // 返回配置值，确保非空
-                                                    if (instance.instance().selectedEntityTypes == null) {
+                                                    if (LucidityConfig.selectedEntityTypes == null) {
                                                         LucidityConfig.selectedEntityTypes = new ArrayList<>();
                                                     }
-                                                    return instance.instance().selectedEntityTypes;
+                                                    return LucidityConfig.selectedEntityTypes;
                                                 },
-                                                list -> instance.instance().selectedEntityTypes = list
+                                                list -> LucidityConfig.selectedEntityTypes = list
                                         )
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
@@ -83,12 +83,12 @@ public class ScreenGenerator {
                                         .binding(
                                                 new ArrayList<>(),
                                                 () -> {
-                                                    if (instance.instance().selectedParticleTypes == null) {
+                                                    if (LucidityConfig.selectedParticleTypes == null) {
                                                         LucidityConfig.selectedParticleTypes = new ArrayList<>();
                                                     }
-                                                    return instance.instance().selectedParticleTypes;
+                                                    return LucidityConfig.selectedParticleTypes;
                                                 },
-                                                list -> instance.instance().selectedParticleTypes = list
+                                                list -> LucidityConfig.selectedParticleTypes = list
                                         )
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
@@ -103,12 +103,12 @@ public class ScreenGenerator {
                                         .binding(
                                                 new ArrayList<>(),
                                                 () -> {
-                                                    if (instance.instance().selectedAreasSaved == null) {
+                                                    if (LucidityConfig.selectedAreasSaved == null) {
                                                         LucidityConfig.selectedAreasSaved = new ArrayList<>();
                                                     }
-                                                    return instance.instance().selectedAreasSaved;
+                                                    return LucidityConfig.selectedAreasSaved;
                                                 },
-                                                list -> instance.instance().selectedAreasSaved = list
+                                                list -> LucidityConfig.selectedAreasSaved = list
                                         )
                                         .controller(StringControllerBuilder::create)
                                         .initial("")
@@ -128,7 +128,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.spectator_select"))
                                                                 .build()
                                                         )
-                                                        .binding(true, () -> instance.instance().selectInSpectator, bool -> instance.instance().selectInSpectator = bool)
+                                                        .binding(true, () -> LucidityConfig.selectInSpectator, bool -> LucidityConfig.selectInSpectator = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -138,7 +138,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.renderSelectionMarker"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderSelectionMarker, bool -> instance.instance().renderSelectionMarker = bool)
+                                                        .binding(false, () -> LucidityConfig.renderSelectionMarker, bool -> LucidityConfig.renderSelectionMarker = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -148,20 +148,20 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.autoNightVision"))
                                                                 .build()
                                                         )
-                                                        .binding(true, () -> instance.instance().autoNightVision, bool -> instance.instance().autoNightVision = bool)
+                                                        .binding(true, () -> LucidityConfig.autoNightVision, bool -> LucidityConfig.autoNightVision = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
                                         .option(Option.<String>createBuilder()
                                                 .name(Text.translatable("config.lucidity.option.wand"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand")))
-                                                .binding("minecraft:breeze_rod", () -> instance.instance().wand, s -> instance.instance().wand = s)
-                                                .controller(opt -> StringControllerBuilder.create(opt))
+                                                .binding("minecraft:breeze_rod", () -> LucidityConfig.wand, s -> LucidityConfig.wand = s)
+                                                .controller(StringControllerBuilder::create)
                                                 .build()
                                         ).option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.option.wand_apply"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.description.wand_apply")))
-                                                .binding(0, () -> instance.instance().wandApplyMode, v -> instance.instance().wandApplyMode = v)
+                                                .binding(0, () -> LucidityConfig.wandApplyMode, v -> LucidityConfig.wandApplyMode = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                         .range(0, WandActionsManager.WandApplyToMode.values().length-1)
                                                         .step(1)
@@ -170,9 +170,9 @@ public class ScreenGenerator {
                                         ).option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.render_mode.rendering_mode_block"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_block")))
-                                                .binding(0, () -> instance.instance().renderModeBlock, v -> instance.instance().renderModeBlock = v)
+                                                .binding(0, () -> LucidityConfig.renderModeBlock, v -> LucidityConfig.renderModeBlock = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                        .range(0, SelectiveRenderingManager.RenderMode.values().length-1)
+                                                        .range(0, RenderMode.values().length-1)
                                                         .step(1)
                                                         .formatValue(val -> Text.translatable(resolveSelectiveBlockRenderingMode(val))))
                                                 .build()
@@ -180,9 +180,9 @@ public class ScreenGenerator {
                                         .option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.render_mode.rendering_mode_entity"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_entity")))
-                                                .binding(0, () -> instance.instance().renderModeEntity, v -> instance.instance().renderModeEntity = v)
+                                                .binding(0, () -> LucidityConfig.renderModeEntity, v -> LucidityConfig.renderModeEntity = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                        .range(0, SelectiveRenderingManager.RenderMode.values().length-1)
+                                                        .range(0, RenderMode.values().length-1)
                                                         .step(1)
                                                         .formatValue(val -> Text.translatable(resolveSelectiveEntityRenderingMode(val))))
                                                 .build()
@@ -190,9 +190,9 @@ public class ScreenGenerator {
                                         .option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.render_mode.rendering_mode_particle"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.render_mode.rendering_mode_particle")))
-                                                .binding(0, () -> instance.instance().renderModeParticle, v -> instance.instance().renderModeParticle = v)
+                                                .binding(0, () -> LucidityConfig.renderModeParticle, v -> LucidityConfig.renderModeParticle = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                                        .range(0, SelectiveRenderingManager.RenderMode.values().length-1)
+                                                        .range(0, RenderMode.values().length-1)
                                                         .step(1)
                                                         .formatValue(val -> Text.translatable(resolveSelectiveParticleRenderingMode(val))))
                                                 .build()
@@ -209,12 +209,12 @@ public class ScreenGenerator {
                                         .binding(
                                                 new ArrayList<>(),
                                                 () -> {
-                                                    if (instance.instance().picturesToRender == null) {
+                                                    if (LucidityConfig.picturesToRender == null) {
                                                         LucidityConfig.picturesToRender = new ArrayList<>();
                                                     }
-                                                    return instance.instance().picturesToRender;
+                                                    return LucidityConfig.picturesToRender;
                                                 },
-                                                list -> instance.instance().picturesToRender = list
+                                                list -> LucidityConfig.picturesToRender = list
                                         )
                                         .controller(StringControllerBuilder::create)
                                         .initial(()->{
@@ -223,7 +223,7 @@ public class ScreenGenerator {
                                                 Vec3d pos = MinecraftClient.getInstance().player.getPos();
                                                 return String.format("path;name;[" + pos.x + ","+ pos.y + "," + pos.z +"];[0,0,0];[1,1];true");
                                             }else{
-                                                return String.format("path;name;[x,y,z];[0,0,0];[1,1];true");
+                                                return "path;name;[x,y,z];[0,0,0];[1,1];true";
                                             }
 
                                         })
@@ -233,8 +233,8 @@ public class ScreenGenerator {
                                         .option(Option.<Float>createBuilder()
                                                 .name(Text.translatable("config.lucidity.pixel_per_block"))
                                                 .description(OptionDescription.of(Text.translatable("config.lucidity.description.pixel_per_block")))
-                                                .binding(377.95f, () -> instance.instance().pixelsPerBlock, v -> instance.instance().pixelsPerBlock = v)
-                                                .controller(opt -> FloatFieldControllerBuilder.create(opt))
+                                                .binding(377.95f, () -> LucidityConfig.pixelsPerBlock, v -> LucidityConfig.pixelsPerBlock = v)
+                                                .controller(FloatFieldControllerBuilder::create)
                                                 .build()
                                         )
                                         .build()
@@ -260,12 +260,12 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("warn.lucidity.photosensitive-seizure-warning"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().enableWorldEaterHelper, bool -> instance.instance().enableWorldEaterHelper = bool)
+                                                        .binding(false, () -> LucidityConfig.enableWorldEaterHelper, bool -> LucidityConfig.enableWorldEaterHelper = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(Option.<Integer>createBuilder()
                                                 .name(Text.translatable("config.lucidity.option.oreHighlightRange"))
-                                                .binding(20, () -> instance.instance().oreHighlightRange, v -> instance.instance().oreHighlightRange = v)
+                                                .binding(20, () -> LucidityConfig.oreHighlightRange, v -> LucidityConfig.oreHighlightRange = v)
                                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                         .range(0, 100)
                                                         .step(1)
@@ -275,7 +275,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.option.palette"))
 
-                                                        .binding(Color.white, () -> instance.instance().colorPalette, color -> instance.instance().colorPalette = color)
+                                                        .binding(Color.white, () -> LucidityConfig.colorPalette, color -> LucidityConfig.colorPalette = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(false))
                                                         .build()
@@ -290,15 +290,15 @@ public class ScreenGenerator {
                                         .binding(
                                                 DEFAULT_SELECTED,
                                                 () -> {
-                                                    if (instance.instance().selectedBlocksToHighLight == null) {
+                                                    if (LucidityConfig.selectedBlocksToHighLight == null) {
                                                         LucidityConfig.selectedBlocksToHighLight = new ArrayList<>();
                                                     }
-                                                    return instance.instance().selectedBlocksToHighLight;
+                                                    return LucidityConfig.selectedBlocksToHighLight;
                                                 },
-                                                list -> instance.instance().selectedBlocksToHighLight = list
+                                                list -> LucidityConfig.selectedBlocksToHighLight = list
                                         )
                                         .controller(StringControllerBuilder::create)
-                                        .initial(String.format(";#%06X", (instance.instance().colorPalette.getRGB() & 0xFFFFFF)))
+                                        .initial(String.format(";#%06X", (LucidityConfig.colorPalette.getRGB() & 0xFFFFFF)))
                                         .build()
                                 )
 
@@ -320,7 +320,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.keyPresses"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderKeyPresses, bool -> instance.instance().renderKeyPresses = bool)
+                                                        .binding(false, () -> LucidityConfig.renderKeyPresses, bool -> LucidityConfig.renderKeyPresses = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
@@ -345,7 +345,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.damageIndicator"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().enableDamageIndicator, bool -> instance.instance().enableDamageIndicator = bool)
+                                                        .binding(false, () -> LucidityConfig.enableDamageIndicator, bool -> LucidityConfig.enableDamageIndicator = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -355,7 +355,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.damageIndicator.offset"))
                                                                 .build()
                                                         )
-                                                        .binding(0, () -> instance.instance().indicatorOffset, integer -> instance.instance().indicatorOffset = integer)
+                                                        .binding(0, () -> LucidityConfig.indicatorOffset, integer -> LucidityConfig.indicatorOffset = integer)
                                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                                 .range(0, 50)
                                                                 .step(1)
@@ -365,7 +365,7 @@ public class ScreenGenerator {
                                                 Option.<Integer>createBuilder()
                                                         .name(Text.translatable("config.lucidity.damageIndicator.time"))
 
-                                                        .binding(0, () -> instance.instance().damageIndicatorLifeTime, integer -> instance.instance().damageIndicatorLifeTime = integer)
+                                                        .binding(0, () -> LucidityConfig.damageIndicatorLifeTime, integer -> LucidityConfig.damageIndicatorLifeTime = integer)
                                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                                 .range(50, 100)
                                                                 .step(1)
@@ -375,7 +375,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.damageIndicator.color"))
 
-                                                        .binding(Color.red, () -> instance.instance().indicatorColor, color -> instance.instance().indicatorColor = color)
+                                                        .binding(Color.red, () -> LucidityConfig.indicatorColor, color -> LucidityConfig.indicatorColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -386,7 +386,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.clientsideDamageCalculation"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().damageCaculator, bool -> instance.instance().damageCaculator = bool)
+                                                        .binding(false, () -> LucidityConfig.damageCaculator, bool -> LucidityConfig.damageCaculator = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
@@ -412,9 +412,23 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.heighLightLava"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().fluidSourceHighLight, bool -> instance.instance().fluidSourceHighLight = bool)
+                                                        .binding(false, () -> LucidityConfig.fluidSourceHighLight, bool -> LucidityConfig.fluidSourceHighLight = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
+                                        ).option(
+                                                Option.<Float>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.fluidTransparency"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.fluidTransparency"))
+                                                                .build()
+                                                        )
+                                                        .binding(1.01f, () -> LucidityConfig.fluidTransparency, v -> LucidityConfig.fluidTransparency = v)
+                                                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                                                .range(0f, 1.01f)
+                                                                .step(0.01f)
+                                                                .formatValue(val -> Text.of((val < 1f)? val.toString() : "-")))
+                                                        .build()
+
                                         )
                                         .build()
                                 )
@@ -438,14 +452,14 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.trajectory"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderTrajectory, bool -> instance.instance().renderTrajectory = bool)
+                                                        .binding(false, () -> LucidityConfig.renderTrajectory, bool -> LucidityConfig.renderTrajectory = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.mob_color"))
 
-                                                        .binding(Color.orange, () -> instance.instance().mobTrajectoryColor, color -> instance.instance().mobTrajectoryColor = color)
+                                                        .binding(Color.orange, () -> LucidityConfig.mobTrajectoryColor, color -> LucidityConfig.mobTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -453,7 +467,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.player_color"))
 
-                                                        .binding(Color.green, () -> instance.instance().selfTrajectoryColor, color -> instance.instance().selfTrajectoryColor = color)
+                                                        .binding(Color.green, () -> LucidityConfig.selfTrajectoryColor, color -> LucidityConfig.selfTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -461,7 +475,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.self_color"))
 
-                                                        .binding(Color.magenta, () -> instance.instance().playerTrajectoryColor, color -> instance.instance().playerTrajectoryColor = color)
+                                                        .binding(Color.magenta, () -> LucidityConfig.playerTrajectoryColor, color -> LucidityConfig.playerTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -469,7 +483,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.liner_projectiles_color"))
 
-                                                        .binding(Color.red, () -> instance.instance().linerTrajectoryColor, color -> instance.instance().linerTrajectoryColor = color)
+                                                        .binding(Color.red, () -> LucidityConfig.linerTrajectoryColor, color -> LucidityConfig.linerTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -477,7 +491,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.far_projectiles_color"))
 
-                                                        .binding(Color.yellow, () -> instance.instance().farTrajectoryColor, color -> instance.instance().farTrajectoryColor = color)
+                                                        .binding(Color.yellow, () -> LucidityConfig.farTrajectoryColor, color -> LucidityConfig.farTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -485,7 +499,7 @@ public class ScreenGenerator {
                                                 Option.<Color>createBuilder()
                                                         .name(Text.translatable("config.lucidity.near_projectiles_color"))
 
-                                                        .binding(Color.cyan, () -> instance.instance().nearTrajectoryColor, color -> instance.instance().nearTrajectoryColor = color)
+                                                        .binding(Color.cyan, () -> LucidityConfig.nearTrajectoryColor, color -> LucidityConfig.nearTrajectoryColor = color)
                                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                                 .allowAlpha(true))
                                                         .build()
@@ -513,7 +527,7 @@ public class ScreenGenerator {
                                                 .image(Lucidity.id("textures/examples/main-render.png"), 192, 108)
                                                 .build()
                                         )
-                                        .binding(true, () -> instance.instance().enableExplosionVisualizer, bool -> instance.instance().enableExplosionVisualizer = bool)
+                                        .binding(true, () -> LucidityConfig.enableExplosionVisualizer, bool -> LucidityConfig.enableExplosionVisualizer = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
 
@@ -524,7 +538,7 @@ public class ScreenGenerator {
                                                 .image(Lucidity.id("textures/examples/block-destruction.png"), 192, 108)
                                                 .build()
                                         )
-                                        .binding(false, () -> instance.instance().showBlockDestroyInfo, bool -> instance.instance().showBlockDestroyInfo = bool)
+                                        .binding(false, () -> LucidityConfig.showBlockDestroyInfo, bool -> LucidityConfig.showBlockDestroyInfo = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
 
@@ -535,7 +549,7 @@ public class ScreenGenerator {
                                                 .image(Lucidity.id("textures/examples/ray.png"), 192, 108)
                                                 .build()
                                         )
-                                        .binding(false, () -> instance.instance().showExplosionBlockDamageRayInfo, bool -> instance.instance().showExplosionBlockDamageRayInfo = bool)
+                                        .binding(false, () -> LucidityConfig.showExplosionBlockDamageRayInfo, bool -> LucidityConfig.showExplosionBlockDamageRayInfo = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
 
@@ -546,7 +560,7 @@ public class ScreenGenerator {
                                                 .image(Lucidity.id("textures/examples/sample-points.png"), 192, 108)
                                                 .build()
                                         )
-                                        .binding(false, () -> instance.instance().showRayCastInfo, bool -> instance.instance().showRayCastInfo = bool)
+                                        .binding(false, () -> LucidityConfig.showRayCastInfo, bool -> LucidityConfig.showRayCastInfo = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
 
@@ -557,7 +571,7 @@ public class ScreenGenerator {
                                                 .image(Lucidity.id("textures/examples/damage.png"), 192, 108)
                                                 .build()
                                         )
-                                        .binding(false, () -> instance.instance().showDamageInfo, bool -> instance.instance().showDamageInfo = bool)
+                                        .binding(false, () -> LucidityConfig.showDamageInfo, bool -> LucidityConfig.showDamageInfo = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build())
 
@@ -572,7 +586,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.x_min"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.x_min")))
-                                        .binding(0, () -> instance.instance().Xmin, v -> instance.instance().Xmin = v)
+                                        .binding(0, () -> LucidityConfig.Xmin, v -> LucidityConfig.Xmin = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -583,7 +597,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.x_max"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.x_max")))
-                                        .binding(15, () -> instance.instance().Xmax, v -> instance.instance().Xmax = v)
+                                        .binding(15, () -> LucidityConfig.Xmax, v -> LucidityConfig.Xmax = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -594,7 +608,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.y_min"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.y_min")))
-                                        .binding(0, () -> instance.instance().Ymin, v -> instance.instance().Ymin = v)
+                                        .binding(0, () -> LucidityConfig.Ymin, v -> LucidityConfig.Ymin = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -605,7 +619,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.y_max"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.y_max")))
-                                        .binding(15, () -> instance.instance().Ymax, v -> instance.instance().Ymax = v)
+                                        .binding(15, () -> LucidityConfig.Ymax, v -> LucidityConfig.Ymax = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -616,7 +630,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.z_min"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.z_min")))
-                                        .binding(0, () -> instance.instance().Zmin, v -> instance.instance().Zmin = v)
+                                        .binding(0, () -> LucidityConfig.Zmin, v -> LucidityConfig.Zmin = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -627,7 +641,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.z_max"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.z_max")))
-                                        .binding(15, () -> instance.instance().Zmax, v -> instance.instance().Zmax = v)
+                                        .binding(15, () -> LucidityConfig.Zmax, v -> LucidityConfig.Zmax = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 15)
                                                 .step(1)
@@ -641,7 +655,7 @@ public class ScreenGenerator {
                                                 .text(Text.translatable("config.option.description.invert"))
                                                 .image(Lucidity.id("textures/examples/invert.png"), 192, 108)
                                                 .build())
-                                        .binding(false, () -> instance.instance().invert, bool -> instance.instance().invert = bool)
+                                        .binding(false, () -> LucidityConfig.invert, bool -> LucidityConfig.invert = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
@@ -649,7 +663,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.layer_min"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.layer_min")))
-                                        .binding(0, () -> instance.instance().LayerMin, v -> instance.instance().LayerMin = v)
+                                        .binding(0, () -> LucidityConfig.LayerMin, v -> LucidityConfig.LayerMin = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 100)
                                                 .step(1)
@@ -660,7 +674,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.layer_max"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.layer_max")))
-                                        .binding(100, () -> instance.instance().LayerMax, v -> instance.instance().LayerMax = v)
+                                        .binding(100, () -> LucidityConfig.LayerMax, v -> LucidityConfig.LayerMax = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 100)
                                                 .step(1)
@@ -671,7 +685,7 @@ public class ScreenGenerator {
                                 .option(Option.<String>createBuilder()
                                         .name(Text.translatable("config.option.block_detection_ray_icon"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.block_detection_ray_icon")))
-                                        .binding("⧈", () -> instance.instance().BlockDetectionRayIcon, v -> instance.instance().BlockDetectionRayIcon = v)
+                                        .binding("⧈", () -> LucidityConfig.BlockDetectionRayIcon, v -> LucidityConfig.BlockDetectionRayIcon = v)
                                         .controller(StringControllerBuilder::create)
                                         .build()
                                 )
@@ -679,7 +693,7 @@ public class ScreenGenerator {
                                 .option(Option.<Float>createBuilder()
                                         .name(Text.translatable("config.option.block_detection_ray_icon_size"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.block_detection_ray_icon_size")))
-                                        .binding(0.005F, () -> instance.instance().BlockDetectionRayIconSize, v -> instance.instance().BlockDetectionRayIconSize = v)
+                                        .binding(0.005F, () -> LucidityConfig.BlockDetectionRayIconSize, v -> LucidityConfig.BlockDetectionRayIconSize = v)
                                         .controller(opt -> FloatSliderControllerBuilder.create(opt)
                                                 .range(0F, 0.1F)
                                                 .step(0.005F)
@@ -690,14 +704,14 @@ public class ScreenGenerator {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.translatable("config.option.render_with_alpha"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.render_with_alpha")))
-                                        .binding(false, () -> instance.instance().EnableAlpha, bool -> instance.instance().EnableAlpha = bool)
+                                        .binding(false, () -> LucidityConfig.EnableAlpha, bool -> LucidityConfig.EnableAlpha = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.translatable("config.option.see_Throw"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.see_Throw")))
-                                        .binding(false, () -> instance.instance().BlockDetectionRaySeeThrow, bool -> instance.instance().BlockDetectionRaySeeThrow = bool)
+                                        .binding(false, () -> LucidityConfig.BlockDetectionRaySeeThrow, bool -> LucidityConfig.BlockDetectionRaySeeThrow = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
@@ -705,7 +719,7 @@ public class ScreenGenerator {
                                 .option(Option.<Integer>createBuilder()
                                         .name(Text.translatable("config.option.type"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.type")))
-                                        .binding(0, () -> instance.instance().ColorType, v -> instance.instance().ColorType = v)
+                                        .binding(0, () -> LucidityConfig.ColorType, v -> LucidityConfig.ColorType = v)
                                         .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                                 .range(0, 2)
                                                 .step(1)
@@ -714,49 +728,49 @@ public class ScreenGenerator {
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.+y"))
-                                        .binding(Color.YELLOW, () -> instance.instance().Colored_UP, v -> instance.instance().Colored_UP = v)
+                                        .binding(Color.YELLOW, () -> LucidityConfig.Colored_UP, v -> LucidityConfig.Colored_UP = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.-y"))
-                                        .binding(Color.GREEN, () -> instance.instance().Colored_DOWN, v -> instance.instance().Colored_DOWN = v)
+                                        .binding(Color.GREEN, () -> LucidityConfig.Colored_DOWN, v -> LucidityConfig.Colored_DOWN = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.+x"))
-                                        .binding(Color.RED, () -> instance.instance().Colored_FRONT, v -> instance.instance().Colored_FRONT = v)
+                                        .binding(Color.RED, () -> LucidityConfig.Colored_FRONT, v -> LucidityConfig.Colored_FRONT = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.-x"))
-                                        .binding(Color.BLUE, () -> instance.instance().Colored_BACK, v -> instance.instance().Colored_BACK = v)
+                                        .binding(Color.BLUE, () -> LucidityConfig.Colored_BACK, v -> LucidityConfig.Colored_BACK = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.+z"))
-                                        .binding(Color.MAGENTA, () -> instance.instance().Colored_LEFT, v -> instance.instance().Colored_LEFT = v)
+                                        .binding(Color.MAGENTA, () -> LucidityConfig.Colored_LEFT, v -> LucidityConfig.Colored_LEFT = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.-z"))
-                                        .binding(Color.WHITE, () -> instance.instance().Colored_RIGHT, v -> instance.instance().Colored_RIGHT = v)
+                                        .binding(Color.WHITE, () -> LucidityConfig.Colored_RIGHT, v -> LucidityConfig.Colored_RIGHT = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.single_color"))
-                                        .binding(Color.WHITE, () -> instance.instance().Single_Color, v -> instance.instance().Single_Color = v)
+                                        .binding(Color.WHITE, () -> LucidityConfig.Single_Color, v -> LucidityConfig.Single_Color = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
@@ -772,7 +786,7 @@ public class ScreenGenerator {
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.block_destruction_render_color"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.block_destruction_render_color")))
-                                        .binding(Color.YELLOW, () -> instance.instance().BlockDestroyIconColor, v -> instance.instance().BlockDestroyIconColor = v)
+                                        .binding(Color.YELLOW, () -> LucidityConfig.BlockDestroyIconColor, v -> LucidityConfig.BlockDestroyIconColor = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
@@ -780,14 +794,14 @@ public class ScreenGenerator {
                                 .option(Option.<String>createBuilder()
                                         .name(Text.translatable("config.option.block_destruction_render_icon"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.block_destruction_render_icon")))
-                                        .binding("⨂", () -> instance.instance().BlockDestroyIcon, v -> instance.instance().BlockDestroyIcon = v)
+                                        .binding("⨂", () -> LucidityConfig.BlockDestroyIcon, v -> LucidityConfig.BlockDestroyIcon = v)
                                         .controller(StringControllerBuilder::create)
                                         .build()
                                 )
                                 .option(Option.<Float>createBuilder()
                                         .name(Text.translatable("config.option.block_destruction_render_icon_size"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.block_destruction_render_icon_size")))
-                                        .binding(0.05F, () -> instance.instance().BlockDestroyIconSize, v -> instance.instance().BlockDestroyIconSize = v)
+                                        .binding(0.05F, () -> LucidityConfig.BlockDestroyIconSize, v -> LucidityConfig.BlockDestroyIconSize = v)
                                         .controller(opt -> FloatSliderControllerBuilder.create(opt)
                                                 .range(0F, 0.2F)
                                                 .step(0.05F)
@@ -797,7 +811,7 @@ public class ScreenGenerator {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.translatable("config.option.see_Throw"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.see_Throw")))
-                                        .binding(true, () -> instance.instance().BlockDestroyIconSeeThrow, bool -> instance.instance().BlockDestroyIconSeeThrow = bool)
+                                        .binding(true, () -> LucidityConfig.BlockDestroyIconSeeThrow, bool -> LucidityConfig.BlockDestroyIconSeeThrow = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
@@ -808,47 +822,47 @@ public class ScreenGenerator {
                                 .name(Text.translatable("config.option.entity_sample_point_render_settings"))
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_safe_color"))
-                                        .binding(Color.GREEN, () -> instance.instance().EntitySamplePoion_Safe_IconColor, v -> instance.instance().EntitySamplePoion_Safe_IconColor = v)
+                                        .binding(Color.GREEN, () -> LucidityConfig.EntitySamplePoion_Safe_IconColor, v -> LucidityConfig.EntitySamplePoion_Safe_IconColor = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<String>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_safe_icon"))
-                                        .binding("√", () -> instance.instance().EntitySamplePoion_Safe_Icon, v -> instance.instance().EntitySamplePoion_Safe_Icon = v)
+                                        .binding("√", () -> LucidityConfig.EntitySamplePoion_Safe_Icon, v -> LucidityConfig.EntitySamplePoion_Safe_Icon = v)
                                         .controller(StringControllerBuilder::create)
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_danger_color"))
-                                        .binding(Color.RED, () -> instance.instance().EntitySamplePoion_Danger_IconColor, v -> instance.instance().EntitySamplePoion_Danger_IconColor = v)
+                                        .binding(Color.RED, () -> LucidityConfig.EntitySamplePoion_Danger_IconColor, v -> LucidityConfig.EntitySamplePoion_Danger_IconColor = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<String>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_danger_icon"))
-                                        .binding("X", () -> instance.instance().EntitySamplePoion_Danger_Icon, v -> instance.instance().EntitySamplePoion_Danger_Icon = v)
+                                        .binding("X", () -> LucidityConfig.EntitySamplePoion_Danger_Icon, v -> LucidityConfig.EntitySamplePoion_Danger_Icon = v)
                                         .controller(StringControllerBuilder::create)
                                         .build()
                                 )
                                 .option(Option.<Color>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_blocked_color"))
-                                        .binding(Color.MAGENTA, () -> instance.instance().EntitySamplePoion_Blocked_IconColor, v -> instance.instance().EntitySamplePoion_Blocked_IconColor = v)
+                                        .binding(Color.MAGENTA, () -> LucidityConfig.EntitySamplePoion_Blocked_IconColor, v -> LucidityConfig.EntitySamplePoion_Blocked_IconColor = v)
                                         .controller(opt -> ColorControllerBuilder.create(opt)
                                                 .allowAlpha(true))
                                         .build()
                                 )
                                 .option(Option.<String>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_blocked_icon"))
-                                        .binding("❖", () -> instance.instance().EntitySamplePoion_Blocked_Icon, v -> instance.instance().EntitySamplePoion_Blocked_Icon = v)
+                                        .binding("❖", () -> LucidityConfig.EntitySamplePoion_Blocked_Icon, v -> LucidityConfig.EntitySamplePoion_Blocked_Icon = v)
                                         .controller(StringControllerBuilder::create)
                                         .build()
                                 )
                                 .option(Option.<Float>createBuilder()
                                         .name(Text.translatable("config.option.entity_sample_point_icon_size"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.entity_sample_point_icon_size")))
-                                        .binding(0.01F, () -> instance.instance().EntitySamplePoionIconSize, v -> instance.instance().EntitySamplePoionIconSize = v)
+                                        .binding(0.01F, () -> LucidityConfig.EntitySamplePoionIconSize, v -> LucidityConfig.EntitySamplePoionIconSize = v)
                                         .controller(opt -> FloatSliderControllerBuilder.create(opt)
                                                 .range(0F, 0.03F)
                                                 .step(0.01F)
@@ -858,7 +872,7 @@ public class ScreenGenerator {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.translatable("config.option.see_Throw"))
                                         .description(OptionDescription.of(Text.translatable("config.option.description.see_Throw")))
-                                        .binding(true, () -> instance.instance().EntitySamplePointSeeThrow, bool -> instance.instance().EntitySamplePointSeeThrow = bool)
+                                        .binding(true, () -> LucidityConfig.EntitySamplePointSeeThrow, bool -> LucidityConfig.EntitySamplePointSeeThrow = bool)
                                         .controller(BooleanControllerBuilder::create)
                                         .build()
                                 )
@@ -882,7 +896,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.mob_chase_range"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderMobChaseRange, bool -> instance.instance().renderMobChaseRange = bool)
+                                                        .binding(false, () -> LucidityConfig.renderMobChaseRange, bool -> LucidityConfig.renderMobChaseRange = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -892,7 +906,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.mob_eye-line"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderMobEyeLineConnection, bool -> instance.instance().renderMobEyeLineConnection = bool)
+                                                        .binding(false, () -> LucidityConfig.renderMobEyeLineConnection, bool -> LucidityConfig.renderMobEyeLineConnection = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -902,7 +916,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.mob_spawn.warden_attack_range"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderMobSpawn, bool -> instance.instance().renderMobSpawn = bool)
+                                                        .binding(false, () -> LucidityConfig.renderMobSpawn, bool -> LucidityConfig.renderMobSpawn = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -912,7 +926,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.warden_attack_range"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderWardenAttackRange, bool -> instance.instance().renderWardenAttackRange = bool)
+                                                        .binding(false, () -> LucidityConfig.renderWardenAttackRange, bool -> LucidityConfig.renderWardenAttackRange = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
@@ -937,7 +951,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.command_helper"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().commandHelper, bool -> instance.instance().commandHelper = bool)
+                                                        .binding(false, () -> LucidityConfig.commandHelper, bool -> LucidityConfig.commandHelper = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -947,7 +961,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.betterStructureVoidBlock"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().betterStructureVoid, bool -> instance.instance().betterStructureVoid = bool)
+                                                        .binding(false, () -> LucidityConfig.betterStructureVoid, bool -> LucidityConfig.betterStructureVoid = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -957,7 +971,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.betterBarrierBlock"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().betterBarrier, bool -> instance.instance().betterBarrier = bool)
+                                                        .binding(false, () -> LucidityConfig.betterBarrier, bool -> LucidityConfig.betterBarrier = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )/*.option(
@@ -967,7 +981,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.betterLightBlock"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().betterLight, bool -> instance.instance().betterLight = bool)
+                                                        .binding(false, () -> LucidityConfig.betterLight, bool -> LucidityConfig.betterLight = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )*/.option(
@@ -977,7 +991,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.forceTechnicalBlocksToRender"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().forceRenderTechnicalBlocks, bool -> instance.instance().forceRenderTechnicalBlocks = bool)
+                                                        .binding(false, () -> LucidityConfig.forceRenderTechnicalBlocks, bool -> LucidityConfig.forceRenderTechnicalBlocks = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         )
@@ -1002,13 +1016,13 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.arrowcam"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().arrowcam, bool -> instance.instance().arrowcam = bool)
+                                                        .binding(false, () -> LucidityConfig.arrowcam, bool -> LucidityConfig.arrowcam = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
                                                 Option.<Boolean>createBuilder()
                                                         .name(Text.translatable("config.lucidity.advancedAdvancedToolTips"))
-                                                        .binding(false, () -> instance.instance().advancedAdvancedToolTips, bool -> instance.instance().advancedAdvancedToolTips = bool)
+                                                        .binding(false, () -> LucidityConfig.advancedAdvancedToolTips, bool -> LucidityConfig.advancedAdvancedToolTips = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).build()
@@ -1025,7 +1039,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.soundEventRender"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderSoundEvents, bool -> instance.instance().renderSoundEvents = bool)
+                                                        .binding(false, () -> LucidityConfig.renderSoundEvents, bool -> LucidityConfig.renderSoundEvents = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -1035,12 +1049,12 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.soundEventsExpiredTime"))
                                                                 .build()
                                                         )
-                                                        .binding(1000, () -> instance.instance().renderSoundEventsExpiredTime, bool -> instance.instance().renderSoundEventsExpiredTime = bool)
+                                                        .binding(1000, () -> LucidityConfig.renderSoundEventsExpiredTime, bool -> LucidityConfig.renderSoundEventsExpiredTime = bool)
                                                         .controller(IntegerFieldControllerBuilder::create)
                                                         .build()
                                         ).option(Option.<Color>createBuilder()
                                                 .name(Text.translatable("config.lucidity.soundEventRenderColor"))
-                                                .binding(new Color(191, 255, 0,100), () -> instance.instance().renderSoundEventsColor, v -> instance.instance().renderSoundEventsColor = v)
+                                                .binding(new Color(191, 255, 0,100), () -> LucidityConfig.renderSoundEventsColor, v -> LucidityConfig.renderSoundEventsColor = v)
                                                 .controller(opt -> ColorControllerBuilder.create(opt)
                                                         .allowAlpha(true))
                                                 .build()
@@ -1059,7 +1073,7 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.description.blockEventRender"))
                                                                 .build()
                                                         )
-                                                        .binding(false, () -> instance.instance().renderBlockEvents, bool -> instance.instance().renderBlockEvents = bool)
+                                                        .binding(false, () -> LucidityConfig.renderBlockEvents, bool -> LucidityConfig.renderBlockEvents = bool)
                                                         .controller(BooleanControllerBuilder::create)
                                                         .build()
                                         ).option(
@@ -1069,12 +1083,12 @@ public class ScreenGenerator {
                                                                 .text(Text.translatable("config.lucidity.blockEventsExpiredTime"))
                                                                 .build()
                                                         )
-                                                        .binding(1000, () -> instance.instance().renderBlockEventsExpiredTime, bool -> instance.instance().renderBlockEventsExpiredTime = bool)
+                                                        .binding(1000, () -> LucidityConfig.renderBlockEventsExpiredTime, bool -> LucidityConfig.renderBlockEventsExpiredTime = bool)
                                                         .controller(IntegerFieldControllerBuilder::create)
                                                         .build()
                                         ).option(Option.<Color>createBuilder()
                                                 .name(Text.translatable("config.lucidity.blockEventRenderColor"))
-                                                .binding(new Color(255,165,0,100), () -> instance.instance().renderBlockEventsColor, v -> instance.instance().renderBlockEventsColor = v)
+                                                .binding(new Color(255,165,0,100), () -> LucidityConfig.renderBlockEventsColor, v -> LucidityConfig.renderBlockEventsColor = v)
                                                 .controller(opt -> ColorControllerBuilder.create(opt)
                                                         .allowAlpha(true))
                                                 .build()
@@ -1088,15 +1102,15 @@ public class ScreenGenerator {
                                         .binding(
                                                 DEFAULT_TOOLTIP_OPTIONS,
                                                 () -> {
-                                                    if (instance.instance().blockToolTipAttributes == null) {
+                                                    if (LucidityConfig.blockToolTipAttributes == null) {
                                                         LucidityConfig.blockToolTipAttributes = new ArrayList<>();
                                                     }
-                                                    return instance.instance().blockToolTipAttributes;
+                                                    return LucidityConfig.blockToolTipAttributes;
                                                 },
-                                                list -> instance.instance().blockToolTipAttributes = list
+                                                list -> LucidityConfig.blockToolTipAttributes = list
                                         )
                                         .controller(StringControllerBuilder::create)
-                                        .initial(String.format("#%06X", (instance.instance().colorPalette.getRGB() & 0xFFFFFF)))
+                                        .initial(String.format("#%06X", (LucidityConfig.colorPalette.getRGB() & 0xFFFFFF)))
                                         .build()
                                 ).build()
                 )

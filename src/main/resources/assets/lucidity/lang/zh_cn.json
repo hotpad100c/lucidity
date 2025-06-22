@@ -257,5 +257,7 @@
   "config.lucidity.category.pictureRenderings": "图像渲染",
   "config.lucidity.pictures": "图像",
   "config.lucidity.pixel_per_block": "像素方块比",
-  "config.lucidity.description.pixel_per_block": "将多少像素渲染于一格方块空间.(默认 = 377.95)"
+  "config.lucidity.description.pixel_per_block": "将多少像素渲染于一格方块空间.(默认 = 377.95)",
+  "config.lucidity.fluidTransparency":"流体透明度覆盖",
+  "config.lucidity.description.fluidTransparency":"覆盖流体透明度(0~1; 1.01 = 关闭)"
 }

@@ -28,12 +28,6 @@ public class WindChargeTrigger {
             return true;
         }
 
-        else if (block instanceof TrapdoorBlock) {
-            return true;
-        }
-
-        else {
-            return false;
-        }
+        else return block instanceof TrapdoorBlock;
     }
 }

@@ -70,7 +70,8 @@ public abstract class SectionBuilderMixin {
 
             FluidState fluidState = blockState.getFluidState();
             if (!fluidState.isEmpty() && shouldRenderBlock(blockState,blockPos3)) {
-                RenderLayer renderLayer = RenderLayers.getFluidLayer(fluidState);
+                RenderLayer renderLayer = LucidityConfig.fluidTransparency == 0.01f? RenderLayers.getFluidLayer(fluidState):RenderLayer.getTranslucent();
+
                 BufferBuilder bufferBuilder = this.beginBufferBuilding(map, allocatorStorage, renderLayer);
                 this.blockRenderManager.renderFluid(blockPos3, renderRegion, bufferBuilder, blockState, fluidState);
             }
@@ -90,8 +91,8 @@ public abstract class SectionBuilderMixin {
         }
 
         for (Map.Entry<RenderLayer, BufferBuilder> entry : map.entrySet()) {
-            RenderLayer renderLayer2 = (RenderLayer)entry.getKey();
-            BuiltBuffer builtBuffer = ((BufferBuilder)entry.getValue()).endNullable();
+            RenderLayer renderLayer2 = entry.getKey();
+            BuiltBuffer builtBuffer = entry.getValue().endNullable();
             if (builtBuffer != null) {
                 if (renderLayer2 == RenderLayer.getTranslucent()) {
                     renderData.translucencySortingData = builtBuffer.sortQuads(allocatorStorage.get(RenderLayer.getTranslucent()), vertexSorter);

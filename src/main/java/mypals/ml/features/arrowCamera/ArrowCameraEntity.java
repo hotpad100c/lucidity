@@ -22,8 +22,8 @@ public class ArrowCameraEntity extends Entity {
     private int deathDelay = 40;
     private ProjectileEntity target;
 
-    private float cameraYawOffset = 0.0F;
-    private float cameraPitchOffset = 0.0F;
+    private final float cameraYawOffset = 0.0F;
+    private final float cameraPitchOffset = 0.0F;
 
 
     public ArrowCameraEntity(EntityType<? extends Entity> type, PersistentProjectileEntity arrow) {
@@ -55,16 +55,16 @@ public class ArrowCameraEntity extends Entity {
             this.prevYaw = this.getYaw();
             this.prevPitch = this.getPitch();
             if (--deathDelay <= 0) {
-                ArrowCamera.instance.stopArrowCam();
+                ArrowCamera.stopArrowCam();
             } else if (deathDelay < 20) {
                 MinecraftClient mc = MinecraftClient.getInstance();
                 ClientWorld world = mc.world;
                 GameOptions options = mc.options;
 
-                if(ArrowCamera.instance.thirdPersonView==0){
+                if(ArrowCamera.thirdPersonView ==0){
                     options.setPerspective(Perspective.FIRST_PERSON);
                 }else{
-                    options.setPerspective(ArrowCamera.instance.thirdPersonView == 2 ? Perspective.THIRD_PERSON_BACK : Perspective.THIRD_PERSON_FRONT);
+                    options.setPerspective(ArrowCamera.thirdPersonView == 2 ? Perspective.THIRD_PERSON_BACK : Perspective.THIRD_PERSON_FRONT);
                 }
                 var player = MinecraftClient.getInstance().player;
                 if (player != null) {
@@ -121,7 +121,7 @@ public class ArrowCameraEntity extends Entity {
     @Override
     public void remove(RemovalReason reason) {
         super.remove(reason);
-        ArrowCamera.instance.stopArrowCam();
+        ArrowCamera.stopArrowCam();
     }
 
     public void setTarget(ProjectileEntity arrow) {

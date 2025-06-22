@@ -47,5 +47,6 @@ accessible field net/minecraft/block/AbstractBlock$Settings requiredFeatures Lne
 accessible field net/minecraft/block/AbstractBlock$Settings offsetter Lnet/minecraft/block/AbstractBlock$Offsetter;
 accessible method net/minecraft/block/AbstractBlock$AbstractBlockState shouldBeSolid ()Z
 accessible method net/minecraft/client/gui/widget/SliderWidget setValue (D)V
+accessible method net/minecraft/client/render/block/BlockModelRenderer renderQuadsFlat (Lnet/minecraft/world/BlockRenderView;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;IIZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Ljava/util/List;Ljava/util/BitSet;)V
 accessible field net/minecraft/client/render/Tessellator allocator Lnet/minecraft/client/util/BufferAllocator;
 accessible field net/minecraft/client/render/WorldRenderer bufferBuilders Lnet/minecraft/client/render/BufferBuilderStorage;

@@ -122,7 +122,7 @@ public class TrajectoryManager {
                         ItemStack itemStack = p.getMainHandStack();
                         ItemStack itemStackAlt = p.getOffHandStack();
                         if (isNormalProjectile(itemStack) || isNormalProjectile(itemStack)) { handSide = 1;}
-                        else if (isNormalProjectile(itemStackAlt) || isNormalProjectile(itemStackAlt)) { handSide = -1; };
+                        else if (isNormalProjectile(itemStackAlt) || isNormalProjectile(itemStackAlt)) { handSide = -1; }
 
                         if (isNormalProjectile(itemStack) || isNormalProjectile(itemStackAlt)) {
 
@@ -169,7 +169,7 @@ public class TrajectoryManager {
                         ItemStack itemStack = livingEntity.getMainHandStack();
                         ItemStack itemStackAlt = livingEntity.getOffHandStack();
                         if (isNormalProjectile(itemStack) || isNormalProjectile(itemStack)) { handSide = 1;}
-                        else if (isNormalProjectile(itemStackAlt) || isNormalProjectile(itemStackAlt)) { handSide = -1; };
+                        else if (isNormalProjectile(itemStackAlt) || isNormalProjectile(itemStackAlt)) { handSide = -1; }
 
                         if (isNormalProjectile(itemStack) || isNormalProjectile(itemStackAlt)) {
 

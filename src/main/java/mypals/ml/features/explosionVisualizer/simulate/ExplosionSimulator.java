@@ -44,13 +44,13 @@ public class ExplosionSimulator {
     private final ExplosionAffectedObjects affected = new ExplosionAffectedObjects(null,null,null, null, null);
 
     public ExplosionSimulator(Entity thisEntity, boolean ignorSelf, World world, float x, float y, float z, float power) {
-        this.thisEntity = thisEntity;
+        ExplosionSimulator.thisEntity = thisEntity;
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
         this.power = power;
-        this.ignorSelf = ignorSelf;
+        ExplosionSimulator.ignorSelf = ignorSelf;
     }
 
     public void simulate() {

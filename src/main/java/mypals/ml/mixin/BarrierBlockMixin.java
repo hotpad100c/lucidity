@@ -28,6 +28,6 @@ public class BarrierBlockMixin extends Block {
     }
     @Override
     protected boolean isSideInvisible(BlockState state, BlockState stateFrom, Direction direction) {
-        return stateFrom.isOf(this) ? true : super.isSideInvisible(state, stateFrom, direction);
+        return stateFrom.isOf(this) || super.isSideInvisible(state, stateFrom, direction);
     }
 }
