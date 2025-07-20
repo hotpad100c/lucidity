@@ -1,11 +1,9 @@
 package mypals.ml.features.arrowCamera;
 
-import mypals.ml.features.arrowCamera.ArrowCameraEntity;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.util.Identifier;
 
-public class ArrowCameraEntityRender extends EntityRenderer<ArrowCameraEntity> {
+public class ArrowCameraEntityRender extends EntityRenderer<ArrowCameraEntity, ArrowCameraEntityModel> {
 
 
     public ArrowCameraEntityRender(EntityRendererFactory.Context context) {
@@ -13,7 +11,7 @@ public class ArrowCameraEntityRender extends EntityRenderer<ArrowCameraEntity> {
     }
 
     @Override
-    public Identifier getTexture(ArrowCameraEntity entity) {
-        return Identifier.of("camera", "textures/entity/camera/camera.png");
+    public ArrowCameraEntityModel createRenderState() {
+        return null;
     }
 }

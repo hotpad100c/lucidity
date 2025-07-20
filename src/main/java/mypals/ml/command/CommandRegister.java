@@ -18,7 +18,7 @@ import static mypals.ml.command.lib.CommandExecutor.setStaticField;
 
 public class CommandRegister {
     public static void registerCommands() {
-        CommandBuilder.clientCommand("enableWorldEaterHelper")
+       /*CommandBuilder.clientCommand("enableWorldEaterHelper")
                 .root("lucidity")
                 .argument("toggle", BoolArgumentType.bool(),Boolean.class)
                 .execute(args -> {
@@ -35,6 +35,7 @@ public class CommandRegister {
                 })
                 .feedBack("renderKeyPresses -> " + LucidityConfig.renderKeyPresses, Formatting.GOLD)
                 .register();
+    }*/
     }
 
 }

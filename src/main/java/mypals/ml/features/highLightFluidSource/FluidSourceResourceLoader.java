@@ -11,7 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.world.BiomeColors;
-import net.minecraft.client.render.model.ModelLoader;
+import net.minecraft.client.render.model.ModelBaker;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureManager;
@@ -30,6 +30,7 @@ import java.util.function.Function;
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static net.minecraft.block.BubbleColumnBlock.DRAG;
+import static net.minecraft.client.texture.SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
 
 public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloadListener {
     public static final Sprite[] lavaSourceSpites = new Sprite[2];
@@ -75,13 +76,13 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
     @Override
     public void reload(ResourceManager manager) {
         //final Function<Identifier, SpriteAtlasTexture> atlas = MinecraftClient.getInstance().getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
-        final Function<Identifier, Sprite> atlas = MinecraftClient.getInstance().getSpriteAtlas(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+        final Function<Identifier, Sprite> atlas = MinecraftClient.getInstance().getSpriteAtlas(BLOCK_ATLAS_TEXTURE);
         lavaSourceStillSprite = atlas.apply(STILL_LAVA_SPRITE_ID);
         lavaSourceFlowSprite = atlas.apply(FLOWING_LAVA_SPRITE_ID);
         lavaSourceSpites[0] = lavaSourceStillSprite;
         lavaSourceSpites[1] = lavaSourceFlowSprite;
         defaultLavaSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager().getBlockModels().getModel(Blocks.LAVA.getDefaultState()).getParticleSprite();
-        defaultLavaSourceFlowSprite = ModelLoader.LAVA_FLOW.getSprite();
+        defaultLavaSourceFlowSprite = ModelBaker.LAVA_FLOW.getSprite();
         defaultLavaSourceSpites[0] = defaultLavaSourceStillSprite;
         defaultLavaSourceSpites[1] = defaultLavaSourceFlowSprite;
         LucidityConfig.CONFIG_HANDLER.instance();
@@ -96,7 +97,7 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
         };
         FluidRenderHandlerRegistry.INSTANCE.register(Fluids.LAVA, lavaSourceRenderHandler);
         FluidRenderHandlerRegistry.INSTANCE.register(Fluids.FLOWING_LAVA, lavaSourceRenderHandler);
-        defaultWaterOverlaySprite = ModelLoader.WATER_OVERLAY.getSprite();
+        defaultWaterOverlaySprite = ModelBaker.WATER_OVERLAY.getSprite();
 
         waterSourceStillSprite = atlas.apply(STILL_WATER_SPRITE_ID);
         waterSourceFlowSprite = atlas.apply(FLOWING_WATER_SPRITE_ID);
@@ -115,7 +116,7 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
         bubbleWaterSpitesUp[2] = defaultWaterOverlaySprite;
 
         defaultWaterSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager().getBlockModels().getModel(Blocks.WATER.getDefaultState()).getParticleSprite();
-        defaultWaterSourceFlowSprite = ModelLoader.WATER_FLOW.getSprite();
+        defaultWaterSourceFlowSprite = ModelBaker.WATER_FLOW.getSprite();
 
         defaultWaterSourceSpites[0] = defaultWaterSourceStillSprite;
         defaultWaterSourceSpites[1] = defaultWaterSourceFlowSprite;

@@ -19,12 +19,14 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.entity.projectile.SpectralArrowEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -41,13 +43,13 @@ import java.util.Set;
 public class ArrowCamera {
 
 	public static ArrowCamera instance;
+	public static final Identifier ARROW_CAMERA_ID = Identifier.of(Lucidity.MOD_ID, "arrow-camera");
+	public static final RegistryKey<EntityType<?>> ARROW_CAMERA_KEY = RegistryKey.of(Registries.ENTITY_TYPE.getKey(), ARROW_CAMERA_ID);
+
 	public static final EntityType<ArrowCameraEntity> ARROW_CAMERA_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
-			Identifier.of(Lucidity.MOD_ID, "camera"),
-			FabricEntityTypeBuilder.<ArrowCameraEntity>create()
-					.entityFactory(ArrowCameraEntity::new)
-					.dimensions(EntityDimensions.fixed(0F, 0F))
-					.build()
+			ARROW_CAMERA_ID,
+			EntityType.Builder.<ArrowCameraEntity>create(ArrowCameraEntity::new, SpawnGroup.MISC).dimensions(0f, 0f).build(ARROW_CAMERA_KEY)
 	);
 
 	private static ArrowCameraEntity camera;

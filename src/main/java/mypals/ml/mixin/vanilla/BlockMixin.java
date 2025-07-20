@@ -18,11 +18,11 @@ import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.sh
 @Mixin(Block.class)
 public class BlockMixin {
     @Inject(at = @At("HEAD"),method =
-            "shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/util/math/BlockPos;)Z",
+            "Lnet/minecraft/block/Block;shouldDrawSide(Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Direction;)Z",
             cancellable = true
     )
-    private static void filterShouldDrawSide(BlockState state, BlockView world, BlockPos pos, Direction side, BlockPos otherPos, CallbackInfoReturnable<Boolean> cir) {
-        LucidityConfig.CONFIG_HANDLER.instance();
+    private static void filterShouldDrawSide(BlockState state, BlockState otherState, Direction side, CallbackInfoReturnable<Boolean> cir) {
+        /*LucidityConfig.CONFIG_HANDLER.instance();
         if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
             boolean shouldRender = shouldRenderBlock(state,pos);
             boolean shouldRenderNeighbor = shouldRenderBlock(world.getBlockState(pos.offset(side)),pos.offset(side));
@@ -33,6 +33,6 @@ public class BlockMixin {
             else if (!shouldRender && shouldRenderNeighbor) {
                 cir.setReturnValue(false);
             }
-        }
+        }*/
     }
 }

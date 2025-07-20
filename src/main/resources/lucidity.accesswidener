@@ -1,4 +1,5 @@
 accessWidener v2 named
+accessible method net/minecraft/entity/Entity isAlwaysInvulnerableTo (Lnet/minecraft/entity/damage/DamageSource;)Z
 accessible method net/minecraft/client/render/WorldRenderer updateChunks (Lnet/minecraft/client/render/Camera;)V
 accessible class net/minecraft/client/render/chunk/RenderedChunk
 accessible field net/minecraft/client/world/ClientChunkManager chunks Lnet/minecraft/client/world/ClientChunkManager$ClientChunkMap;
@@ -28,7 +29,6 @@ accessible field net/minecraft/block/AbstractBlock$Settings slipperiness F
 accessible field net/minecraft/block/AbstractBlock$Settings velocityMultiplier F
 accessible field net/minecraft/block/AbstractBlock$Settings jumpVelocityMultiplier F
 accessible field net/minecraft/block/AbstractBlock$Settings opaque Z
-accessible field net/minecraft/block/AbstractBlock$Settings lootTableKey Lnet/minecraft/registry/RegistryKey;
 accessible field net/minecraft/block/AbstractBlock$Settings isAir Z
 accessible field net/minecraft/block/AbstractBlock$Settings burnable Z
 accessible field net/minecraft/block/AbstractBlock$Settings forceSolid Z

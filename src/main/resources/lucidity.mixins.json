@@ -7,6 +7,8 @@
     "BlocksMixin",
     "ItemMixin",
     "StructureVoidBlockMixin",
+    "compat.AbstractBlockRenderContextAccessor",
+    "compat.BlockRendererMixin",
     "compat.ChunkBuilderMeshingTaskMixin",
     "compat.DefaultFluidRendererMixin",
     "compat.MixinBlockOcclusionCacheMixin",
@@ -27,7 +29,9 @@
     "MouseMixin",
     "TextureManagerMixin",
     "WorldRenderMixin",
+    "vanilla.BlockModelRendererMixin",
     "vanilla.EntityRenderDispatcherMixin",
+    "vanilla.LucidityRenderLayersMixin",
     "vanilla.ParticleManagerMixin",
     "vanilla.SectionBuilderMixin"
   ]

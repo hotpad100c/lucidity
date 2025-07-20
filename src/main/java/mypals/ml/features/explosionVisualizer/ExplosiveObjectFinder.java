@@ -97,7 +97,7 @@ public class ExplosiveObjectFinder {
             NbtCompound nbtData = new NbtCompound();
             e.writeNbt(nbtData);
             int explosionRadius = nbtData.contains("ExplosionRadius") ? nbtData.getByte("ExplosionRadius") : 3;
-            float f = e.shouldRenderOverlay() ? 2.0F : 1.0F;
+            float f = e.isCharged() ? 2.0F : 1.0F;
             explosiveEntitys.add(new ExplosionData(entity, pos, explosionRadius * f));
         }
 

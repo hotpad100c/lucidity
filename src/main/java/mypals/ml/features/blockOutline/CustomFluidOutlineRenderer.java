@@ -6,7 +6,6 @@ import net.minecraft.client.color.world.BiomeColors;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluid;
@@ -22,7 +21,7 @@ import org.joml.Vector4f;
 
 public class CustomFluidOutlineRenderer {
 
-    public static void renderFluidOutline(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, MatrixStack matrixStack) {
+    /*public static void renderFluidOutline(BlockRenderView world, BlockPos pos, VertexConsumer vertexConsumer, BlockState blockState, FluidState fluidState, MatrixStack matrixStack) {
 
         matrixStack.push();
         matrixStack.translate(-pos.getX(), -pos.getY(), -pos.getZ());
@@ -307,5 +306,5 @@ public class CustomFluidOutlineRenderer {
         int m = i >> 16 & (LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE | 15);
         int n = j >> 16 & (LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE | 15);
         return (k > l ? k : l) | (m > n ? m : n) << 16;
-    }
+    }*/
 }

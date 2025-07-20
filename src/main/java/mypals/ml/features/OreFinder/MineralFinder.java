@@ -59,9 +59,8 @@ public class MineralFinder {
             Color color = parseHexColor(hexColor);
             if (color == null) continue;
 
-            // 解析方块
-            Optional<Block> block = Registries.BLOCK.getOrEmpty(Identifier.of(blockId));
-            if (block.isEmpty()) continue; // 确保是有效的方块
+            Optional<Block> block = Registries.BLOCK.getOptionalValue(Identifier.of(blockId));
+            if (block.isEmpty()) continue;
 
             MINERAL_BLOCKS.put(block.get(), color);
         }
@@ -111,7 +110,7 @@ public class MineralFinder {
             for (int z = -r; z <= r; z++) {
                 BlockPos blockPos = new BlockPos(centerPos.getX() + x, 0, centerPos.getZ() + z);
                 Chunk chunk = MinecraftClient.getInstance().world.getChunk(blockPos);
-                for (int y = chunk.getBottomY(); y <= chunk.getTopY(); y++) {
+                for (int y = chunk.getBottomY(); y <= chunk.getTopYInclusive(); y++) {
                     blockPos = new BlockPos(centerPos.getX() + x, centerPos.getY() + y, centerPos.getZ() + z);
                     double distance = centerPos.getSquaredDistance(blockPos);
                     if (distance <= radius * radius) {

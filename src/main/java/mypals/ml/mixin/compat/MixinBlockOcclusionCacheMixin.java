@@ -19,7 +19,7 @@ import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.sh
 public class MixinBlockOcclusionCacheMixin {
     @Inject(at = @At("HEAD"), method = "shouldDrawSide", cancellable = true, remap = false)
     private void filterShouldDrawSide(BlockState state, BlockView reader, BlockPos pos, Direction face,
-                                CallbackInfoReturnable<Boolean> ci) {
+                                      CallbackInfoReturnable<Boolean> ci) {
         if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
 
             boolean shouldRender = shouldRenderBlock(state,pos);

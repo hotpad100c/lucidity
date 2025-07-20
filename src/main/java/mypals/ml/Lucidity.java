@@ -157,11 +157,7 @@ public class Lucidity implements ModInitializer {
 			WandTooltipRenderer.renderWandTooltip(context);
 			IndicatorRenderer.renderIndicators(context);
 		});
-		WorldRenderEvents.AFTER_ENTITIES.register((context) ->{
-			OutlineManager.init();
-			OutlineManager.onRenderWorldLast(context);
 
-		});
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			updateConfig();
 		});
@@ -265,9 +261,7 @@ public class Lucidity implements ModInitializer {
 		if(renderBlockEvents){
 			ClientsideBlockEventManager.onClientTick();
 		}
-		OutlineManager.resolveBlocks();
 		ImageDataParser.onClientTick();
-		//TreeSearchManager.onClientTick();
 	}
 	public static void UpdateTimers(){
 		warningTime = warningTime <= 0? 0 : warningTime-1;

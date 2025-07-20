@@ -57,7 +57,7 @@ public class ShapeRender {
         VertexConsumer consumer = client.getBufferBuilders().getEntityVertexConsumers().getBuffer(RenderLayer.getLines());
         matrices.translate(x, y, z);
 
-        WorldRenderer.drawBox(matrices, consumer, 0, 0, 0, pos.getX(), pos.getY(), pos.getZ(), 1, 1, 1, 1, 0, 0, 0);
+        VertexRendering.drawBox(matrices, consumer, 0, 0, 0, pos.getX(), pos.getY(), pos.getZ(), 1, 1, 1, 1, 0, 0, 0);
 
         matrices.pop();
     }

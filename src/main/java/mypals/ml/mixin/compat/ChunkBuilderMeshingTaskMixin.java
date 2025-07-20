@@ -3,8 +3,6 @@ package mypals.ml.mixin.compat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import mypals.ml.config.LucidityConfig;
-import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildBuffers;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.FluidRenderer;
@@ -15,8 +13,6 @@ import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.Transl
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
@@ -58,7 +54,6 @@ public abstract class ChunkBuilderMeshingTaskMixin{
                                   FluidState fluidState, BlockPos blockPos, BlockPos modelOffset,
                                   TranslucentGeometryCollector translucentGeometryCollector, ChunkBuildBuffers chunkBuildBuffers, Operation<Void> original){
         if(shouldRenderBlock(blockState,blockPos)){
-
             original.call(instance, levelSlice, blockState, fluidState, blockPos,modelOffset,translucentGeometryCollector,chunkBuildBuffers);
         }
     }

@@ -44,13 +44,13 @@ public class ExplosionSimulator {
     private final ExplosionAffectedObjects affected = new ExplosionAffectedObjects(null,null,null, null, null);
 
     public ExplosionSimulator(Entity thisEntity, boolean ignorSelf, World world, float x, float y, float z, float power) {
-        ExplosionSimulator.thisEntity = thisEntity;
+        this.thisEntity = thisEntity;
         this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
         this.power = power;
-        ExplosionSimulator.ignorSelf = ignorSelf;
+        this.ignorSelf = ignorSelf;
     }
 
     public void simulate() {
@@ -214,7 +214,7 @@ public class ExplosionSimulator {
                     blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
                 }
                 else if(thisEntity instanceof WindChargeEntity || thisEntity instanceof BreezeWindChargeEntity){
-                    WindChargeExplosionBehaviorManager EManager = new WindChargeExplosionBehaviorManager(true, Registries.BLOCK.getEntryList(BlockTags.BLOCKS_WIND_CHARGE_EXPLOSIONS).map(Function.identity()));
+                    WindChargeExplosionBehaviorManager EManager = new WindChargeExplosionBehaviorManager(true);
                     blastResistance = EManager.getBlastResistance(world, currentPos,world.getBlockState(currentPos), world.getFluidState(currentPos));
                 }
                 else{

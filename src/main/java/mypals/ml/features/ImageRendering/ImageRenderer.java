@@ -1,11 +1,11 @@
 package mypals.ml.features.ImageRendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.systems.VertexSorter;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgram;
+
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
@@ -17,31 +17,16 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.*;
-
 import java.io.IOException;
 import java.lang.Math;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
+
 
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.features.ImageRendering.ImageDataParser.requestIdentifier;
 
 public class ImageRenderer {
-    public static PictureShader pictureShader = PictureShader.PosColTexLight;
-    static Map<RenderLayer, BufferBuilder> BufferBuilderMap = new Reference2ObjectArrayMap<>(RenderLayer.getBlockLayers().size());
 
-    public enum PictureShader {
-        PosColTexLight(GameRenderer::getPositionColorTexLightmapProgram),
-        RenderTypeCutout(GameRenderer::getRenderTypeCutoutProgram),
-        PosTex(GameRenderer::getPositionTexProgram),
-        PosTexCol(GameRenderer::getPositionTexColorProgram);
-
-        PictureShader(Supplier<ShaderProgram> program) {
-            this.program = program;
-        }
-        public final Supplier<ShaderProgram> program;
-    }
     public static void renderPictureWorldSpace(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
@@ -59,9 +44,7 @@ public class ImageRenderer {
 
     }
     public static void renderPictureWorldSpace(MatrixStack matrixStack, MediaEntry mediaEntry, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
-
         renderPictureWorldSpace(matrixStack,requestIdentifier(mediaEntry),pos,rotation,scale,pixelsPerBlock,light,overlay,tickDelta,disableDepthTest);
-
     }
 
     public static void renderPicture(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
@@ -76,7 +59,8 @@ public class ImageRenderer {
         Optional<Resource> resourceOptional;
         try {
             AbstractTexture texture = client.getTextureManager().getTexture(textureId);
-            if (texture instanceof NativeImageBackedTexture nativeTexture) {
+            if (texture instanceof NativeImageBackedTexture) {
+                NativeImageBackedTexture nativeTexture = (NativeImageBackedTexture) texture;
                 NativeImage image = nativeTexture.getImage();
 
                 textureWidth = image.getWidth() / pixelsPerBlock;
@@ -115,14 +99,13 @@ public class ImageRenderer {
         float scaledWidth = (float) (textureWidth * scale.x);
         float scaledHeight = (float) (textureHeight * scale.y);
 
-        float centerX = scaledWidth/2;
-        float centerY = scaledHeight/2;
+        float centerX = (float) (scaledWidth/2);
+        float centerY = (float) (scaledHeight/2);
 
         Camera camera = client.gameRenderer.getCamera();
         if (!(camera.isReady() && client.player != null)) return;
 
-        //RenderSystem.setShader(isIrisShaderUsed()?ImageRenderer.pictureShader.program : GameRenderer::getPositionColorTexLightmapProgram);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 
         RenderSystem.setShaderTexture(0, textureId);
         RenderSystem.setShaderColor(1,1,1,1);
@@ -137,7 +120,6 @@ public class ImageRenderer {
         matrixStack.push();
 
         matrixStack.translate(pos.getX(), pos.getY(), pos.getZ());
-        //matrixStack.scale(scale.x, scale.y, 1);
         matrixStack.multiply(
                 new Quaternionf()
                         .rotateX((float)Math.toRadians( rotation.x))
@@ -145,22 +127,9 @@ public class ImageRenderer {
                         .rotateZ((float) Math.toRadians(rotation.z))
         );
 
-        Vector3f normal = new Vector3f(0, 0, 1);
-
-        // 旋转矩阵 (例如：绕Y轴旋转45度)
-        Matrix3f rotationMatrix = new Matrix3f().rotateX((float)Math.toRadians( rotation.x))
-                .rotateY((float) Math.toRadians(rotation.y))
-                .rotateZ((float) Math.toRadians(rotation.z));
-
-        // 计算旋转后的法线
-        Vector3f rotatedNormal = rotationMatrix.transform(normal);
-
-
         Matrix4f matrix = matrixStack.peek().getPositionMatrix();
         Tessellator tessellator = Tessellator.getInstance();
-        //BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
-        //BufferBuilder buffer = beginBufferBuilding(map,MinecraftClient.getInstance().getBufferBuilders().getBlockBufferBuilders(),RenderLayer.getSolid());
         buffer.vertex(matrix, -centerX, -centerY, 0.0f).color(255,255,255,255).texture(0.0f, 1.0f).light(light).overlay(overlay);
         buffer.vertex(matrix, centerX, -centerY, 0.0f).color(255,255,255,255).texture(1.0f, 1.0f).light(light).overlay(overlay);
         buffer.vertex(matrix, centerX, centerY, 0.0f).color(255,255,255,255).texture(1.0f, 0.0f).light(light).overlay(overlay);
@@ -172,21 +141,5 @@ public class ImageRenderer {
         RenderSystem.enableDepthTest();
         RenderSystem.enableCull();
         matrixStack.pop();
-    }/*private static BufferBuilder beginBufferBuilding(Map<RenderLayer, BufferBuilder> builders, BlockBufferAllocatorStorage allocatorStorage, RenderLayer layer) {
-        BufferBuilder bufferBuilder = (BufferBuilder)builders.get(layer);
-        if (bufferBuilder == null) {
-            BufferAllocator bufferAllocator = Tessellator.getInstance().allocator;
-            bufferBuilder = new BufferBuilder(bufferAllocator, VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT);
-            builders.put(layer, bufferBuilder);
-        }
-
-        return bufferBuilder;
-    }*/
-    static VertexSorter getBlockBufferAllocatorStorage(Vec3d pos) {
-        Vec3d vec3d = MinecraftClient.getInstance().player.getCameraPosVec(0);
-        return VertexSorter.byDistance(
-                (float)(vec3d.x - (float)pos.getX()), (float)(vec3d.y - pos.getY()), (float)(vec3d.z - pos.getZ())
-        );
     }
-
 }

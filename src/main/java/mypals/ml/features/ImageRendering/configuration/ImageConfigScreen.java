@@ -98,7 +98,7 @@ public class ImageConfigScreen extends Screen {
             final int boxHeight = 50;
             final int spacing = 5;
             @Override
-            protected int getContentsHeight() {
+            protected int getContentsHeightWithPadding() {
                 return (boxHeight + spacing) * ImageDataParser.images.size() - spacing;
             }
 
@@ -108,7 +108,7 @@ public class ImageConfigScreen extends Screen {
             }
 
             @Override
-            protected void renderContents(DrawContext context, int mouseX, int mouseY, float delta) {
+            protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 int index = 0;
                 // 调整鼠标Y坐标以考虑滚动
                 double adjustedMouseY = mouseY + this.getScrollY();
@@ -179,10 +179,7 @@ public class ImageConfigScreen extends Screen {
             protected void appendClickableNarrations(NarrationMessageBuilder builder) {
 
             }
-            @Override
-            protected void drawBox(DrawContext context, int x, int y, int width, int height) {
-                context.fill(x, y, width, height,0x19000000);
-            }
+            
         });
 
         this.addDrawableChild(saveButton = ButtonWidget.builder(Text.literal("Save"), button -> {
@@ -392,7 +389,7 @@ public class ImageConfigScreen extends Screen {
     public void renderBackground(DrawContext context, int mouseX, int mouseY,float delta) {
         int cx = (this.width) / 2;
         int cy = (this.height) / 2;
-        this.applyBlur(delta);
+        this.applyBlur();
         context.getMatrices().push();
         context.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         if(currentImage != null) {

@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -64,8 +65,8 @@ public class ShineMarker {
         float lastTickPosY = (float) cameraPos.getY();
         float lastTickPosZ = (float) cameraPos.getZ();
 
-        // 设置通用渲染状态
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
@@ -73,7 +74,6 @@ public class ShineMarker {
         java.util.List<ShineMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
         java.util.List<ShineMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
 
-        // 绘制不穿透的标记
         if (!opaqueMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);

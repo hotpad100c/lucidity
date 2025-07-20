@@ -8,7 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.data.client.BlockStateVariantMap;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -22,6 +22,8 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2d;
 
+import java.awt.*;
+
 import static mypals.ml.Lucidity.MOD_ID;
 import static mypals.ml.config.LucidityConfig.damageCaculator;
 import static mypals.ml.config.LucidityConfig.enableDamageIndicator;
@@ -33,7 +35,6 @@ public class IndicatorRenderer {
         MinecraftClient client = MinecraftClient.getInstance();
         if (!client.options.hudHidden && client.options.getPerspective().isFirstPerson()) {
             LucidityConfig.CONFIG_HANDLER.instance();
-            RenderSystem.setShader(GameRenderer::getPositionTexProgram);
             float r = LucidityConfig.indicatorColor.getRed() / 255.0F;
             float g = LucidityConfig.indicatorColor.getGreen() / 255.0F;
             float b = LucidityConfig.indicatorColor.getBlue() / 255.0F;
@@ -51,7 +52,8 @@ public class IndicatorRenderer {
         float realDamage = 0;
         if(MinecraftClient.getInstance().crosshairTarget.getType() == HitResult.Type.ENTITY ) {
             EntityHitResult entityHitResult = (EntityHitResult) MinecraftClient.getInstance().crosshairTarget;
-            if(entityHitResult.getEntity() instanceof LivingEntity playerLookingAtEntity) {
+            if(entityHitResult.getEntity() instanceof LivingEntity) {
+                LivingEntity playerLookingAtEntity = (LivingEntity) entityHitResult.getEntity();
                 if (playerLookingAtEntity != null) {
                     playerDellDamage = DamageHandler.calculatePlayerDamage(client.player, playerLookingAtEntity);
                     realDamage = DamageHandler.calculateTargetDamage(damageSource, playerDellDamage, playerLookingAtEntity);
@@ -63,14 +65,12 @@ public class IndicatorRenderer {
         }
         int x = MinecraftClient.getInstance().getWindow().getScaledWidth() - 110;
         int y = MinecraftClient.getInstance().getWindow().getScaledHeight()/2;
-        context.setShaderColor(r, g, b, 255);
         if(realDamage != 0){
-            context.drawText(MinecraftClient.getInstance().textRenderer, Text.translatable("info.lucidity.clientsideDamageCalculation.damageToEnemy").getString() + realDamage, x, y, 0xFFFFFF, true);
+            context.drawText(MinecraftClient.getInstance().textRenderer, Text.translatable("info.lucidity.clientsideDamageCalculation.damageToEnemy").getString() + realDamage, x, y, new Color(r, g, b, 255).getRGB(), true);
         }
         if(playerDellDamage != 0) {
             context.drawText(MinecraftClient.getInstance().textRenderer, Text.translatable("info.lucidity.clientsideDamageCalculation.damageDealing").getString() + playerDellDamage, x, y+10, 0xFFFFFF, true);
         }
-        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
     private static void renderIndicators(MinecraftClient client, DrawContext context, float r, float g, float b) {
         DamageHandler.indicaors.forEach(indicator -> {
@@ -85,7 +85,7 @@ public class IndicatorRenderer {
                 float radians2 = (float) Math.toRadians(finalAngle - 90.0D);
 
                 int textureWidth = 100;
-                int distanceFromCenter = LucidityConfig.indicatorOffset;
+                int distanceFromCenter = (int) LucidityConfig.indicatorOffset;
 
                 int x = client.getWindow().getScaledWidth() / 2;
                 int y = client.getWindow().getScaledHeight() / 2;
@@ -94,20 +94,16 @@ public class IndicatorRenderer {
 
                 float a = calculateAlpha(client.world.getTime(),indicator.lifeTime,LucidityConfig.damageIndicatorLifeTime) / 255f;
 
-                
-                context.setShaderColor(r, g, b, Math.min(1,Math.max(0,a)));
-
                 context.getMatrices().push();
                 context.getMatrices().translate(indicatorX, indicatorY, 0.0F);
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation(radians));
                 context.getMatrices().translate(-indicatorX, -indicatorY, 0.0F);
 
                 RenderSystem.enableBlend();
-                context.drawTexture(indicatorTexture,
-                        (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth);
+                context.drawTexture(RenderLayer::getGuiTextured,indicatorTexture,
+                        (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth,new Color(r,g,b,a).getRGB());
                 RenderSystem.disableBlend();
                 context.getMatrices().pop();
-                context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             }
         });
     }

@@ -22,11 +22,10 @@ import net.minecraft.world.BlockRenderView;
 import java.util.BitSet;
 import java.util.List;
 
-import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
-import static net.minecraft.client.render.WorldRenderer.DIRECTIONS;
+
 
 public class CustomBlockOutlineRenderer {
-    public static void render(BlockRenderView world, BakedModel model, BlockState state,
+    /*public static void render(BlockRenderView world, BakedModel model, BlockState state,
                        BlockPos pos, MatrixStack matrices, VertexConsumer vertexConsumer,
                        boolean cull, Random random, long seed,
                               int overlay, BlockRenderManager blockRenderManager) {
@@ -79,5 +78,5 @@ public class CustomBlockOutlineRenderer {
             }
         }
         return false;
-    }
+    }*/
 }

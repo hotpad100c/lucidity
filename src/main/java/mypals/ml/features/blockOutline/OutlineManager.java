@@ -33,18 +33,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import static mypals.ml.Lucidity.LOGGER;
-import static mypals.ml.config.LucidityConfig.selectInSpectator;
-import static mypals.ml.features.blockOutline.CustomBlockOutlineRenderer.shouldDraw;
-import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.selectedAreas;
-import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.wand;
-import static mypals.ml.rendering.InformationRender.isSodiumUsed;
-import static net.minecraft.client.render.WorldRenderer.DIRECTIONS;
 
 public class OutlineManager {
-    public static Map<BlockPos, BlockState> blockToRenderer = new HashMap<>();
+    /*public static Map<BlockPos, BlockState> blockToRenderer = new HashMap<>();
     public static ArrayList<BlockPos> targetedBlocks = new ArrayList<>();
 
     public static void init() {
@@ -71,7 +62,7 @@ public class OutlineManager {
     }
     public static boolean shouldDraw(BlockPos pos,AreaBox areaBox){
         ClientWorld world = MinecraftClient.getInstance().world;
-        for(Direction direction : DIRECTIONS) {
+        for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
             boolean shouldRender = !Block.isShapeFullCube(world.getBlockState(offset).getCollisionShape(world,offset))
                     || !isInBox(pos.offset(direction),areaBox);
@@ -166,11 +157,11 @@ public class OutlineManager {
                     }
                 }
             }
-        }*/
+        }
         for(BlockPos pos : targetedBlocks){
             blockToRenderer.put(pos,world.getBlockState(pos));
         }
         OutlineManager.targetedBlocks.clear();
-    }
+    }*/
 
 }

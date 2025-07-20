@@ -2,6 +2,7 @@ package mypals.ml.rendering.shapes;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -104,7 +105,7 @@ public class BoxShape{
             RenderSystem.enableBlend();
             RenderSystem.disableCull();
 
-            RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             BufferRenderer.drawWithGlobalProgram(buffer.end());
 

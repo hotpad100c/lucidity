@@ -12,7 +12,7 @@ import java.awt.*;
 
 public class WardenStateResolver {
     public static void resolveWardenState(WardenEntity wardenEntity) {
-        if (wardenEntity.chargingSonicBoomAnimationState.getTimeRunning() > 0) {
+        if (wardenEntity.chargingSonicBoomAnimationState.isRunning()) {
             InformationRender.addBox(new BoxShape(wardenEntity.getBlockPos().toCenterPos(),30,30,40, Color.cyan,0.2f,true));
         }
     }
