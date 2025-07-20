@@ -30,7 +30,6 @@ public class OnGroundMarker {
         drawSingle(matrixStack, this);
     }
 
-    // 单独绘制一个 OnGroundMarker
     private static void drawSingle(MatrixStack matrixStack, OnGroundMarker marker) {
         drawMultiple(matrixStack, Collections.singletonList(marker));
     }
@@ -39,7 +38,6 @@ public class OnGroundMarker {
         drawMultiple(matrixStack, Collections.singletonList(new OnGroundMarker(pos, color, alpha, seeThrough)));
     }
 
-    // 批量绘制多个 OnGroundMarker
     public static void drawMultiple(MatrixStack matrixStack, java.util.List<OnGroundMarker> markers) {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
@@ -50,18 +48,15 @@ public class OnGroundMarker {
         matrixStack.push();
         Vec3d cameraPos = camera.getPos();
 
-        // 设置通用渲染状态
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.enableBlend();
         RenderSystem.disableCull();
         RenderSystem.defaultBlendFunc();
 
-        // 分批处理：不穿透和穿透
         java.util.List<OnGroundMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
         java.util.List<OnGroundMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
 
-        // 绘制不穿透的标记
         if (!opaqueMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, cameraPos, buffer);
@@ -69,7 +64,6 @@ public class OnGroundMarker {
             BufferRenderer.drawWithGlobalProgram(buffer.end());
         }
 
-        // 绘制穿透的标记
         if (!seeThroughMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, seeThroughMarkers, cameraPos, buffer);
@@ -86,7 +80,7 @@ public class OnGroundMarker {
     // 绘制一组 OnGroundMarker 的核心逻辑
     private static void drawMarkers(MatrixStack matrixStack, java.util.List<OnGroundMarker> markers, Vec3d cameraPos, BufferBuilder buffer) {
         for (OnGroundMarker marker : markers) {
-            float size = 0.8f; // 默认大小，可以作为参数传入
+            float size = 0.8f;
             float x = (float) (marker.pos.toCenterPos().x - cameraPos.getX());
             float y = (float) (marker.pos.getY() - cameraPos.getY());
             float z = (float) (marker.pos.toCenterPos().z - cameraPos.getZ());
@@ -95,7 +89,6 @@ public class OnGroundMarker {
             float minZ = -(size / 2);
             float maxZ = (size / 2);
 
-            // 将 0-255 的颜色值转换为 0-1
             float red = marker.color.getRed() / 255f;
             float green = marker.color.getGreen() / 255f;
             float blue = marker.color.getBlue() / 255f;

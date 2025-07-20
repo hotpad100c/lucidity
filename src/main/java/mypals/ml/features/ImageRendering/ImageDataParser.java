@@ -217,6 +217,9 @@ public class ImageDataParser {
     }
 
     public static Identifier requestIdentifier(MediaEntry mediaEntry) {
+        if(mediaEntry == null) {
+            return LOST;
+        }
         if(mediaEntry.getType().equals(MediaTypeDetector.MediaType.IMAGE)) {
             return mediaEntry.isReady() ? mediaEntry.getTexture()[0] : LOADING;
         }
@@ -230,7 +233,6 @@ public class ImageDataParser {
                 return LOADING;
             }
 
-            // 计算总时长
             int totalDuration = delays.stream().mapToInt(Integer::intValue).sum();
             if (totalDuration == 0) {
                 return textures.get(0);
@@ -378,7 +380,7 @@ public class ImageDataParser {
                 ) {
                     @Override
                     protected void onClicked(ImageConfigScreen imageConfigScreen) {
-                        System.out.println("You clicked " + this.getName());
+
                         if(imageConfigScreen != null) {
                             imageConfigScreen.currentImage = this;
                             this.setSelected(true);

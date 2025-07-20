@@ -946,6 +946,17 @@ public class ScreenGenerator {
                                                         .build()
                                         ).option(
                                                 Option.<Boolean>createBuilder()
+                                                        .name(Text.translatable("config.lucidity.option.containerComparatorOutputPreview"))
+                                                        .description(OptionDescription.createBuilder()
+                                                                .text(Text.translatable("config.lucidity.description.containerComparatorOutputPreview"))
+                                                                .build()
+                                                        )
+                                                        .binding(false, () -> LucidityConfig.containerComparatorOutputPreview, bool -> LucidityConfig.containerComparatorOutputPreview = bool)
+                                                        .controller(BooleanControllerBuilder::create)
+                                                        .build()
+                                        )
+                                        .option(
+                                                Option.<Boolean>createBuilder()
                                                         .name(Text.translatable("config.lucidity.command_helper"))
                                                         .description(OptionDescription.createBuilder()
                                                                 .text(Text.translatable("config.lucidity.description.command_helper"))

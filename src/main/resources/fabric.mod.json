@@ -16,11 +16,9 @@
 	"icon": "assets/lucidity/modIcon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"mypals.ml.Lucidity"
-		],"modmenu": [
-			"mypals.ml.config.LucidityModMenuIntegration"
-		]
+		"main": ["mypals.ml.Lucidity"],
+		"client": ["mypals.ml.LucidityClient"],
+		"modmenu": ["mypals.ml.config.LucidityModMenuIntegration"]
 	},
 	"mixins": [
 		"lucidity.mixins.json"

@@ -24,11 +24,7 @@ public class MediaTypeDetector {
         }
     }
 
-    /**
-     * 判断文件是图片、GIF 还是视频
-     * @param source 本地路径或 URL
-     * @return MediaType 枚举值
-     */
+
     public static MediaType detectMediaType(String source) {
         // 初步通过扩展名判断
         MediaType typeByExtension = guessMediaTypeByExtension(source);
@@ -36,27 +32,22 @@ public class MediaTypeDetector {
 
         try {
             if (source.startsWith("http://") || source.startsWith("https://")) {
-                // 处理 URL
                 URL url = new URL(source);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestProperty("User-Agent", "Mozilla/5.0");
                 connection.setConnectTimeout(5000);
 
-                // 检查 Content-Type
                 String contentType = connection.getContentType();
                 MediaType typeByContentType = guessMediaTypeByContentType(contentType);
-                Lucidity.LOGGER.debug("Guessed media type by Content-Type for {}: {}", source, typeByContentType);
+                //Lucidity.LOGGER.debug("Guessed media type by Content-Type for {}: {}", source, typeByContentType);
 
-                // 如果 Content-Type 明确是视频或 GIF，直接返回
                 if (typeByContentType == MediaType.VIDEO || typeByContentType == MediaType.GIF) {
                     connection.disconnect();
                     return typeByContentType;
                 }
-
-                // 进一步检查文件头
                 try (InputStream inputStream = connection.getInputStream()) {
                     MediaType typeByHeader = detectMediaTypeByHeader(inputStream);
-                    Lucidity.LOGGER.debug("Detected media type by header for {}: {}", source, typeByHeader);
+                    //Lucidity.LOGGER.debug("Detected media type by header for {}: {}", source, typeByHeader);
                     return typeByHeader;
                 } finally {
                     connection.disconnect();
@@ -65,17 +56,17 @@ public class MediaTypeDetector {
                 // 处理本地文件
                 File file = new File(source);
                 if (!file.exists() || !file.isFile()) {
-                    Lucidity.LOGGER.warn("File {} does not exist or is not a file", source);
+                    //Lucidity.LOGGER.warn("File {} does not exist or is not a file", source);
                     return MediaType.UNKNOWN;
                 }
                 try (InputStream inputStream = Files.newInputStream(file.toPath())) {
                     MediaType typeByHeader = detectMediaTypeByHeader(inputStream);
-                    Lucidity.LOGGER.debug("Detected media type by header for {}: {}", source, typeByHeader);
+                    //Lucidity.LOGGER.debug("Detected media type by header for {}: {}", source, typeByHeader);
                     return typeByHeader;
                 }
             }
         } catch (IOException e) {
-            Lucidity.LOGGER.error("Failed to detect media type for {}: {}", source, e.getMessage());
+            //Lucidity.LOGGER.error("Failed to detect media type for {}: {}", source, e.getMessage());
             return MediaType.UNKNOWN;
         }
     }

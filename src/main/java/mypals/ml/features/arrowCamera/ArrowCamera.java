@@ -41,14 +41,6 @@ import java.util.Set;
 public class ArrowCamera {
 
 	public static ArrowCamera instance;
-	/*public static final EntityType<ArrowCameraEntity> ARROW_CAMERA_ENTITY = Registry.register(
-			Registries.ENTITY_TYPE,
-			Identifier.of(MOD_ID, "camera"),
-			FabricEntityTypeBuilder.create()
-					.entityFactory(ArrowCameraEntity::new)
-					.dimensions(EntityDimensions.fixed(0F, 0F))
-					.build()
-	);*/
 	public static final EntityType<ArrowCameraEntity> ARROW_CAMERA_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
 			Identifier.of(Lucidity.MOD_ID, "camera"),
@@ -64,7 +56,7 @@ public class ArrowCamera {
 	public static int thirdPersonView;
 	private static final Set<Entity> trackedEntities = new HashSet<>();
 	public ArrowCamera() {
-		instance = this;  // ✅ 在构造函数中赋值
+		instance = this;
 	}
 	public static void onClientTick(){
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -97,9 +89,9 @@ public class ArrowCamera {
 	}
 	public static void startArrowCam(ProjectileEntity arrow) {
 		if (!isInArrowCam()) {
-			camera = new ArrowCameraEntity(ARROW_CAMERA_ENTITY, arrow.getWorld());
-			camera.setTarget(arrow);
-			camera.setPos(arrow.getPos().x, arrow.getPos().y, arrow.getPos().z);
+			camera = new ArrowCameraEntity(ARROW_CAMERA_ENTITY, arrow);
+			//camera.setTarget(arrow);
+			//camera.setPos(arrow.getPos().x, arrow.getPos().y, arrow.getPos().z);
 
 			MinecraftClient mc = MinecraftClient.getInstance();
 			ClientWorld world = mc.world;

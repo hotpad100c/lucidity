@@ -258,11 +258,11 @@ public class WandActionsManager {
     }
 
     private static void handleMouseWheel(double scroll) {
-        if (scroll > 0) {
+        /*if (scroll > 0) {
             System.out.println("滚轮向上滚动！");
         } else if (scroll < 0) {
             System.out.println("滚轮向下滚动！");
-        }
+        }*/
     }
     public static void wandActions(MinecraftClient client){
         if(client.world == null){return;}

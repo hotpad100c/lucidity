@@ -103,7 +103,6 @@ public class Lucidity implements ModInitializer {
 			LOGGER.error(e.toString());
 			e.printStackTrace();
 		}
-
     }
 	private static void resolveSettings(){
 		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
@@ -146,7 +145,6 @@ public class Lucidity implements ModInitializer {
 		TrajectoryManager.init();
 		new SoundListener();
 		new ArrowCamera();
-		ArrowCamera.onInitialize();
 		AdvancedAdvancedToolTip.onInitialize();
 
 		SelectiveRenderingManager.resolveSelectiveBlockRenderingMode(renderModeBlock);
@@ -160,14 +158,12 @@ public class Lucidity implements ModInitializer {
 			IndicatorRenderer.renderIndicators(context);
 		});
 		WorldRenderEvents.AFTER_ENTITIES.register((context) ->{
-			//OutlineManager.init();
 			OutlineManager.init();
 			OutlineManager.onRenderWorldLast(context);
 
 		});
 		ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
 			updateConfig();
-			//OutlineManager.init();
 		});
 
 		ClientTickEvents.END_CLIENT_TICK.register(client-> {

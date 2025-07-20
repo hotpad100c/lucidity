@@ -26,11 +26,12 @@ public class ArrowCameraEntity extends Entity {
     private final float cameraPitchOffset = 0.0F;
 
 
-    public ArrowCameraEntity(EntityType<? extends Entity> type, PersistentProjectileEntity arrow) {
+    public ArrowCameraEntity(EntityType<? extends Entity> type, ProjectileEntity arrow) {
         this(type, arrow.getWorld());
         this.setNoGravity(true);
         this.setTarget(arrow);
-        this.updatePosition(arrow.getX(), arrow.getY(), arrow.getZ());
+        this.setPosition(arrow.getX(), arrow.getY(), arrow.getZ());
+        //this.updatePosition(arrow.getX(), arrow.getY(), arrow.getZ());
         this.setVelocity(arrow.getVelocity());
         this.setYaw(arrow.getYaw());
         this.setPitch(arrow.getPitch());
@@ -48,9 +49,13 @@ public class ArrowCameraEntity extends Entity {
     }
     @Override
     public void tick() {
+        if(target == null ) {
+            this.discard();
+            return;
+        }
         super.tick();
 
-        if (ArrowCamera.instance.isArrowInGround(target) || !target.isAlive() || !isChunkLoaded() || target == null ) {
+        if (ArrowCamera.instance.isArrowInGround(target) || !target.isAlive() || !isChunkLoaded()) {
             this.setVelocity(0, 0, 0);
             this.prevYaw = this.getYaw();
             this.prevPitch = this.getPitch();

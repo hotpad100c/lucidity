@@ -40,6 +40,8 @@
   "config.lucidity.category.selectedParticle": "Selected Particles",
   "config.lucidity.description.selectiveAreaRender": "<Selective Rendering> Selected Area",
 
+  "config.lucidity.option.containerComparatorOutputPreview": "Container Comparator Output Preview",
+  "config.lucidity.description.containerComparatorOutputPreview": "Preview the comparator output of the container by adding (C:<output>) after container name.",
   "config.lucidity.point1_add": "Point 1 recorded: ",
   "config.lucidity.point2_add": "Point 2 recorded: ",
   "config.lucidity.should_add_area": "Both points are recorded. press addSelection key to add a region.",

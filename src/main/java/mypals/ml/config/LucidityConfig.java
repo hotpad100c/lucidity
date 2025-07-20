@@ -219,6 +219,8 @@ public class LucidityConfig {
     @SerialEntry
     public static boolean advancedAdvancedToolTips = false;
     @SerialEntry
+    public static boolean containerComparatorOutputPreview = true;
+    @SerialEntry
     public static List<String> blockToolTipAttributes = Arrays.asList(
             "mapColorProvider",
             "collidable",

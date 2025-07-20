@@ -1,8 +1,8 @@
 package mypals.ml.features.ImageRendering.configuration;
 
-import com.google.common.net.MediaType;
 import mypals.ml.features.ImageRendering.MediaTypeDetector;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -13,7 +13,6 @@ public abstract class MediaEntry {
     private List<Integer> delays;
     public int index;
     public Identifier[] textureIDs;
-    //public ImageDataParser.ImageData data;
     public boolean ready;
     public String path;
     public String name;
@@ -21,7 +20,10 @@ public abstract class MediaEntry {
     public double[] rotation;
     public double[] scale;
 
-    public MediaEntry(boolean ready, @Nullable int index, @Nullable String name, @Nullable String orgPath, @Nullable Identifier[] texturePath, double[] pos, double[] rotation, double[] scale, @Nullable MediaTypeDetector.MediaType type) {
+    public MediaEntry(boolean ready, int index, @Nullable String name,
+                      @Nullable String orgPath, @Nullable Identifier[] texturePath,
+                      double[] pos, double[] rotation, double[] scale,
+                      @NotNull MediaTypeDetector.MediaType type) {
         this.ready = ready;
         this.index = index;
         this.name = name;
@@ -54,9 +56,6 @@ public abstract class MediaEntry {
     public boolean isReady() {
         return ready;
     }
-    /*public ImageDataParser.ImageData getData() {
-        return data;
-    }*/
     public int getIndex() {
         return index;
     }

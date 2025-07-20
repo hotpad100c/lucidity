@@ -39,6 +39,8 @@
   "config.lucidity.area_added": "已添加新的选区。",
   "config.lucidity.clear": "已放弃当前选区。",
   "category.selective_renderings": "选择性渲染热键",
+  "config.lucidity.option.containerComparatorOutputPreview": "容器比较器输出预览",
+  "config.lucidity.description.containerComparatorOutputPreview": "在容器名后方插入(C:比较器输出)显示比较器输出。",
   "key.selective_renderings.addSelection": "添加选区",
   "key.selective_renderings.renderingMode": "切换模式",
   "key.selective_renderings.removeSelection": "切除选区",

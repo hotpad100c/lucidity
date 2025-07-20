@@ -90,11 +90,10 @@ public class InformationRender {
                 k -> new ConcurrentHashMap<>()
         );
 
-        // 更新或添加 ShineMarker
         markers.compute(shineMarker.pos, (pos, existingMarker) -> {
             if (existingMarker != null) {
                 existingMarker.lifeTime = time;
-                existingMarker.color = shineMarker.color; // 更新颜色（如果需要）
+                existingMarker.color = shineMarker.color;
                 return existingMarker;
             } else {
                 shineMarker.lifeTime = time;
@@ -172,10 +171,10 @@ public class InformationRender {
 
             if(deleteArea.isPressed()) {
                 for (AreaBox selectedArea : selectedAreas) {
-                    if (!areasToDelete.contains(selectedArea)) {
+                    if (areasToDelete.contains(selectedArea)) {
+                        selectedArea.draw(matrixStack, Color.red, 0.1f, true);
+                    }else {
                         selectedArea.draw(matrixStack, Color.white, 0.01f, true);
-                    } else {
-                        selectedArea.draw(matrixStack, Color.white, 0.1f, true);
                     }
                 }
             }

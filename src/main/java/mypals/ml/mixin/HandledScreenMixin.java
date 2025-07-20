@@ -22,9 +22,12 @@ import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static mypals.ml.config.LucidityConfig.containerComparatorOutputPreview;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenHandlerProvider<T> {
@@ -46,8 +49,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         super(title);
     }
 
-    @WrapMethod(method = "drawForeground")
-    private void renderComparatorOutput(DrawContext context, int mouseX, int mouseY, Operation<Void> original) {
+    @Unique
+    private void renderComparatorOutput(DrawContext context, int mouseX, int mouseY){
         if (this.client == null || this.client.player == null) {
             return;
         }
@@ -63,18 +66,17 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
             ScreenHandler screenHandler = this.handler;
 
-            float totalFullness = 0.0F; // 所有槽位的满度之和
-            int totalSlots = 0; // 槽位总数
+            float totalFullness = 0.0F;
+            int totalSlots = 0;
 
-            // 遍历槽位计算总满度
             for (Slot slot : screenHandler.slots) {
                 if (slot.inventory instanceof PlayerInventory) {
-                    continue; // 跳过玩家物品栏的槽位
+                    continue;
                 }
                 totalSlots++;
                 ItemStack itemStack = slot.getStack();
                 if (!itemStack.isEmpty()) {
-                    // 计算单个槽位的满度并累加
+
                     totalFullness += (float) itemStack.getCount() / (float) itemStack.getMaxCount();
                 }
             }
@@ -117,6 +119,15 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         } else {
             WritableBookContentComponent writableBookContentComponent = stack.get(DataComponentTypes.WRITABLE_BOOK_CONTENT);
             return writableBookContentComponent != null ? writableBookContentComponent.pages().size() : 0;
+        }
+    }
+
+    @WrapMethod(method = "drawForeground")
+    private void drawForeground(DrawContext context, int mouseX, int mouseY, Operation<Void> original) {
+        if (!containerComparatorOutputPreview) {
+            original.call(context, mouseX, mouseY);
+        }else {
+            renderComparatorOutput(context, mouseX, mouseY);
         }
     }
 
