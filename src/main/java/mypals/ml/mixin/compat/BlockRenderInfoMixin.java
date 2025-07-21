@@ -5,13 +5,13 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import mypals.ml.Lucidity;
 import mypals.ml.features.selectiveRendering.SelectiveRenderingManager;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBlockStateModel;
 import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Objects;
@@ -19,15 +19,18 @@ import java.util.Objects;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.blockRenderMode;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
 
-@Mixin(BlockRenderInfo.class)
+@Pseudo
+@Mixin(targets = "net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo")
 public class BlockRenderInfoMixin {
-    @Shadow BlockPos blockPos;
+    @Shadow
+    public BlockPos blockPos;
 
-    @Shadow BlockState blockState;
+    @Shadow
+    public BlockState blockState;
 
     @Shadow public BlockRenderView blockView;
 
-    @WrapMethod(method = "Lnet/fabricmc/fabric/impl/client/indigo/renderer/render/BlockRenderInfo;shouldCullSide(Lnet/minecraft/util/math/Direction;)Z", remap = false)
+    @WrapMethod(method = "shouldCullSide(Lnet/minecraft/util/math/Direction;)Z")
     private boolean filterShouldDrawSide(Direction face, Operation<Boolean> original) {
         if(face != null) {
             if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {

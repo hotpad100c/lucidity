@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
 @Mixin(value = BlockRenderer.class)
 public abstract class BlockRendererMixin{
+    
     @Inject(method = "processQuad(Lnet/caffeinemc/mods/sodium/client/render/frapi/mesh/MutableQuadViewImpl;)V",
             at = @At("HEAD"), cancellable = true,remap = false)
     private void injectProcessQuad(MutableQuadViewImpl quad, CallbackInfo ci) {
