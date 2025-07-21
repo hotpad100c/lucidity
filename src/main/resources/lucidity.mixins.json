@@ -30,7 +30,7 @@
     "MouseMixin",
     "TextureManagerMixin",
     "WorldRenderMixin",
-    "compat.FabricBlockStateModelMixin",
+    "compat.BlockRenderInfoMixin",
     "vanilla.BlockModelRendererMixin",
     "vanilla.EntityRenderDispatcherMixin",
     "vanilla.LucidityRenderLayersMixin",

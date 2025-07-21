@@ -3,9 +3,7 @@ package mypals.ml.features.selectiveRendering;
 import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FarmlandBlock;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.entity.Entity;
+
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
