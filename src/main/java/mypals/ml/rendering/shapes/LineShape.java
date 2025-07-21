@@ -39,7 +39,7 @@ public class LineShape {
         Vec3d cameraPos = camera.getPos();
         matrixStack.push();
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager._enableBlend();
         RenderSystem.lineWidth(5f);
 
@@ -139,7 +139,7 @@ public class LineShape {
             buffer.vertex(modelViewMatrix, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z))
                     .color(red, green, blue, alpha);
 
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager._enableBlend();
             RenderSystem.lineWidth(2f);
             if(seeThrough)

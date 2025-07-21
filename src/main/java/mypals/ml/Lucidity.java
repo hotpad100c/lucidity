@@ -26,7 +26,6 @@ import mypals.ml.features.OreFinder.OreResolver;
 import mypals.ml.rendering.InformationRender;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -37,6 +36,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -128,7 +128,7 @@ public class Lucidity implements ModInitializer {
 	public void onInitialize() {
 		BetterBarrier.init();
 		Registries.FLUID.forEach(fluid -> {
-			BlockRenderLayerMap.INSTANCE.putFluid(fluid, RenderLayer.getTranslucent());
+			net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap.putFluid(fluid, BlockRenderLayer.TRANSLUCENT);
 		});
 		FabricLoader.getInstance().getModContainer(MOD_ID).ifPresent(container -> {
 			ResourceManagerHelper.registerBuiltinResourcePack(

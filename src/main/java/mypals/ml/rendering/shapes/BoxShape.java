@@ -106,7 +106,7 @@ public class BoxShape{
             GlStateManager._enableBlend();
             GlStateManager._disableCull();
 
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderLayer.getDebugQuads().draw(buffer.end());
 
             GlStateManager._enableDepthTest();

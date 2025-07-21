@@ -123,7 +123,8 @@ public class DamageHandler {
     public static double getWeaponAttackDamage(ItemStack itemStack) {
         AtomicReference<Double> v = new AtomicReference<>((double) 0);
         for (AttributeModifierSlot attributeModifierSlot : AttributeModifierSlot.values()) {
-            itemStack.applyAttributeModifier(attributeModifierSlot, (attribute, modifier) -> {
+            itemStack.applyAttributeModifier(attributeModifierSlot,
+                    (attribute, modifier, display) -> {
                 if (EntityAttributes.ATTACK_DAMAGE.equals(attribute)) {
                     v.set(modifier.value());
                 }

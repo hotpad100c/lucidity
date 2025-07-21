@@ -44,7 +44,7 @@ public class LineStrip {
         Vec3d cameraPos = camera.getPos();
         matrixStack.push();
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager._enableBlend();
         RenderSystem.lineWidth(2f);
 

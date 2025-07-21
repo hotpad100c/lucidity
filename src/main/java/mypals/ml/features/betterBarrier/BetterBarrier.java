@@ -1,9 +1,10 @@
 package mypals.ml.features.betterBarrier;
 
 import mypals.ml.config.LucidityConfig;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -57,8 +58,8 @@ public class BetterBarrier {
         return ((stack.getItem().equals(Items.LIGHT) || stack2.getItem().equals(Items.LIGHT) && LucidityConfig.betterLight)) || forceRenderTechnicalBlocks;
     }
     public static void init(){
-        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.BARRIER, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.STRUCTURE_VOID, RenderLayer.getTranslucent());
-        BlockRenderLayerMap.INSTANCE.putBlock(Blocks.LIGHT, RenderLayer.getTranslucent());
+        BlockRenderLayerMap.putBlock(Blocks.BARRIER, BlockRenderLayer.TRANSLUCENT);
+        BlockRenderLayerMap.putBlock(Blocks.STRUCTURE_VOID, BlockRenderLayer.TRANSLUCENT);
+        BlockRenderLayerMap.putBlock(Blocks.LIGHT, BlockRenderLayer.TRANSLUCENT);
     }
 }

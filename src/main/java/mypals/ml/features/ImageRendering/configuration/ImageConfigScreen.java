@@ -127,7 +127,7 @@ public class ImageConfigScreen extends Screen {
                     float ppb = pictureSize[0] / (float) PREVIEW_SCALE;
 
                     try {
-                        ImageRenderer.renderPicture(context.getMatrices(), requestIdentifier(entry),
+                        ImageRenderer.renderPictureScreenSpace(context, requestIdentifier(entry),
                                 new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
                                 new Vec3d(0, 180, 180),
                                 new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
@@ -389,8 +389,8 @@ public class ImageConfigScreen extends Screen {
     public void renderBackground(DrawContext context, int mouseX, int mouseY,float delta) {
         int cx = (this.width) / 2;
         int cy = (this.height) / 2;
-        this.applyBlur();
-        context.getMatrices().push();
+        this.applyBlur(context);
+        context.getMatrices().pushMatrix();
         context.fillGradient(0, 0, this.width, this.height, -1072689136, -804253680);
         if(currentImage != null) {
             Identifier texturePath = requestIdentifier(images.get(currentImage.getName()));
@@ -402,7 +402,7 @@ public class ImageConfigScreen extends Screen {
             float ppb = getTextureSize(texturePath)[0] / (float) PREVIEW_SCALE;
 
             try {
-                ImageRenderer.renderPicture(context.getMatrices(), texturePath
+                ImageRenderer.renderPictureScreenSpace(context, texturePath
                         , new Vec3d(cx + (cx / 1.45), cy - 30, 1000)
                         , new Vec3d(rotX, rotY+180, rotZ + 180)
                         , new Vector2d(normalizedScale[0] * 20, normalizedScale[1] * 20),
@@ -411,7 +411,7 @@ public class ImageConfigScreen extends Screen {
                 throw new RuntimeException(e);
             }
         }
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
     }
     public ImageConfigScreen getInstance(){
         return this;

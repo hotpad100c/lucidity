@@ -94,8 +94,6 @@ public class ExplosiveObjectFinder {
         for (Entity entity : world.getEntitiesByType(EntityType.CREEPER, searchBox, e -> true)) {
             Vec3d pos = entity.getPos();
             CreeperEntity e = (CreeperEntity) entity;
-            NbtCompound nbtData = new NbtCompound();
-            e.writeNbt(nbtData);
             float f = e.isCharged() ? 2.0F : 1.0F;
             explosiveEntitys.add(new ExplosionData(entity, pos, 3 * f));
         }

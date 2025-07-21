@@ -50,7 +50,7 @@ public class OnGroundMarker {
         matrixStack.push();
         Vec3d cameraPos = camera.getPos();
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager._enableBlend();
         GlStateManager._disableCull();
 

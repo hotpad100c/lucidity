@@ -32,9 +32,8 @@ public abstract class ClientPlayNetworkMixin {
 
     @Shadow private ClientWorld world;
 
-    @Shadow protected abstract ParseResults<CommandSource> parse(String command);
 
-    @Inject(method = "onBlockEvent", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onBlockEvent", at = @At("HEAD"))
     public void onBlockEvent(BlockEventS2CPacket packet, CallbackInfo ci) {
         if(renderBlockEvents) {
             ClientsideBlockEventManager.addSyncedBlockEvent(packet.getPos(), packet.getBlock(), packet.getType(), packet.getData());

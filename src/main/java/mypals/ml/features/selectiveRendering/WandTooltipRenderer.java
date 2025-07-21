@@ -1,9 +1,11 @@
 package mypals.ml.features.selectiveRendering;
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
 import net.minecraft.client.option.KeyBinding;
@@ -127,7 +129,7 @@ public class WandTooltipRenderer {
         for (ToolTipItem item : hudItems) {
             if (item.icon != null) {
                 GlStateManager._enableBlend();
-                context.drawTexture(RenderLayer::getGuiTextured, item.icon, x, y, 0, 0, 16, 16, 16, 16);
+                context.drawTexture(RenderPipelines.GUI_TEXTURED, item.icon, x, y, 0, 0, 16, 16, 16, 16);
                 GlStateManager._disableBlend();
             }
 
@@ -160,7 +162,7 @@ public class WandTooltipRenderer {
         int x = 0;
         int y = centerY - 60/* + iconYOffset*/;
         GlStateManager._enableBlend();
-        context.drawTexture(RenderLayer::getGuiTextured, Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
         GlStateManager._disableBlend();
         context.drawText(client.textRenderer, Text.translatable(wandApplyToMode.getTranslationKey()), x+iconWidth+2, y+(iconWidth/2), 0xFFFFFFE0, true);
 
@@ -180,7 +182,7 @@ public class WandTooltipRenderer {
             }
         };
         GlStateManager._enableBlend();
-        context.drawTexture(RenderLayer::getGuiTextured, secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
         GlStateManager._disableBlend();
         context.drawText(client.textRenderer, Text.translatable(translationKey), x+iconWidth, y + iconWidth, 0xFFFFFFE0, true);
     }

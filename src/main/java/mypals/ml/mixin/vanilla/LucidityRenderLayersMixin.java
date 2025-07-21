@@ -1,6 +1,7 @@
 package mypals.ml.mixin.vanilla;
 
 import mypals.ml.config.LucidityConfig;
+import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.fluid.Fluid;
@@ -13,9 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(RenderLayers.class)
 public class LucidityRenderLayersMixin {
     @Inject(method = "getFluidLayer", at = @At("HEAD"), cancellable = true)
-    private static void injectCustomFluidRenderLayer(FluidState state, CallbackInfoReturnable<RenderLayer> cir) {
+    private static void injectCustomFluidRenderLayer(FluidState state, CallbackInfoReturnable<BlockRenderLayer> cir) {
         if (LucidityConfig.fluidTransparency < 1.01f) {
-            cir.setReturnValue(RenderLayer.getTranslucent());
+            cir.setReturnValue(BlockRenderLayer.TRANSLUCENT);
         }
     }
 }

@@ -1,11 +1,13 @@
 package mypals.ml.features.damageIndicator;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.BarrierBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 
 import net.minecraft.client.render.GameRenderer;
@@ -95,16 +97,16 @@ public class IndicatorRenderer {
 
                 float a = calculateAlpha(client.world.getTime(),indicator.lifeTime,LucidityConfig.damageIndicatorLifeTime) / 255f;
 
-                context.getMatrices().push();
-                context.getMatrices().translate(indicatorX, indicatorY, 0.0F);
-                context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation(radians));
-                context.getMatrices().translate(-indicatorX, -indicatorY, 0.0F);
+                context.getMatrices().pushMatrix();
+                context.getMatrices().translate(indicatorX, indicatorY);
+                context.getMatrices().rotate((float) finalAngle);
+                context.getMatrices().translate(-indicatorX, -indicatorY);
 
                 GlStateManager._enableBlend();
-                context.drawTexture(RenderLayer::getGuiTextured,indicatorTexture,
+                context.drawTexture(RenderPipelines.GUI_TEXTURED,indicatorTexture,
                         (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth,new Color(r,g,b,a).getRGB());
                 GlStateManager._disableBlend();
-                context.getMatrices().pop();
+                context.getMatrices().popMatrix();
             }
         });
     }

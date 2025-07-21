@@ -90,7 +90,7 @@ public class ShineMarker {
         }
 
         GlStateManager._disableBlend();
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         matrixStack.pop();
     }
 
@@ -166,11 +166,11 @@ public class ShineMarker {
     private static final float HALF_SQRT_3 = (float) (Math.sqrt(3.0D) / 2.0D);
 
     private static void setShaderColor(MinecraftClient client, boolean seeThrough, Color color) {
-        if (isIrisShaderUsed()) {
+        /*if (isIrisShaderUsed()) {
             RenderSystem.setShaderColor((float) color.getRed() /255, (float) color.getGreen() /255, (float) color.getBlue() /255, 1);
         } else {
             RenderSystem.setShaderColor(1, 1, 1, 1.0f);
-        }
+        }*/
     }
 
 

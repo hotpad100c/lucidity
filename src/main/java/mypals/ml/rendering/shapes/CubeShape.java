@@ -44,7 +44,7 @@ public class CubeShape {
         float lastTickPosZ = (float) cameraPos.getZ();
 
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager._enableBlend();
 
 
@@ -161,7 +161,7 @@ public class CubeShape {
         matrices.translate(x, y, z);
         Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
 
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        //RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager._enableBlend();
 
         BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
