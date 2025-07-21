@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockRenderView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Objects;
@@ -19,15 +20,19 @@ import java.util.Objects;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.blockRenderMode;
 import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.shouldRenderBlock;
 
+@Pseudo
 @Mixin(BlockRenderInfo.class)
 public class BlockRenderInfoMixin {
-    @Shadow BlockPos blockPos;
+    @Shadow
+    public BlockPos blockPos;
 
-    @Shadow BlockState blockState;
+    @Shadow
+    public BlockState blockState;
 
     @Shadow public BlockRenderView blockView;
 
-    @WrapMethod(method = "Lnet/fabricmc/fabric/impl/client/indigo/renderer/render/BlockRenderInfo;shouldCullSide(Lnet/minecraft/util/math/Direction;)Z", remap = false)
+    @WrapMethod(method = "Lnet/fabricmc/fabric/impl/client/indigo/renderer/render/BlockRenderInfo;" +
+            "shouldCullSide(Lnet/minecraft/util/math/Direction;)Z")
     private boolean filterShouldDrawSide(Direction face, Operation<Boolean> original) {
         if(face != null) {
             if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {

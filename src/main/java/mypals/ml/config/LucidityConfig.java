@@ -252,5 +252,5 @@ public class LucidityConfig {
     @SerialEntry
     public static float pixelsPerBlock = 377.95f;
     @SerialEntry
-    public static float fluidTransparency = 1.1f;
+    public static float fluidTransparency = 1f;
 }
