@@ -13,7 +13,7 @@ import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.Transl
 import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BlockStateModel;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,12 +31,13 @@ public abstract class ChunkBuilderMeshingTaskMixin{
             method = "execute(Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildContext;Lnet/caffeinemc/mods/sodium/client/util/task/CancellationToken;)Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer;renderModel(Lnet/minecraft/client/render/model/BakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)V"
+                    target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/BlockRenderer;renderModel(Lnet/minecraft/client/render/model/BlockStateModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/BlockPos;)V"
             )
     )
-    public void filterBlockRender(BlockRenderer instance, BakedModel type, BlockState blockState, BlockPos model, BlockPos state, Operation<Void> original){
-        if(shouldRenderBlock(blockState,model)){
-            original.call(instance, type, blockState, model, state);
+    public void filterBlockRender(BlockRenderer instance, BlockStateModel blockStateModel, BlockState model,
+                                  BlockPos pos, BlockPos offset, Operation<Void> original){
+        if(shouldRenderBlock(model,pos)){
+            original.call(instance, blockStateModel, model, pos, offset);
         }
     }
     @WrapOperation(
@@ -52,7 +53,8 @@ public abstract class ChunkBuilderMeshingTaskMixin{
     )
     public void filterFluidRender(FluidRenderer instance, LevelSlice levelSlice, BlockState blockState,
                                   FluidState fluidState, BlockPos blockPos, BlockPos modelOffset,
-                                  TranslucentGeometryCollector translucentGeometryCollector, ChunkBuildBuffers chunkBuildBuffers, Operation<Void> original){
+                                  TranslucentGeometryCollector translucentGeometryCollector,
+                                  ChunkBuildBuffers chunkBuildBuffers, Operation<Void> original){
         if(shouldRenderBlock(blockState,blockPos)){
             original.call(instance, levelSlice, blockState, fluidState, blockPos,modelOffset,translucentGeometryCollector,chunkBuildBuffers);
         }

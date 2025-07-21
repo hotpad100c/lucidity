@@ -37,8 +37,6 @@ public class ArrowCameraEntity extends Entity {
         this.setVelocity(arrow.getVelocity());
         this.setYaw(arrow.getYaw());
         this.setPitch(arrow.getPitch());
-        this.prevYaw = arrow.prevYaw;
-        this.prevPitch = arrow.prevPitch;
     }
 
     public ArrowCameraEntity(EntityType<? extends Entity> type, World world) {
@@ -59,8 +57,7 @@ public class ArrowCameraEntity extends Entity {
 
         if (ArrowCamera.instance.isArrowInGround(target) || !target.isAlive() || !isChunkLoaded()) {
             this.setVelocity(0, 0, 0);
-            this.prevYaw = this.getYaw();
-            this.prevPitch = this.getPitch();
+
             if (--deathDelay <= 0) {
                 ArrowCamera.stopArrowCam();
             } else if (deathDelay < 20) {
@@ -113,10 +110,6 @@ public class ArrowCameraEntity extends Entity {
 
             this.setYaw(newYaw);
             this.setPitch(newPitch);
-
-
-            this.prevYaw = this.getYaw();
-            this.prevPitch = this.getPitch();
         }
     }
 

@@ -81,7 +81,8 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
         lavaSourceFlowSprite = atlas.apply(FLOWING_LAVA_SPRITE_ID);
         lavaSourceSpites[0] = lavaSourceStillSprite;
         lavaSourceSpites[1] = lavaSourceFlowSprite;
-        defaultLavaSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager().getBlockModels().getModel(Blocks.LAVA.getDefaultState()).getParticleSprite();
+        defaultLavaSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager()
+                .getBlockModels().getModel(Blocks.LAVA.getDefaultState()).particleSprite();
         defaultLavaSourceFlowSprite = ModelBaker.LAVA_FLOW.getSprite();
         defaultLavaSourceSpites[0] = defaultLavaSourceStillSprite;
         defaultLavaSourceSpites[1] = defaultLavaSourceFlowSprite;
@@ -115,7 +116,7 @@ public class FluidSourceResourceLoader implements SimpleSynchronousResourceReloa
         bubbleWaterSpitesUp[1] = bubbleUpSprite;
         bubbleWaterSpitesUp[2] = defaultWaterOverlaySprite;
 
-        defaultWaterSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager().getBlockModels().getModel(Blocks.WATER.getDefaultState()).getParticleSprite();
+        defaultWaterSourceStillSprite = MinecraftClient.getInstance().getBakedModelManager().getBlockModels().getModel(Blocks.WATER.getDefaultState()).particleSprite();
         defaultWaterSourceFlowSprite = ModelBaker.WATER_FLOW.getSprite();
 
         defaultWaterSourceSpites[0] = defaultWaterSourceStillSprite;

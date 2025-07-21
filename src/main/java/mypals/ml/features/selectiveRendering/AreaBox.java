@@ -4,9 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.rendering.ShapeRender;
 import mypals.ml.rendering.shapes.BoxShape;
 import mypals.ml.rendering.shapes.LineShape;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
+
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;

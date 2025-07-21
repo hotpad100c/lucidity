@@ -1,5 +1,6 @@
 package mypals.ml.features.damageIndicator;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.config.LucidityConfig;
 import net.minecraft.block.BarrierBlock;
@@ -99,10 +100,10 @@ public class IndicatorRenderer {
                 context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotation(radians));
                 context.getMatrices().translate(-indicatorX, -indicatorY, 0.0F);
 
-                RenderSystem.enableBlend();
+                GlStateManager._enableBlend();
                 context.drawTexture(RenderLayer::getGuiTextured,indicatorTexture,
                         (int) (indicatorX - textureWidth / 2), (int) (indicatorY - textureWidth / 2), 0, 0, textureWidth, textureWidth, textureWidth, textureWidth,new Color(r,g,b,a).getRGB());
-                RenderSystem.disableBlend();
+                GlStateManager._disableBlend();
                 context.getMatrices().pop();
             }
         });

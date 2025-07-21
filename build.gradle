@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 	//id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id 'maven-publish'
 }
@@ -47,7 +47,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
 	modImplementation("com.terraformersmc:modmenu:${project.modmenu_version}")
-	modCompileOnly("maven.modrinth:sodium:mc1.21.1-0.6.5-fabric")
+	modCompileOnly("maven.modrinth:sodium:mc1.21.5-0.6.13-fabric")
 	modCompileOnly "maven.modrinth:iris:${project.iris_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"

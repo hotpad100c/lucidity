@@ -310,7 +310,7 @@ public class TrajectoryManager {
 
         projectilesSimple.addAll(world.getEntitiesByType(EntityType.SNOWBALL,searchBox, entity -> true));
         projectilesSimple.addAll(world.getEntitiesByType(EntityType.EGG,searchBox, entity -> true));
-        projectilesSimple.addAll(world.getEntitiesByType(EntityType.POTION,searchBox, entity -> true));
+        projectilesSimple.addAll(world.getEntitiesByType(EntityType.SPLASH_POTION,searchBox, entity -> true));
         projectilesSimple.addAll(world.getEntitiesByType(EntityType.ENDER_PEARL,searchBox, entity -> true));
 
         projectilesComplex.addAll(world.getEntitiesByType(EntityType.TRIDENT, searchBox, trident -> !trident.isOnGround()));

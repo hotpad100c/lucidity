@@ -1,10 +1,11 @@
 package mypals.ml.rendering.shapes;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -46,12 +47,9 @@ public class ShineMarker {
         drawSingle(matrixStack, this, time,color);
     }
 
-    // 单独绘制一个 ShineMarker
     private static void drawSingle(MatrixStack matrixStack, ShineMarker marker, float time, Color color) {
         drawMultiple(matrixStack, Collections.singletonList(marker), time, color);
     }
-
-    // 批量绘制多个 ShineMarker
     public static void drawMultiple(MatrixStack matrixStack, java.util.List<ShineMarker> markers, float time, Color color) {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera cam = client.gameRenderer.getCamera();
@@ -66,32 +64,32 @@ public class ShineMarker {
         float lastTickPosZ = (float) cameraPos.getZ();
 
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
 
-        // 分批处理：不穿透和穿透
+        //RenderLayer.setShader(ShaderProgramKeys.POSITION_COLOR);
+        GlStateManager._enableBlend();
+        GlStateManager._enableDepthTest();
+        
         java.util.List<ShineMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
         java.util.List<ShineMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
 
         if (!opaqueMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
-            RenderSystem.enableDepthTest();
+            GlStateManager._enableDepthTest();
             setShaderColor(client, false, color);
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            RenderLayer.getDebugQuads().draw(buffer.end());
         }
 
         if (!seeThroughMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, seeThroughMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
-            RenderSystem.disableDepthTest();
+            GlStateManager._disableDepthTest();
             setShaderColor(client, true, color);
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest();
+            RenderLayer.getDebugQuads().draw(buffer.end());
+            GlStateManager._enableDepthTest();
         }
 
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         matrixStack.pop();
     }

@@ -44,17 +44,6 @@ public class InformationRender {
     public static ConcurrentHashMap<Vec3d, TextShape> texts = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<Map.Entry<BlockPos,BlockPos>, AreaBox> areaBoxes = new ConcurrentHashMap<>();
     public static ConcurrentHashMap<BlockPos,OnGroundMarker> onGroundMarkers = new ConcurrentHashMap<>();
-    public static final RenderPhase.DepthTest NO_DEPTH_TEST = new RenderPhase.DepthTest("none", 0) {
-        @Override
-        public void startDrawing() {
-            RenderSystem.disableDepthTest();
-        }
-
-        @Override
-        public void endDrawing() {
-            RenderSystem.enableDepthTest();
-        }
-    };
 
     public static boolean isIrisShaderUsed(){
         if( FabricLoader.getInstance().isModLoaded("iris")) {
@@ -115,19 +104,19 @@ public class InformationRender {
                             new Vec3d(image.getPos()[0],image.getPos()[1],image.getPos()[2]),
                             new Vec3d(image.getRotation()[0],image.getRotation()[1],image.getRotation()[2]),
                             new Vector2d(image.getScale()[0],image.getScale()[1]),
-                            pixelsPerBlock,15720000, OverlayTexture.DEFAULT_UV,counter.getTickDelta(true),false);
+                            pixelsPerBlock,15720000, OverlayTexture.DEFAULT_UV,counter.getDynamicDeltaTicks(),false);
                 }
                 //parse()
                 for (BoxShape box : boxes) {
                     box.draw(matrixStack);
                 }
-                CubeShape.drawCubes(matrixStack,cubes,0.01f,counter.getTickDelta(true));
+                CubeShape.drawCubes(matrixStack,cubes,0.01f,counter.getDynamicDeltaTicks());
                 drawLines(matrixStack);
                 for (Map.Entry<Color,ConcurrentHashMap<Vec3d, ShineMarker>> markers : shineMarkers.entrySet()){
                     ShineMarker.drawMultiple(matrixStack,markers.getValue().values().stream().toList(),MinecraftClient.getInstance().cameraEntity.age, markers.getKey());
                 }
                 OnGroundMarker.drawMultiple(matrixStack,onGroundMarkers.values().stream().toList());
-                TextShape.drawMultiple(matrixStack, texts.values().stream().toList(),counter.getTickDelta(true));
+                TextShape.drawMultiple(matrixStack, texts.values().stream().toList(),counter.getDynamicDeltaTicks());
                 for (AreaBox areaBox: areaBoxes.values()) {
                     areaBox.draw(matrixStack, false);
                 }

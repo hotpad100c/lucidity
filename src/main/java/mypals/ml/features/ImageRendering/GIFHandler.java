@@ -114,7 +114,7 @@ public class GIFHandler {
                 NativeImage finalNativeImage = nativeImage;
                 Identifier finalFrameIdentifier = frameIdentifier;
                 MinecraftClient.getInstance().execute(() -> {
-                    textureManager.registerTexture(finalFrameIdentifier, new NativeImageBackedTexture(finalNativeImage));
+                    textureManager.registerTexture(finalFrameIdentifier, new NativeImageBackedTexture(frameIdentifier::toTranslationKey,finalNativeImage));
                 });
             }
 

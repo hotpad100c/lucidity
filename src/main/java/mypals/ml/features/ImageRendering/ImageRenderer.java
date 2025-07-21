@@ -1,11 +1,14 @@
 package mypals.ml.features.ImageRendering;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import com.mojang.blaze3d.textures.GpuTexture;
+import com.mojang.blaze3d.textures.TextureFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.minecraft.client.MinecraftClient;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
@@ -105,17 +108,13 @@ public class ImageRenderer {
         Camera camera = client.gameRenderer.getCamera();
         if (!(camera.isReady() && client.player != null)) return;
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
+        //RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 
-        RenderSystem.setShaderTexture(0, textureId);
         RenderSystem.setShaderColor(1,1,1,1);
         if(disableDepthTest)
-            RenderSystem.disableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.depthMask(true);
-
-        RenderSystem.disableCull();
+            GlStateManager._disableDepthTest();
+        GlStateManager._enableBlend();
+        GlStateManager._depthMask(true);
 
         matrixStack.push();
 
@@ -135,11 +134,13 @@ public class ImageRenderer {
         buffer.vertex(matrix, centerX, centerY, 0.0f).color(255,255,255,255).texture(1.0f, 0.0f).light(light).overlay(overlay);
         buffer.vertex(matrix, -centerX, centerY, 0.0f).color(255,255,255,255).texture(0.0f, 0.0f).light(light).overlay(overlay);
 
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
 
-        RenderSystem.disableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableCull();
+        GlStateManager._disableCull();
+        RenderLayer.getGuiTextured(textureId).draw(buffer.end());
+
+        GlStateManager._disableBlend();
+        GlStateManager._enableDepthTest();
+        GlStateManager._enableCull();
         matrixStack.pop();
     }
 }

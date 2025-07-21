@@ -33,17 +33,17 @@ public class WorldRenderMixin {
 	) {
 		InformationRender.render(new MatrixStack(), new RenderTickCounter() {
 			@Override
-			public float getLastFrameDuration() {
+			public float getDynamicDeltaTicks() {
 				return 0;
 			}
 
 			@Override
-			public float getTickDelta(boolean ignoreFreeze) {
+			public float getTickProgress(boolean ignoreFreeze) {
 				return 0;
 			}
 
 			@Override
-			public float getLastDuration() {
+			public float getFixedDeltaTicks() {
 				return 0;
 			}
 		});

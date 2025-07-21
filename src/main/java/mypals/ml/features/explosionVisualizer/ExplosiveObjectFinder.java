@@ -96,9 +96,8 @@ public class ExplosiveObjectFinder {
             CreeperEntity e = (CreeperEntity) entity;
             NbtCompound nbtData = new NbtCompound();
             e.writeNbt(nbtData);
-            int explosionRadius = nbtData.contains("ExplosionRadius") ? nbtData.getByte("ExplosionRadius") : 3;
             float f = e.isCharged() ? 2.0F : 1.0F;
-            explosiveEntitys.add(new ExplosionData(entity, pos, explosionRadius * f));
+            explosiveEntitys.add(new ExplosionData(entity, pos, 3 * f));
         }
 
         for (Entity entity : world.getEntitiesByType(EntityType.BREEZE_WIND_CHARGE, searchBox, e -> true)) {

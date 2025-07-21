@@ -1,28 +1,5 @@
 package mypals.ml.features.blockOutline;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedQuad;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.crash.CrashException;
-import net.minecraft.util.crash.CrashReport;
-import net.minecraft.util.crash.CrashReportSection;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.BlockRenderView;
-
-import java.util.BitSet;
-import java.util.List;
-
-
 
 public class CustomBlockOutlineRenderer {
     /*public static void render(BlockRenderView world, BakedModel model, BlockState state,

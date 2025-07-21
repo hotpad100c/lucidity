@@ -45,7 +45,7 @@ public class ParticleCommandParser {
             double dy = delta[1] * speed;
             double dz = delta[2] * speed;
 
-            world.addParticle(particle,forceMode,false, position[0], position[1], position[2], dx, dy, dz);
+            world.addParticleClient(particle,forceMode,false, position[0], position[1], position[2], dx, dy, dz);
         } else {
             for (int i = 0; i < count; i++) {
                 double offsetX = gaussianOffset(position[0], delta[0]);
@@ -56,7 +56,7 @@ public class ParticleCommandParser {
                 double dy = gaussianOffset(0, speed);
                 double dz = gaussianOffset(0, speed);
 
-                world.addParticle(particle, forceMode,false, offsetX, offsetY, offsetZ, dx, dy, dz);
+                world.addParticleClient(particle, forceMode,false, offsetX, offsetY, offsetZ, dx, dy, dz);
             }
         }
     }

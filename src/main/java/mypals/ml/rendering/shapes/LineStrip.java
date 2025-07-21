@@ -1,8 +1,9 @@
 package mypals.ml.rendering.shapes;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -43,10 +44,8 @@ public class LineStrip {
         Vec3d cameraPos = camera.getPos();
         matrixStack.push();
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
         RenderSystem.lineWidth(2f);
 
         java.util.List<LineStrip> opaqueStrips = lineStrips.stream().filter(strip -> !strip.seeThrough && strip.points.size() > 1)
@@ -73,8 +72,8 @@ public class LineStrip {
                     buffer.vertex(matrixStack.peek().getPositionMatrix(), x, y, z)
                             .color(red, green, blue, strip.alpha);
                 }
-                RenderSystem.enableDepthTest();
-                BufferRenderer.drawWithGlobalProgram(buffer.end());
+                GlStateManager._enableDepthTest();
+                RenderLayer.getDebugLineStrip(.2).draw(buffer.end());
             }
 
 
@@ -102,12 +101,12 @@ public class LineStrip {
                 }
             }
 
-            RenderSystem.disableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest();
+            GlStateManager._disableDepthTest();
+            RenderLayer.getDebugLineStrip(.2).draw(buffer.end());
+            GlStateManager._enableDepthTest();
         }
 
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         matrixStack.pop();
     }
 }

@@ -1,4 +1,5 @@
 package mypals.ml.features.selectiveRendering;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -125,9 +126,9 @@ public class WandTooltipRenderer {
         x = centerX - maxTextWidth / 2;
         for (ToolTipItem item : hudItems) {
             if (item.icon != null) {
-                RenderSystem.enableBlend();
+                GlStateManager._enableBlend();
                 context.drawTexture(RenderLayer::getGuiTextured, item.icon, x, y, 0, 0, 16, 16, 16, 16);
-                RenderSystem.disableBlend();
+                GlStateManager._disableBlend();
             }
 
             int textX = x + (item.icon != null ? 20 : 0);
@@ -158,9 +159,9 @@ public class WandTooltipRenderer {
 
         int x = 0;
         int y = centerY - 60/* + iconYOffset*/;
-        RenderSystem.enableBlend();
+        GlStateManager._enableBlend();
         context.drawTexture(RenderLayer::getGuiTextured, Identifier.of(MOD_ID, wandApplyToMode.getIcon()), x, y, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         context.drawText(client.textRenderer, Text.translatable(wandApplyToMode.getTranslationKey()), x+iconWidth+2, y+(iconWidth/2), 0xFFFFFFE0, true);
 
         String translationKey = "-";
@@ -178,9 +179,9 @@ public class WandTooltipRenderer {
                 yield Identifier.of(MOD_ID, particleRenderMode.getIcon());
             }
         };
-        RenderSystem.enableBlend();
+        GlStateManager._enableBlend();
         context.drawTexture(RenderLayer::getGuiTextured, secondIcon, x , y + iconWidth/2, 0, 0, iconWidth, iconWidth, iconWidth, iconWidth);
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         context.drawText(client.textRenderer, Text.translatable(translationKey), x+iconWidth, y + iconWidth, 0xFFFFFFE0, true);
     }
 }

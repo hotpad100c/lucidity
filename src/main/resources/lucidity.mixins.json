@@ -11,9 +11,10 @@
     "compat.BlockRendererMixin",
     "compat.ChunkBuilderMeshingTaskMixin",
     "compat.DefaultFluidRendererMixin",
-    "compat.MixinBlockOcclusionCacheMixin",
+    "compat.AbstractBlockRenderContextMixin",
     "vanilla.BlockMixin",
-    "vanilla.FluidRenderMixin"
+    "vanilla.FluidRenderMixin",
+    "vanilla.WorldChunkMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -29,6 +30,7 @@
     "MouseMixin",
     "TextureManagerMixin",
     "WorldRenderMixin",
+    "compat.FabricBlockStateModelMixin",
     "vanilla.BlockModelRendererMixin",
     "vanilla.EntityRenderDispatcherMixin",
     "vanilla.LucidityRenderLayersMixin",

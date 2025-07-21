@@ -3,7 +3,7 @@ package mypals.ml.mixin.compat;
 import net.caffeinemc.mods.sodium.client.render.chunk.
         compile.pipeline.BlockRenderer;
 import net.caffeinemc.mods.sodium.client.render.frapi.mesh.MutableQuadViewImpl;
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractBlockRenderContext;
+
 import net.minecraft.block.BlockState;
 
 import net.minecraft.client.render.LightmapTextureManager;
@@ -26,7 +26,7 @@ public abstract class BlockRendererMixin{
         BlockPos pos = ((AbstractBlockRenderContextAccessor) this).getPos();
         BlockRenderView world = ((AbstractBlockRenderContextAccessor) this).getLevel();
 
-        Direction quadDirection = Direction.byId(quad.getFaceNormal());
+        Direction quadDirection = Direction.byIndex(quad.getFaceNormal());
 
         BlockPos neighborPos = pos.offset(quadDirection);
         BlockState neighborState = world.getBlockState(neighborPos);

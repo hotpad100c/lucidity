@@ -205,7 +205,9 @@ public class ImageDataParser {
             Identifier finalGeneratedPath = generatedPath;
             NativeImage finalImage = image;
 
-            MinecraftClient.getInstance().execute(()-> textureManager.registerTexture(finalGeneratedPath, new NativeImageBackedTexture(finalImage)));
+            Identifier finalGeneratedPath1 = generatedPath;
+            MinecraftClient.getInstance().execute(()-> textureManager.registerTexture(finalGeneratedPath,
+                    new NativeImageBackedTexture(finalGeneratedPath1::toTranslationKey,finalImage)));
 
         } catch (IOException e) {
             LOGGER.error("Failed to create texture from {}: {}", source, e.getMessage());

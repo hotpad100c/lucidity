@@ -1,8 +1,9 @@
 package mypals.ml.rendering.shapes;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -49,11 +50,9 @@ public class OnGroundMarker {
         matrixStack.push();
         Vec3d cameraPos = camera.getPos();
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.disableCull();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
+        GlStateManager._disableCull();
 
         java.util.List<OnGroundMarker> opaqueMarkers = markers.stream().filter(m -> !m.seeThrough).collect(Collectors.toList());
         java.util.List<OnGroundMarker> seeThroughMarkers = markers.stream().filter(m -> m.seeThrough).collect(Collectors.toList());
@@ -61,20 +60,20 @@ public class OnGroundMarker {
         if (!opaqueMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, cameraPos, buffer);
-            RenderSystem.enableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            GlStateManager._enableDepthTest();
+            RenderLayer.getDebugQuads().draw(buffer.end());
         }
 
         if (!seeThroughMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, seeThroughMarkers, cameraPos, buffer);
-            RenderSystem.disableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest();
+            GlStateManager._disableDepthTest();
+            RenderLayer.getDebugQuads().draw(buffer.end());
+            GlStateManager._enableDepthTest();
         }
 
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
+        GlStateManager._enableCull();
+        GlStateManager._disableBlend();
         matrixStack.pop();
     }
 

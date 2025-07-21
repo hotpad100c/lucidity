@@ -1,5 +1,6 @@
 package mypals.ml.rendering.shapes;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -47,8 +48,7 @@ public class TextShape {
         Vec3d cameraPos = camera.getPos();
         TextRenderer textRenderer = client.textRenderer;
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
 
         List<TextShape> opaqueShapes = shapes.stream().filter(shape -> !shape.seeThrough).collect(Collectors.toList());
         List<TextShape> seeThroughShapes = shapes.stream().filter(shape -> shape.seeThrough).collect(Collectors.toList());
@@ -56,19 +56,19 @@ public class TextShape {
         if (!opaqueShapes.isEmpty()) {
             VertexConsumerProvider.Immediate immediate = getVertexConsumer();
             drawShapes(matrices, opaqueShapes, tickDelta, cameraPos, textRenderer, immediate, false);
-            RenderSystem.enableDepthTest();
+            GlStateManager._enableDepthTest();
             immediate.draw();
         }
 
         if (!seeThroughShapes.isEmpty()) {
             VertexConsumerProvider.Immediate immediate = getVertexConsumer();
             drawShapes(matrices, seeThroughShapes, tickDelta, cameraPos, textRenderer, immediate, true);
-            RenderSystem.disableDepthTest();
+            GlStateManager._disableDepthTest();
             immediate.draw();
-            RenderSystem.enableDepthTest();
+            GlStateManager._enableDepthTest();
         }
 
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         matrices.pop();
     }
 

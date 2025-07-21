@@ -1,8 +1,9 @@
 package mypals.ml.rendering.shapes;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -43,10 +44,8 @@ public class CubeShape {
         float lastTickPosZ = (float) cameraPos.getZ();
 
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
 
 
         Set<BlockPos> cubePositions = cubes.keySet();
@@ -57,19 +56,19 @@ public class CubeShape {
         if (!opaqueCubes.isEmpty()) {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawCubes(bufferBuilder, matrices, opaqueCubes, sizeAdd, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
-            RenderSystem.enableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+            GlStateManager._enableDepthTest();
+            RenderLayer.getDebugQuads().draw(bufferBuilder.end());
         }
 
         if (!seeThroughCubes.isEmpty()) {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawCubes(bufferBuilder, matrices, seeThroughCubes, sizeAdd, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
-            RenderSystem.disableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-            RenderSystem.enableDepthTest();
+            GlStateManager._disableDepthTest();
+            RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+            GlStateManager._enableDepthTest();
         }
 
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         matrices.pop();
     }
 
@@ -162,10 +161,8 @@ public class CubeShape {
         matrices.translate(x, y, z);
         Matrix4f modelViewMatrix = matrices.peek().getPositionMatrix();
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
 
         BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         float minOffset = -0.001f - sizeAdd;
@@ -200,10 +197,10 @@ public class CubeShape {
         bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
 
-        if (seeThrough) RenderSystem.disableDepthTest();
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        if (seeThrough) GlStateManager._disableDepthTest();
+        RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+        GlStateManager._enableDepthTest();
+        GlStateManager._disableBlend();
         matrices.pop();
     }
 }

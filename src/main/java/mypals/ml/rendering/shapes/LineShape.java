@@ -1,9 +1,10 @@
 package mypals.ml.rendering.shapes;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import mypals.ml.rendering.ShapeRender;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -38,10 +39,8 @@ public class LineShape {
         Vec3d cameraPos = camera.getPos();
         matrixStack.push();
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        GlStateManager._enableBlend();
         RenderSystem.lineWidth(5f);
 
         List<LineShape> opaqueLines = lines.stream().filter(line -> !line.seeThrough).collect(Collectors.toList());
@@ -78,8 +77,8 @@ public class LineShape {
                 matrixStack.pop();
             }
 
-            RenderSystem.enableDepthTest(); // 确保深度测试启用
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
+            GlStateManager._enableDepthTest();
+            RenderLayer.getDebugLineStrip(2f).draw(buffer.end());
         }
 
         if (!seeThroughLines.isEmpty()) {
@@ -110,13 +109,13 @@ public class LineShape {
                 matrixStack.pop();
             }
 
-            RenderSystem.disableDepthTest(); // 禁用深度测试
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest(); // 恢复深度测试
+            GlStateManager._disableDepthTest();
+            RenderLayer.getDebugLineStrip(2f).draw(buffer.end());
+            GlStateManager._enableDepthTest();
         }
 
         // 清理渲染状态
-        RenderSystem.disableBlend();
+        GlStateManager._disableBlend();
         matrixStack.pop();
     }
     public static void draw(MatrixStack matrixStack, Vec3d start, Vec3d end, Color color, float alpha, boolean seeThrough) {
@@ -129,10 +128,6 @@ public class LineShape {
             float red = ((color.getRGB() >> 16) & 0xFF) / 255.0f;
             float green = ((color.getRGB() >> 8) & 0xFF) / 255.0f;
             float blue = (color.getRGB() & 0xFF) / 255.0f;
-
-            float normalX = 0.0F;
-            float normalY = 1.0F;
-            float normalZ = 0.0F;
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
             matrixStack.push();
@@ -144,17 +139,14 @@ public class LineShape {
             buffer.vertex(modelViewMatrix, (float) (end.x - start.x), (float) (end.y - start.y), (float) (end.z - start.z))
                     .color(red, green, blue, alpha);
 
-            RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            GlStateManager._enableBlend();
             RenderSystem.lineWidth(2f);
-            RenderSystem.getShaderLineWidth();
             if(seeThrough)
-                RenderSystem.disableDepthTest();
-            BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
+                GlStateManager._disableDepthTest();
+            RenderLayer.getDebugLineStrip(2f).draw(buffer.end());
+            GlStateManager._enableDepthTest();
+            GlStateManager._disableBlend();
             matrixStack.pop();
         }
     }
