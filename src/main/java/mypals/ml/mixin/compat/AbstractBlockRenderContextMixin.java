@@ -27,7 +27,7 @@ public class AbstractBlockRenderContextMixin {
     @Shadow protected BlockRenderView level;
 
 
-    @WrapMethod(method = "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z", remap = false)
+    @WrapMethod(method = "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z", remap = true)
     private boolean filterShouldDrawSide(Direction face, Operation<Boolean> original) {
         if(face != null) {
             if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
