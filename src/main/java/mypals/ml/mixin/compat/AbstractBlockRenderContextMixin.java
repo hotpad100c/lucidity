@@ -29,7 +29,7 @@ public class AbstractBlockRenderContextMixin {
     @Shadow private boolean enableCulling;
 
     @WrapMethod(method = "Lnet/caffeinemc/mods/sodium/client/render/frapi/render/AbstractBlockRenderContext;" +
-            "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z", remap = false)
+            "isFaceCulled(Lnet/minecraft/util/math/Direction;)Z", remap = true)
     private boolean filterShouldDrawSide(Direction face, Operation<Boolean> original) {
         if(face != null) {
             if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
