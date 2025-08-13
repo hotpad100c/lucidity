@@ -211,7 +211,7 @@ public class GIFHandler {
         for (int x = 0; x < bufferedImage.getWidth(); x++) {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
                 int argb = bufferedImage.getRGB(x, y);
-                nativeImage.setColorArgb(x, y, argb);
+                nativeImage.setColor(x, y, argb);
             }
         }
 
