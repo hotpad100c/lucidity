@@ -12,7 +12,10 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,7 +38,7 @@ public class GIFHandler {
             this.delays = delays;
         }
     }
-
+    //https://stackoverflow.com/questions/11005362/java-get-frames-from-animated-gif-without-imagereader
     public static GifFrameData createGifTextures(String source, String baseName) {
         List<Identifier> identifiers = new ArrayList<>();
         List<Integer> delays = new ArrayList<>();
@@ -46,6 +49,7 @@ public class GIFHandler {
         InputStream inputStream = null;
 
         try {
+            byte[] data;
             if (source.startsWith("http://") || source.startsWith("https://")) {
                 URL imageUrl = new URL(source);
                 HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
@@ -54,28 +58,27 @@ public class GIFHandler {
 
                 String contentType = connection.getContentType();
                 if (contentType == null || !contentType.toLowerCase().contains("gif")) {
-                    LOGGER.warn("URL {} 不指向 GIF 文件 (Content-Type: {})", source, contentType);
+                    LOGGER.warn("URL {} was not a GIF file (Content-Type: {})", source, contentType);
                     identifiers.add(LOST);
                     connection.disconnect();
                     return new GifFrameData(identifiers, delays);
                 }
 
                 inputStream = new BufferedInputStream(connection.getInputStream());
-                byte[] data = inputStream.readAllBytes();
-                imageInputStream = ImageIO.createImageInputStream(new ByteArrayInputStream(data));
+                data = inputStream.readAllBytes();
                 connection.disconnect();
             } else {
                 File file = new File(source);
                 if (!file.exists() || !file.isFile()) {
-                    LOGGER.warn("文件 {} 不存在或不是文件", source);
+                    LOGGER.warn("File {} dose not exists", source);
                     identifiers.add(LOST);
                     return new GifFrameData(identifiers, delays);
                 }
                 inputStream = new BufferedInputStream(Files.newInputStream(file.toPath()));
-                byte[] data = inputStream.readAllBytes();
-                imageInputStream = ImageIO.createImageInputStream(new ByteArrayInputStream(data));
+                data = inputStream.readAllBytes();
             }
 
+            imageInputStream = ImageIO.createImageInputStream(new ByteArrayInputStream(data));
             reader = getGifReader(imageInputStream);
             if (reader == null) {
                 identifiers.add(LOST);
@@ -83,7 +86,25 @@ public class GIFHandler {
             }
 
             int frameCount = reader.getNumImages(true);
-            BufferedImage previousFrame = null;
+
+            // GEt Canvas size
+            IIOMetadataNode globalRoot = (IIOMetadataNode) reader.getStreamMetadata()
+                    .getAsTree("javax_imageio_gif_stream_1.0");
+            int canvasWidth = Integer.parseInt(globalRoot.getElementsByTagName("LogicalScreenDescriptor")
+                    .item(0).getAttributes().getNamedItem("logicalScreenWidth").getNodeValue());
+            int canvasHeight = Integer.parseInt(globalRoot.getElementsByTagName("LogicalScreenDescriptor")
+                    .item(0).getAttributes().getNamedItem("logicalScreenHeight").getNodeValue());
+
+            // Save merged
+            BufferedImage canvas = new BufferedImage(canvasWidth, canvasHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gCanvas = canvas.createGraphics();
+            gCanvas.setComposite(AlphaComposite.Clear);
+            gCanvas.fillRect(0, 0, canvasWidth, canvasHeight);
+            gCanvas.dispose();
+
+            BufferedImage savedPrevious = null;
+            String prevDisposal = "none";
+            int prevX = 0, prevY = 0, prevW = canvasWidth, prevH = canvasHeight;
 
             for (int i = 0; i < frameCount; i++) {
                 BufferedImage frame = reader.read(i);
@@ -94,32 +115,55 @@ public class GIFHandler {
                 IIOMetadataNode imgDescr = (IIOMetadataNode) root.getElementsByTagName("ImageDescriptor").item(0);
                 int x = Integer.parseInt(imgDescr.getAttribute("imageLeftPosition"));
                 int y = Integer.parseInt(imgDescr.getAttribute("imageTopPosition"));
+                int w = Integer.parseInt(imgDescr.getAttribute("imageWidth"));
+                int h = Integer.parseInt(imgDescr.getAttribute("imageHeight"));
 
                 IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GraphicControlExtension").item(0);
                 String disposalMethod = gce.getAttribute("disposalMethod");
                 int delay = Integer.parseInt(gce.getAttribute("delayTime")) * 10;
-
-                BufferedImage fullFrame = mergeFrames(previousFrame, frame, disposalMethod, reader, i, x, y);
-                NativeImage nativeImage = convertBufferedImageToNativeImage(fullFrame);
-                Identifier frameIdentifier = Identifier.of(MOD_ID, TEMP_TEXTURE_PATH + baseName + "_frame_" + i);
-                identifiers.add(frameIdentifier);
                 delays.add(delay);
 
-                if (!disposalMethod.equals("restoreToBackgroundColor")) {
-                    previousFrame = copyBufferedImage(fullFrame); // 保留当前帧作为下一帧的基础
-                } else {
-                    previousFrame = null;
+                if (prevDisposal.equalsIgnoreCase("restoreToBackgroundColor")) {
+                    Graphics2D g = canvas.createGraphics();
+                    g.setComposite(AlphaComposite.Clear);
+                    g.fillRect(prevX, prevY, prevW, prevH);
+                    g.dispose();
+                } else if (prevDisposal.equalsIgnoreCase("restoreToPrevious") && savedPrevious != null) {
+
+                    canvas = deepCopy(savedPrevious);
                 }
 
-                NativeImage finalNativeImage = nativeImage;
-                Identifier finalFrameIdentifier = frameIdentifier;
+                // Save canvas for "restoreToPrevious"
+                if (disposalMethod.equalsIgnoreCase("restoreToPrevious")) {
+                    savedPrevious = deepCopy(canvas);
+                } else {
+                    savedPrevious = null;
+                }
+
+                // Draw image
+                Graphics2D gFrame = canvas.createGraphics();
+                gFrame.setComposite(AlphaComposite.SrcOver);
+                gFrame.drawImage(frame, x, y, null);
+                gFrame.dispose();
+
+                //Save current frame
+                NativeImage nativeImage = convertBufferedImageToNativeImage(canvas);
+                Identifier frameIdentifier = Identifier.of(MOD_ID, TEMP_TEXTURE_PATH + baseName + "_frame_" + i);
+                identifiers.add(frameIdentifier);
+
                 MinecraftClient.getInstance().execute(() -> {
-                    textureManager.registerTexture(finalFrameIdentifier, new NativeImageBackedTexture(frameIdentifier::toTranslationKey,finalNativeImage));
+                    textureManager.registerTexture(frameIdentifier, new NativeImageBackedTexture(frameIdentifier::toTranslationKey,nativeImage));
                 });
+
+                prevDisposal = disposalMethod;
+                prevX = x;
+                prevY = y;
+                prevW = w;
+                prevH = h;
             }
 
         } catch (IOException e) {
-            LOGGER.error("无法从 {} 创建 GIF 纹理: {}", source, e.getMessage());
+            LOGGER.error("Cant create GIF texture from {} : {}", source, e.getMessage());
             e.printStackTrace();
             identifiers.add(LOST);
         } finally {
@@ -128,7 +172,7 @@ public class GIFHandler {
                 if (imageInputStream != null) imageInputStream.close();
                 if (inputStream != null) inputStream.close();
             } catch (IOException e) {
-                LOGGER.error("关闭资源时出错: {}", e.getMessage());
+                LOGGER.error("Error while closing source: {}", e.getMessage());
             }
         }
 
@@ -138,47 +182,24 @@ public class GIFHandler {
         return new GifFrameData(identifiers, delays);
     }
 
+    private static BufferedImage deepCopy(BufferedImage bi) {
+        ColorModel cm = bi.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = bi.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+    }
+
+
     private static ImageReader getGifReader(ImageInputStream imageInputStream) {
         Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("gif");
         if (!readers.hasNext()) {
-            LOGGER.error("未找到 GIF的ImageReader");
+            LOGGER.error("Unable to find the ImageReader");
             return null;
         }
         ImageReader reader = readers.next();
         reader.setInput(imageInputStream);
         return reader;
     }
-
-    private static BufferedImage mergeFrames(BufferedImage previousFrame, BufferedImage currentFrame, String disposalMethod, ImageReader reader, int index, int x, int y) throws IOException {
-        int width = reader.getWidth(0);
-        int height = reader.getHeight(0);
-        BufferedImage fullFrame = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        if (previousFrame != null && !disposalMethod.equals("restoreToBackgroundColor")) {
-            fullFrame.getGraphics().drawImage(previousFrame, 0, 0, null);
-        } else if (disposalMethod.equals("restoreToBackgroundColor")) {
-            IIOMetadata metadata = reader.getStreamMetadata();
-            if (metadata != null) {
-                IIOMetadataNode root = (IIOMetadataNode) metadata.getAsTree(metadata.getNativeMetadataFormatName());
-                IIOMetadataNode gce = (IIOMetadataNode) root.getElementsByTagName("GlobalColorTable").item(0);
-                if (gce != null) {
-                    fullFrame.getGraphics().setColor(new java.awt.Color(0, 0, 0, 0)); // 默认透明
-                    fullFrame.getGraphics().fillRect(0, 0, width, height);
-                }
-            }
-        }
-
-        fullFrame.getGraphics().drawImage(currentFrame, x, y, null);
-        return fullFrame;
-    }
-
-    private static BufferedImage copyBufferedImage(BufferedImage source) {
-        if (source == null) return null;
-        BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        copy.getGraphics().drawImage(source, 0, 0, null);
-        return copy;
-    }
-
     private static NativeImage convertBufferedImageToNativeImage(BufferedImage bufferedImage) {
         NativeImage nativeImage = new NativeImage(
                 NativeImage.Format.RGBA,
@@ -197,3 +218,4 @@ public class GIFHandler {
         return nativeImage;
     }
 }
+
