@@ -40,10 +40,6 @@ public class BlockRenderInfoMixin {
                 boolean shouldRender = shouldRenderBlock(this.blockState,pos);
                 boolean shouldRenderNeighbor = shouldRenderBlock(this.blockView.getBlockState(pos.offset(face)),pos.offset(face));
 
-                if(pos.equals(new BlockPos(8, -58, 4)) && Objects.equals(pos.offset(face), new BlockPos(7, -58, 4))) {
-                    Lucidity.LOGGER.info("Checking rendering for pos: {}, face: {}, shouldRender: {}, shouldRenderNeighbor: {}", pos, face, shouldRender, shouldRenderNeighbor);
-
-                }
 
                 if (shouldRender && !shouldRenderNeighbor) {
                     return false; // Do not cull if the block should be rendered but its neighbor should not

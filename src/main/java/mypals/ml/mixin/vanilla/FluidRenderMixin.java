@@ -20,7 +20,7 @@ public class FluidRenderMixin {
     )
     private void wrapVertex(FluidRenderer instance, VertexConsumer vertexConsumer, float x, float y, float z, float red, float green, float blue, float u, float v, int light, Operation<Void> original) {
         float alpha = LucidityConfig.fluidTransparency;
-        if(alpha == 1.01f){
+        if(alpha >= 1.0f){
             original.call(instance, vertexConsumer, x, y, z, red, green, blue, u, v, light);
         }else{
             vertexConsumer.vertex(x, y, z)

@@ -103,17 +103,20 @@ public class Lucidity implements ModInitializer {
 		}
     }
 	private static void resolveSettings(){
-		if(MinecraftClient.getInstance().world == null) return;
+
 		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
 		resolveSelectedEntityTypesFromString(LucidityConfig.selectedEntityTypes);
 		resolveSelectedParticleTypesFromString(LucidityConfig.selectedParticleTypes);
-		parseSelectedBlocks();
+		if(MinecraftClient.getInstance().world != null){
+			parseSelectedBlocks();
+			if(blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
+				MinecraftClient.getInstance().player.
+						removeStatusEffect(StatusEffects.NIGHT_VISION);
+			resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
+		};
 		prepareImages();
-		resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
 		resolveSelectedWandFromString(LucidityConfig.wand);
-		if(blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
-			MinecraftClient.getInstance().player.
-					removeStatusEffect(StatusEffects.NIGHT_VISION);
+
 	}
 	public static void updateChunks(MinecraftClient client){
 		client.worldRenderer.reload();
