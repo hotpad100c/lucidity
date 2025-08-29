@@ -3,6 +3,7 @@ package mypals.ml.rendering.shapes;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -57,14 +58,22 @@ public class CubeShape {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawCubes(bufferBuilder, matrices, opaqueCubes, sizeAdd, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
             GlStateManager._enableDepthTest();
-            RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+            if(IrisApi.getInstance().isShaderPackInUse()){
+                RenderLayer.getDebugFilledBox().draw(bufferBuilder.end());
+            }else{
+                RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+            }
         }
 
         if (!seeThroughCubes.isEmpty()) {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-            drawCubes(bufferBuilder, matrices, seeThroughCubes, sizeAdd, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
+            drawCubes(bufferBuilder, matrices, seeThroughCubes, 0, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
             GlStateManager._disableDepthTest();
-            RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+            if(IrisApi.getInstance().isShaderPackInUse()){
+                RenderLayer.getDragonRays().draw(bufferBuilder.end());
+            }else{
+                RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+            }
             GlStateManager._enableDepthTest();
         }
 
@@ -99,41 +108,41 @@ public class CubeShape {
             boolean hasEast = cubePositions.contains(pos.east());
 
             if (!hasUp) {
-                bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
             }
 
             if (!hasDown) {
-                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
             }
 
             if (!hasWest) {
-                bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
             }
 
             if (!hasEast) {
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
             }
 
             if (!hasNorth) {
-                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
-                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
+                bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, cube.alpha);
             }
 
-            // 南表面
+
             if (!hasSouth) {
                 bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
                 bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, cube.alpha);
@@ -172,33 +181,43 @@ public class CubeShape {
         float green = ((color.getRGB() >> 8) & 0xFF) / 255.0f;
         float blue = (color.getRGB() & 0xFF) / 255.0f;
 
-        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
+
         bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, alpha);
-        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
+
+        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
+
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, alpha);
+
+        bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, minOffset).color(red, green, blue, alpha);
+        bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, minOffset).color(red, green, blue, alpha);
+
         bufferBuilder.vertex(modelViewMatrix, minOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, maxOffset, maxOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, maxOffset, minOffset, maxOffset).color(red, green, blue, alpha);
         bufferBuilder.vertex(modelViewMatrix, minOffset, minOffset, maxOffset).color(red, green, blue, alpha);
 
+
         if (seeThrough) GlStateManager._disableDepthTest();
-        RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+        if(IrisApi.getInstance().isShaderPackInUse()){
+            RenderLayer.getDragonRays().draw(bufferBuilder.end());
+        }else{
+            RenderLayer.getDebugQuads().draw(bufferBuilder.end());
+        }
         GlStateManager._enableDepthTest();
         GlStateManager._disableBlend();
         matrices.pop();

@@ -102,6 +102,7 @@ public class Lucidity implements ModInitializer {
 		}
     }
 	private static void resolveSettings(){
+		if(MinecraftClient.getInstance().world == null) return;
 		resolveSelectedBlockStatesFromString(LucidityConfig.selectedBlockTypes);
 		resolveSelectedEntityTypesFromString(LucidityConfig.selectedEntityTypes);
 		resolveSelectedParticleTypesFromString(LucidityConfig.selectedParticleTypes);

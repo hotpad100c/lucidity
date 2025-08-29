@@ -3,6 +3,7 @@ package mypals.ml.rendering.shapes;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -61,14 +62,22 @@ public class OnGroundMarker {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, opaqueMarkers, cameraPos, buffer);
             GlStateManager._enableDepthTest();
-            RenderLayer.getDebugQuads().draw(buffer.end());
+            if(IrisApi.getInstance().isShaderPackInUse()){
+                RenderLayer.getDragonRays().draw(buffer.end());
+            }else{
+                RenderLayer.getDebugQuads().draw(buffer.end());
+            }
         }
 
         if (!seeThroughMarkers.isEmpty()) {
             BufferBuilder buffer = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawMarkers(matrixStack, seeThroughMarkers, cameraPos, buffer);
             GlStateManager._disableDepthTest();
-            RenderLayer.getDebugQuads().draw(buffer.end());
+            if(IrisApi.getInstance().isShaderPackInUse()){
+                RenderLayer.getDragonRays().draw(buffer.end());
+            }else{
+                RenderLayer.getDebugQuads().draw(buffer.end());
+            }
             GlStateManager._enableDepthTest();
         }
 

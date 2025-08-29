@@ -1,11 +1,14 @@
 package mypals.ml.features.ImageRendering.configuration;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.features.ImageRendering.ITextureManagerMixin;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.ImageRenderer;
 import mypals.ml.features.ImageRendering.MediaTypeDetector;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -108,9 +111,9 @@ public class ImageConfigScreen extends Screen {
             }
 
             @Override
-            protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+            public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                 int index = 0;
-                // 调整鼠标Y坐标以考虑滚动
+
                 double adjustedMouseY = mouseY + this.getScrollY();
 
                 for (MediaEntry entry : ImageDataParser.images.values()) {
@@ -126,20 +129,11 @@ public class ImageConfigScreen extends Screen {
 
                     float ppb = pictureSize[0] / (float) PREVIEW_SCALE;
 
-                    try {
-                        ImageRenderer.renderPictureScreenSpace(context, requestIdentifier(entry),
-                                new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
-                                new Vec3d(0, 180, 180),
-                                new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
-                                ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+
 
                     boolean isMouseOver = mouseX >= x && mouseX <= x + boxWidth && adjustedMouseY >= y && adjustedMouseY <= y + boxHeight;
 
                     context.fill(x, y, x + boxWidth, y + boxHeight, entry.isSelected()? 0x19E0E0E0 : 0x19000000);
-
                     int borderColor = isMouseOver ? Color.WHITE.getRGB() : Color.GRAY.getRGB(); // 鼠标悬停时变黄
                     context.drawBorder(x, y, boxWidth, boxHeight, borderColor);
 
@@ -151,6 +145,15 @@ public class ImageConfigScreen extends Screen {
 
                     context.drawText(MinecraftClient.getInstance().textRenderer, "[ " + String.format("%.2f", blockScale.x) + ", " + String.format("%.2f", blockScale.y) + " ] Block(s)", x + 5, y+40, 0xFFFFFF, false);
 
+                    try {
+                        ImageRenderer.renderPictureScreenSpace(context, requestIdentifier(entry),
+                                new Vec3d(cx + (cx / 1.5) - 10, cy-5, 10),
+                                new Vec3d(0, 180, 180),
+                                new Vector2d(normalizedScale[0] * 9, normalizedScale[1] * 9),
+                                ppb, 15720000, OverlayTexture.DEFAULT_UV, (int) delta,true);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     index++;
                 }
@@ -376,17 +379,18 @@ public class ImageConfigScreen extends Screen {
     }
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        //renderBackground(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Scale"),this.width / 2 + 23, this.height / 2 + 30, 0xffffff);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Position"),this.width / 2 + 140, this.height / 2 + 15, 0xffffff);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Path"),this.width / 2 + 23, this.height - (this.height -30), 0xffffff);
-        context.drawCenteredTextWithShadow(textRenderer, Text.literal("Name"),this.width / 2 + 125, this.height - (this.height -30), 0xffffff);
 
+        //renderBackground(context, mouseX, mouseY, delta);
+        context.drawTextWithShadow(textRenderer, Text.literal("Scale"),this.width / 2 + 23, this.height / 2 + 30, 0xffffff);
+        context.drawTextWithShadow(textRenderer, Text.literal("Position"),this.width / 2 + 140, this.height / 2 + 15, 0xffffff);
+        context.drawTextWithShadow(textRenderer, Text.literal("Path"),this.width / 2 + 23, this.height - (this.height -30), 0xffffff);
+        context.drawTextWithShadow(textRenderer, Text.literal("Name"),this.width / 2 + 125, this.height - (this.height -30), 0xffffff);
+        super.render(context, mouseX, mouseY, delta);
 
     }
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY,float delta) {
+
         int cx = (this.width) / 2;
         int cy = (this.height) / 2;
         this.applyBlur(context);

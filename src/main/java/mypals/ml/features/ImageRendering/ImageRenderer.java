@@ -10,6 +10,8 @@ import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
+import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.api.v0.IrisProgram;
 import net.minecraft.client.MinecraftClient;
 
 import net.minecraft.client.gl.RenderPipelines;
@@ -40,6 +42,7 @@ public class ImageRenderer {
     private static final Function<Identifier, RenderLayer> IMAGE;
     public static final RenderPipeline GUI_TEXTURED_ALPHA;
     static {
+
         GUI_TEXTURED_ALPHA = RenderPipelines.register(RenderPipeline.builder(POSITION_TEX_COLOR_SNIPPET)
                 .withLocation("pipeline/gui_textured_alpha")
                 .withCull(false).build());
@@ -49,6 +52,7 @@ public class ImageRenderer {
                         false, GUI_TEXTURED_ALPHA,
                         RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture,
                                 false)).build(false)));
+        IrisApi.getInstance().assignPipeline(GUI_TEXTURED_ALPHA, IrisProgram.TEXTURED);
     }
     public static void renderPictureWorldSpace(MatrixStack matrixStack, Identifier textureId, Vec3d pos, Vec3d rotation, Vector2d scale, float pixelsPerBlock, int light, int overlay, float tickDelta, boolean disableDepthTest) throws IOException {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -150,8 +154,9 @@ public class ImageRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
-        context.drawTexture(GUI_TEXTURED_ALPHA, textureId, -centerX,-centerY, centerX, centerY,
-                centerX, centerY, centerX, centerY);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, textureId, -centerX+5,-centerY, centerX, centerY,
+                centerX, centerY, (int) textureWidth, (int) textureHeight);
+        context.drawText(MinecraftClient.getInstance().textRenderer, "1", centerX + 5, centerX + 5, 0xFFFFFF, false);
 
         buffer.vertex(matrix, -centerX, -centerY, 0.0f).color(255,255,255,255).texture(0.0f, 1.0f).light(light).overlay(overlay);
         buffer.vertex(matrix, centerX, -centerY, 0.0f).color(255,255,255,255).texture(1.0f, 1.0f).light(light).overlay(overlay);
@@ -254,7 +259,11 @@ public class ImageRenderer {
 
 
         GlStateManager._disableCull();
-        IMAGE.apply(textureId).draw(buffer.end());
+        if(IrisApi.getInstance().isShaderPackInUse()){
+            IMAGE.apply(textureId).draw(buffer.end());
+        }else{
+            IMAGE.apply(textureId).draw(buffer.end());
+        }
 
         GlStateManager._disableBlend();
         GlStateManager._enableDepthTest();

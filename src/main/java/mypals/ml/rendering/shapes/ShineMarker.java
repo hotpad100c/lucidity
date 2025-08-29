@@ -64,8 +64,6 @@ public class ShineMarker {
         float lastTickPosZ = (float) cameraPos.getZ();
 
 
-
-        //RenderLayer.setShader(ShaderProgramKeys.POSITION_COLOR);
         GlStateManager._enableBlend();
         GlStateManager._enableDepthTest();
         
@@ -77,7 +75,7 @@ public class ShineMarker {
             drawMarkers(matrixStack, opaqueMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
             GlStateManager._enableDepthTest();
             setShaderColor(client, false, color);
-            RenderLayer.getDebugQuads().draw(buffer.end());
+            RenderLayer.getDragonRays().draw(buffer.end());
         }
 
         if (!seeThroughMarkers.isEmpty()) {
@@ -85,7 +83,7 @@ public class ShineMarker {
             drawMarkers(matrixStack, seeThroughMarkers, time, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, buffer);
             GlStateManager._disableDepthTest();
             setShaderColor(client, true, color);
-            RenderLayer.getDebugQuads().draw(buffer.end());
+            RenderLayer.getDragonRays().draw(buffer.end());
             GlStateManager._enableDepthTest();
         }
 
