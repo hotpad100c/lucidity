@@ -3,6 +3,7 @@ package mypals.ml.rendering.shapes;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import mypals.ml.Lucidity;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -58,7 +59,7 @@ public class CubeShape {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawCubes(bufferBuilder, matrices, opaqueCubes, sizeAdd, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
             GlStateManager._enableDepthTest();
-            if(IrisApi.getInstance().isShaderPackInUse()){
+            if(Lucidity.shaderEnabled()){
                 RenderLayer.getDebugFilledBox().draw(bufferBuilder.end());
             }else{
                 RenderLayer.getDebugQuads().draw(bufferBuilder.end());
@@ -69,7 +70,7 @@ public class CubeShape {
             BufferBuilder bufferBuilder = Tessellator.getInstance().begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             drawCubes(bufferBuilder, matrices, seeThroughCubes, 0, tickDelta, cameraPos, lastTickPosX, lastTickPosY, lastTickPosZ, cubePositions);
             GlStateManager._disableDepthTest();
-            if(IrisApi.getInstance().isShaderPackInUse()){
+            if(Lucidity.shaderEnabled()){
                 RenderLayer.getDragonRays().draw(bufferBuilder.end());
             }else{
                 RenderLayer.getDebugQuads().draw(bufferBuilder.end());
@@ -213,7 +214,7 @@ public class CubeShape {
 
 
         if (seeThrough) GlStateManager._disableDepthTest();
-        if(IrisApi.getInstance().isShaderPackInUse()){
+        if(Lucidity.shaderEnabled()){
             RenderLayer.getDragonRays().draw(bufferBuilder.end());
         }else{
             RenderLayer.getDebugQuads().draw(bufferBuilder.end());

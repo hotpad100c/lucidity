@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import mypals.ml.Lucidity;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.irisshaders.iris.api.v0.IrisProgram;
@@ -259,7 +260,7 @@ public class ImageRenderer {
 
 
         GlStateManager._disableCull();
-        if(IrisApi.getInstance().isShaderPackInUse()){
+        if(Lucidity.shaderEnabled()){
             IMAGE.apply(textureId).draw(buffer.end());
         }else{
             IMAGE.apply(textureId).draw(buffer.end());

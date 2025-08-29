@@ -1,6 +1,7 @@
 package mypals.ml.rendering;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import mypals.ml.Lucidity;
 import mypals.ml.features.ImageRendering.ImageDataParser;
 import mypals.ml.features.ImageRendering.configuration.MediaEntry;
 import mypals.ml.features.selectiveRendering.AreaBox;
@@ -47,7 +48,7 @@ public class InformationRender {
 
     public static boolean isIrisShaderUsed(){
         if( FabricLoader.getInstance().isModLoaded("iris")) {
-            return IrisApi.getInstance() != null && IrisApi.getInstance().isShaderPackInUse();
+            return IrisApi.getInstance() != null && Lucidity.shaderEnabled();
         }
         return false;
     }

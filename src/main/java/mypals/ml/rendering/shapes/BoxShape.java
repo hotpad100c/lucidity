@@ -3,6 +3,7 @@ package mypals.ml.rendering.shapes;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import mypals.ml.Lucidity;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
@@ -108,7 +109,7 @@ public class BoxShape{
             GlStateManager._disableCull();
 
             //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            if(IrisApi.getInstance().isShaderPackInUse()){
+            if(Lucidity.shaderEnabled()){
                 RenderLayer.getDragonRays().draw(buffer.end());
             }else{
                 RenderLayer.getDebugQuads().draw(buffer.end());

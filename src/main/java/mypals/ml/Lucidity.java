@@ -34,6 +34,7 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.BlockRenderLayer;
@@ -221,6 +222,9 @@ public class Lucidity implements ModInitializer {
 		if(renderMobChaseRange || renderMobEyeLineConnection){
 			MobFollowRangeScanner.onClientTick(scanRadius);
 		}
+	}
+	public static boolean shaderEnabled() {
+		return FabricLoader.getInstance().isModLoaded("iris") && IrisApi.getInstance().isShaderPackInUse();
 	}
 	private static void resolveEnviroment(MinecraftClient client){
 		ClientWorld world = client.world;
