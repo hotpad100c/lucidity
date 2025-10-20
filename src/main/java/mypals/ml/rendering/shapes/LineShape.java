@@ -77,7 +77,7 @@ public class LineShape {
                 matrixStack.pop();
             }
 
-            RenderSystem.enableDepthTest(); // 确保深度测试启用
+            RenderSystem.enableDepthTest();
             BufferRenderer.drawWithGlobalProgram(buffer.end());
         }
 
@@ -109,12 +109,12 @@ public class LineShape {
                 matrixStack.pop();
             }
 
-            RenderSystem.disableDepthTest(); // 禁用深度测试
+            RenderSystem.disableDepthTest(); 
             BufferRenderer.drawWithGlobalProgram(buffer.end());
-            RenderSystem.enableDepthTest(); // 恢复深度测试
+            RenderSystem.enableDepthTest(); 
         }
 
-        // 清理渲染状态
+        
         RenderSystem.disableBlend();
         matrixStack.pop();
     }
