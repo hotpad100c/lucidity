@@ -82,7 +82,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             int comparatorOutput = totalFullness > 0 ? (int) Math.floor(1 + averageFullness * 14) : 0;
 
             String outputText = "(C: " + comparatorOutput + ")";
-            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, 4210752, false);
+            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, -12566464, false);
         } else if(this.handler instanceof CrafterScreenHandler crafterScreenHandler){
             int affectSlots = 0;
             for (Slot slot : crafterScreenHandler.slots) {
@@ -94,7 +94,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 }
             }
             String outputText = "(C: " + affectSlots + ")";
-            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, 4210752, false);
+            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, -12566464, false);
 
         }else if(this.handler instanceof LecternScreenHandler lecternScreenHandler){
             int currentPage = lecternScreenHandler.getPage();
@@ -102,11 +102,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             float f = pageCount > 1 ? (float)currentPage / ((float)pageCount - 1.0F) : 1.0F;
             int result = MathHelper.floor(f * 14.0F) + 1;
             String outputText = "(C: " + result + ")";
-            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, 4210752, false);
+            context.drawText(this.textRenderer, this.title.getString() + outputText, this.titleX, this.titleY, -12566464, false);
         }else {
-            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 4210752, false);
+            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, -12566464, false);
         }
-        context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, 4210752, false);
+        context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, -12566464, false);
     }
     private static int getPageCount(ItemStack stack) {
         WrittenBookContentComponent writtenBookContentComponent = stack.get(DataComponentTypes.WRITTEN_BOOK_CONTENT);
