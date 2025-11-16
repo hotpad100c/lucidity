@@ -93,7 +93,9 @@ public class Lucidity implements ModInitializer {
 		if(!enableWorldEaterHelper) {
 			OreResolver.recordedOres.clear();
 		}else{
-			iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
+			if(MinecraftClient.getInstance().player!=null){
+				iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
+			}
 		}
 		try {
 			updateConfig();
@@ -303,7 +305,7 @@ public class Lucidity implements ModInitializer {
 				start,
 				end,
 				box,
-				entity -> entity != player, // 忽略玩家自身
+				entity -> entity != player,
 				0.5F
 		);
 
@@ -322,10 +324,9 @@ public class Lucidity implements ModInitializer {
 		Entity closestEntity = null;
 
 		for (Entity target : world.getOtherEntities(entity, box, predicate)) {
-			// 扩展包围盒
 			Box expandedBox = target.getBoundingBox().expand(margin);
 
-			// 检测射线与包围盒的交点
+	
 			Optional<Vec3d> hitPos = expandedBox.raycast(min, max);
 			if (hitPos.isPresent()) {
 				double distance = min.squaredDistanceTo(hitPos.get());
@@ -336,7 +337,6 @@ public class Lucidity implements ModInitializer {
 			}
 		}
 
-		// 返回最近的命中实体结果
 		return closestEntity == null ? null : new EntityHitResult(closestEntity);
 	}
 
