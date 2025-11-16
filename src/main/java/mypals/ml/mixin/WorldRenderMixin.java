@@ -31,21 +31,6 @@ public class WorldRenderMixin {
 	)private void render(CallbackInfo ci,
 						 @Local MatrixStack stack
 	) {
-		InformationRender.render(new MatrixStack(), new RenderTickCounter() {
-			@Override
-			public float getLastFrameDuration() {
-				return 0;
-			}
-
-			@Override
-			public float getTickDelta(boolean ignoreFreeze) {
-				return 0;
-			}
-
-			@Override
-			public float getLastDuration() {
-				return 0;
-			}
-		});
+		InformationRender.render(new MatrixStack(), MinecraftClient.getInstance().getRenderTickCounter());
 	}
 }

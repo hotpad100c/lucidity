@@ -103,30 +103,33 @@ public class ExplosionInformationManager {
             }
             for (ExplosionCastLine l : explosionCastedLines) {
                 int color = l.getLineColor();
-                for (CastPoint p : l.getPoints()) {
+                for (int i = 0;i<l.getPoints().size()-1;i++) {
+                    CastPoint p = l.getPoints().get(i);
+                    CastPoint p_last = l.getPoints().get(Math.max(i - 1, 0));
                     if(LucidityConfig.EnableAlpha)
                         color = mapAlpha(color, l.getOrgBlastStrength(), p.getStrength());
+                    Color c = new Color(color, true);
                     if(p.getStrength() > 0 && !(MinecraftClient.getInstance().world.getBlockState(BlockPos.ofFloored(p.getPosition())).getBlock() instanceof AirBlock))
                         InformationRender.addText(new TextShape(
                                 new ArrayList<>(Collections.singletonList(BlockDetectionRayIcon)),
                                 p.getPosition(),
                                 LucidityConfig.BlockDetectionRayIconSize,
-                                new ArrayList<>(List.of(new Color(color))),
+                                new ArrayList<>(List.of(c)),
                                 1,
                                 LucidityConfig.BlockDetectionRaySeeThrow
                         ));
                 }
                 if(!l.getPoints().isEmpty())
-                    InformationRender.addLine(new LineShape(l.getPoints().getFirst().getPosition(), l.getPoints().getLast().getPosition(),new Color(color),0.2f, BlockDetectionRaySeeThrow));
+                    InformationRender.addLine(new LineShape(l.getPoints().getFirst().getPosition(),
+                            l.getPoints().getLast().getPosition(),new Color(color),LucidityConfig.EnableAlpha ?0.2f:1f, BlockDetectionRaySeeThrow));
             }
             for (Vec3d p : explotionCenters) {
-                int orangeColor = 16753920;
-                String s = "\uD83D\uDCA5";
+                String s = "⦿";
                 InformationRender.addText(new TextShape(
                         new ArrayList<>(List.of(s)),
                         p,
                         0.045F,
-                        new ArrayList<>(List.of(new Color(orangeColor))),
+                        new ArrayList<>(List.of(LucidityConfig.Single_Color)),
                         1,
                         true
                 ));
@@ -147,7 +150,7 @@ public class ExplosionInformationManager {
                                         1,
                                                 LucidityConfig.EntitySamplePointSeeThrow
                                 ));
-                                InformationRender.addLine(new LineShape(org, r.point_hit,LucidityConfig.EntitySamplePoion_Safe_IconColor,0.2f,LucidityConfig.EntitySamplePointSeeThrow));
+                                InformationRender.addLine(new LineShape(org, r.point_hit,LucidityConfig.EntitySamplePoion_Safe_IconColor,0.5f,LucidityConfig.EntitySamplePointSeeThrow));
 
                             }
                             else {
@@ -193,14 +196,12 @@ public class ExplosionInformationManager {
         return rgba;
     }
     public static int mapAlpha(int rgb, double max, double v) {
-        // 防止 v 超出范围，确保 v 在 0 到 max 之间
+
         v = Math.max(0, Math.min(v, max));
 
-        // 计算 alpha 值，将 v 映射到 [0, 255] 的范围
         int alpha = (int) ((v / (float) max) * 255);
 
         int rgba = (alpha << 24) | (rgb & 0xFFFFFF);
-        // 返回新的 Color 对象，保持原来的 RGB 值，但使用新的 alpha
         return rgba;
     }
     public static Color invertColor(Color color) {

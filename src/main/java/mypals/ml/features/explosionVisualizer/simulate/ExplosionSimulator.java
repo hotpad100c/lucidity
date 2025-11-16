@@ -177,7 +177,7 @@ public class ExplosionSimulator {
         dy /= distance;
         dz /= distance;
 
-        float initialBlastStrength = this.power * (0.7F + this.world.random.nextFloat() * 0.6F);
+        float initialBlastStrength = this.power * (0.7F + /*this.world.random.nextFloat()*/0.5F * 0.6F);
         double currentX = this.x;
         double currentY = this.y;
         double currentZ = this.z;
@@ -283,10 +283,8 @@ public class ExplosionSimulator {
     }
 
     public float calculateDamage(Vec3d pos, float power, Entity entity,SamplePointData sampleData) {
-        // 获取爆炸威力，并乘以一个常数因子
         float explosionPower = power * 2.0F;
 
-        // 获取爆炸的位置
         Vec3d explosionPosition = pos;
 
         double normalizedDistance = Math.sqrt(entity.squaredDistanceTo(explosionPosition)) / (double) explosionPower;

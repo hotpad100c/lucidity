@@ -22,6 +22,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkMixin",
     "ClientWorldMixin",
+    "FogRendererMixin",
     "HandledScreenMixin",
     "KeyboardMixin",
     "LightmapTextureManagerMixin",

@@ -1,8 +1,10 @@
 package mypals.ml.features.explosionVisualizer;
 
 import mypals.ml.features.explosionVisualizer.explotionAffectdDataManage.ExplosionData;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.enums.BedPart;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.boss.WitherEntity;
@@ -18,6 +20,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.minecraft.block.BedBlock.PART;
 import static net.minecraft.block.RespawnAnchorBlock.CHARGES;
 
 public class ExplosiveObjectFinder {
@@ -41,9 +44,8 @@ public class ExplosiveObjectFinder {
 
                         }
 
-                        if (bs.isIn(BlockTags.BEDS) && !world.getDimension().bedWorks()) {
+                        if (bs.getBlock() instanceof BedBlock block && bs.get(PART) == BedPart.HEAD && !world.getDimension().bedWorks()) {
                             explosiveBlocks.add(new ExplosionData(null, Vec3d.of(bpos), 5.0f));
-
                         }
 
                     }

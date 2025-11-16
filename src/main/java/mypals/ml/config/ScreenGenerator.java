@@ -61,7 +61,6 @@ public class ScreenGenerator {
                                         .binding(
                                                 new ArrayList<>(),
                                                 () -> {
-                                                    // 返回配置值，确保非空
                                                     if (LucidityConfig.selectedEntityTypes == null) {
                                                         LucidityConfig.selectedEntityTypes = new ArrayList<>();
                                                     }

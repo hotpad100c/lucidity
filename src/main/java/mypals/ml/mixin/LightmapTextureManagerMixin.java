@@ -14,12 +14,12 @@ import static mypals.ml.features.selectiveRendering.SelectiveRenderingManager.bl
 
 @Mixin(value = LightmapTextureManager.class)
 public class LightmapTextureManagerMixin {
-    @Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;getGamma()Lnet/minecraft/client/option/SimpleOption;", opcode = Opcodes.INVOKEVIRTUAL), method = "update(F)V")
+    /*@Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/GameOptions;getGamma()Lnet/minecraft/client/option/SimpleOption;", opcode = Opcodes.INVOKEVIRTUAL), method = "update(F)V")
     private SimpleOption<Double> getFieldValue(GameOptions options) {
         if (!blockRenderMode.equals(SelectiveRenderingManager.RenderMode.OFF)) {
             return Lucidity.GAMMA_BYPASS;
         } else {
             return options.getGamma();
         }
-    }
+    }*/
 }

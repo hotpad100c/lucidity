@@ -1,5 +1,6 @@
 package mypals.ml.features.mobFollowRange;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import mypals.ml.config.LucidityConfig;
 import mypals.ml.rendering.InformationRender;
 import mypals.ml.rendering.shapes.LineShape;
@@ -77,19 +78,24 @@ public class MobFollowRangeScanner {
 
                 for (LivingEntity target : potentialTargets) {
                     HitResult hitResult = canSeeTarget(mob, target);
+                    float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+                    Vec3d mobEyePos = mob.getLerpedPos(delta).add(0,mob.getEyeHeight(mob.getPose()),0);
                     if(mob.distanceTo(target) < followRange){
                         if(target == player){
                             Vec3d targetPos = getTargetPosition(player);
+
+
+
                             if (hitResult.getType() == HitResult.Type.MISS) {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), targetPos, Color.GREEN, 1f, true));
+                                InformationRender.addLine(new LineShape(mobEyePos, targetPos, Color.GREEN, 1f, true));
                             }else {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.RED, 1, true));
+                                InformationRender.addLine(new LineShape(mobEyePos, hitResult.getPos(), Color.RED, 1, true));
                             }
                         }else {
                             if (mob != target && hitResult.getType() == HitResult.Type.MISS) {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), target.getEyePos(), Color.GREEN, 1, true));
+                                InformationRender.addLine(new LineShape(mobEyePos, target.getEyePos(), Color.GREEN, 1, true));
                             } else {
-                                InformationRender.addLine(new LineShape(mob.getEyePos(), hitResult.getPos(), Color.RED, 1, true));
+                                InformationRender.addLine(new LineShape(mobEyePos, hitResult.getPos(), Color.RED, 1, true));
                             }
                         }
                     }
@@ -102,11 +108,14 @@ public class MobFollowRangeScanner {
     }
     private static Vec3d getTargetPosition(PlayerEntity player) {
         MinecraftClient client = MinecraftClient.getInstance();
+        float delta = MinecraftClient.getInstance().getRenderTickCounter().getTickDelta(false);
+        Vec3d eyePos = player.getLerpedPos(delta).add(0,player.getEyeHeight(player.getPose()),0);
+
         if (client.options.getPerspective().isFirstPerson()) {
             Vec3d viewDirection = player.getRotationVec(1.0F);
-            return player.getEyePos().add(viewDirection.multiply(0.5));
+            return eyePos.add(viewDirection.multiply(0.5));
         }
-        return player.getEyePos();
+        return eyePos;
     }
     public static HitResult canSeeTarget(LivingEntity mob, LivingEntity target) {
         Vec3d mobEyes = mob.getEyePos();
@@ -119,12 +128,7 @@ public class MobFollowRangeScanner {
                 mob));
     }
     private static double getFollowRangeEstimate(MobEntity mob) {
-        double followRange = mob.getAttributeValue(EntityAttributes.FOLLOW_RANGE);
-        if (followRange <= 0) {
-            if (mob.getType().toString().contains("dragon")) return 128.0;
-            return 0;
-        }
-        return followRange;
+        return mob.getAttributeValue(EntityAttributes.FOLLOW_RANGE);
     }
 
     private static List<BlockPos> getCircleBlocks(BlockPos center, double radius) {

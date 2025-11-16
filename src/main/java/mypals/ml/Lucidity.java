@@ -95,7 +95,8 @@ public class Lucidity implements ModInitializer {
 		if(!enableWorldEaterHelper) {
 			OreResolver.recordedOres.clear();
 		}else{
-			iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
+			if(client.player != null && client.world != null)
+				iterateBlocksWithinDistance(client.player.getBlockPos(), oreHighlightRange);
 		}
 		try {
 			updateConfig();
@@ -113,8 +114,7 @@ public class Lucidity implements ModInitializer {
 		resolveSelectedAreasFromString(LucidityConfig.selectedAreasSaved);
 		resolveSelectedWandFromString(LucidityConfig.wand);
 		if(blockRenderMode.equals(RenderMode.OFF) && MinecraftClient.getInstance().player!=null)
-			MinecraftClient.getInstance().player.
-					removeStatusEffect(StatusEffects.NIGHT_VISION);
+			MinecraftClient.getInstance().player.removeStatusEffect(StatusEffects.NIGHT_VISION);
 	}
 	public static void updateChunks(MinecraftClient client){
 		client.worldRenderer.reload();
