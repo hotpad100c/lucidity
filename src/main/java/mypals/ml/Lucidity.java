@@ -92,7 +92,8 @@ public class Lucidity implements ModInitializer {
 		if(!enableWorldEaterHelper) {
 			OreResolver.recordedOres.clear();
 		}else{
-			iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
+			if(MinecraftClient.getInstance().player != null)
+				iterateBlocksWithinDistance(MinecraftClient.getInstance().player.getBlockPos(), oreHighlightRange);
 		}
 		try {
 			updateConfig();
